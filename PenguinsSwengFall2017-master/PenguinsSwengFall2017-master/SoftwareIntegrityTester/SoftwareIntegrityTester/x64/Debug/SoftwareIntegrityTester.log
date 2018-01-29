@@ -1,0 +1,42 @@
+﻿  AdaSource.cpp
+  FilterSettings.cpp
+c:\users\ty\desktop\11..29\penguinsswengfall2017-master\penguinsswengfall2017-master\softwareintegritytester\softwareintegritytester\FilterSettings.h(31): warning C4677: 'FilterSettings': signature of non-private member contains assembly private type 'Weakness'
+  c:\users\ty\desktop\11..29\penguinsswengfall2017-master\penguinsswengfall2017-master\softwareintegritytester\softwareintegritytester\Weakness.h(5): note: see declaration of 'Weakness'
+  MainForm.cpp
+c:\users\ty\desktop\11..29\penguinsswengfall2017-master\penguinsswengfall2017-master\softwareintegritytester\softwareintegritytester\FilterSettings.h(31): warning C4677: 'FilterSettings': signature of non-private member contains assembly private type 'Weakness'
+  c:\users\ty\desktop\11..29\penguinsswengfall2017-master\penguinsswengfall2017-master\softwareintegritytester\softwareintegritytester\Weakness.h(5): note: see declaration of 'Weakness'
+c:\users\ty\desktop\11..29\penguinsswengfall2017-master\penguinsswengfall2017-master\softwareintegritytester\softwareintegritytester\MainForm.h(341): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+c:\users\ty\desktop\11..29\penguinsswengfall2017-master\penguinsswengfall2017-master\softwareintegritytester\softwareintegritytester\MainForm.h(349): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+c:\users\ty\desktop\11..29\penguinsswengfall2017-master\penguinsswengfall2017-master\softwareintegritytester\softwareintegritytester\MainForm.h(360): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
+c:\users\ty\desktop\11..29\penguinsswengfall2017-master\penguinsswengfall2017-master\softwareintegritytester\softwareintegritytester\MainForm.h(399): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+c:\users\ty\desktop\11..29\penguinsswengfall2017-master\penguinsswengfall2017-master\softwareintegritytester\softwareintegritytester\MainForm.h(454): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+c:\users\ty\desktop\11..29\penguinsswengfall2017-master\penguinsswengfall2017-master\softwareintegritytester\softwareintegritytester\MainForm.h(461): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+c:\users\ty\desktop\11..29\penguinsswengfall2017-master\penguinsswengfall2017-master\softwareintegritytester\softwareintegritytester\MainForm.h(470): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
+c:\users\ty\desktop\11..29\penguinsswengfall2017-master\penguinsswengfall2017-master\softwareintegritytester\softwareintegritytester\MainForm.h(474): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+c:\users\ty\desktop\11..29\penguinsswengfall2017-master\penguinsswengfall2017-master\softwareintegritytester\softwareintegritytester\MainForm.h(483): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
+c:\users\ty\desktop\11..29\penguinsswengfall2017-master\penguinsswengfall2017-master\softwareintegritytester\softwareintegritytester\MainForm.h(487): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+c:\users\ty\desktop\11..29\penguinsswengfall2017-master\penguinsswengfall2017-master\softwareintegritytester\softwareintegritytester\MainForm.h(496): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
+c:\users\ty\desktop\11..29\penguinsswengfall2017-master\penguinsswengfall2017-master\softwareintegritytester\softwareintegritytester\MainForm.h(504): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
+c:\users\ty\desktop\11..29\penguinsswengfall2017-master\penguinsswengfall2017-master\softwareintegritytester\softwareintegritytester\MainForm.h(513): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
+c:\users\ty\desktop\11..29\penguinsswengfall2017-master\penguinsswengfall2017-master\softwareintegritytester\softwareintegritytester\MainForm.h(520): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+c:\users\ty\desktop\11..29\penguinsswengfall2017-master\penguinsswengfall2017-master\softwareintegritytester\softwareintegritytester\MainForm.h(529): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
+c:\users\ty\desktop\11..29\penguinsswengfall2017-master\penguinsswengfall2017-master\softwareintegritytester\softwareintegritytester\MainForm.h(533): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+c:\users\ty\desktop\11..29\penguinsswengfall2017-master\penguinsswengfall2017-master\softwareintegritytester\softwareintegritytester\MainForm.h(542): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
+c:\users\ty\desktop\11..29\penguinsswengfall2017-master\penguinsswengfall2017-master\softwareintegritytester\softwareintegritytester\MainForm.h(546): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+c:\users\ty\desktop\11..29\penguinsswengfall2017-master\penguinsswengfall2017-master\softwareintegritytester\softwareintegritytester\MainForm.h(555): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
+c:\users\ty\desktop\11..29\penguinsswengfall2017-master\penguinsswengfall2017-master\softwareintegritytester\softwareintegritytester\MainForm.h(563): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
+c:\users\ty\desktop\11..29\penguinsswengfall2017-master\penguinsswengfall2017-master\softwareintegritytester\softwareintegritytester\MainForm.h(592): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+c:\users\ty\desktop\11..29\penguinsswengfall2017-master\penguinsswengfall2017-master\softwareintegritytester\softwareintegritytester\MainForm.h(598): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+c:\users\ty\desktop\11..29\penguinsswengfall2017-master\penguinsswengfall2017-master\softwareintegritytester\softwareintegritytester\MainForm.h(605): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
+c:\users\ty\desktop\11..29\penguinsswengfall2017-master\penguinsswengfall2017-master\softwareintegritytester\softwareintegritytester\MainForm.h(612): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+c:\users\ty\desktop\11..29\penguinsswengfall2017-master\penguinsswengfall2017-master\softwareintegritytester\softwareintegritytester\MainForm.h(616): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+c:\users\ty\desktop\11..29\penguinsswengfall2017-master\penguinsswengfall2017-master\softwareintegritytester\softwareintegritytester\MainForm.h(625): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
+c:\users\ty\desktop\11..29\penguinsswengfall2017-master\penguinsswengfall2017-master\softwareintegritytester\softwareintegritytester\MainForm.h(635): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+c:\users\ty\desktop\11..29\penguinsswengfall2017-master\penguinsswengfall2017-master\softwareintegritytester\softwareintegritytester\MainForm.h(638): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
+c:\users\ty\desktop\11..29\penguinsswengfall2017-master\penguinsswengfall2017-master\softwareintegritytester\softwareintegritytester\MainForm.h(641): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
+  UserSettings.cpp
+  Variable.cpp
+  Weakness.cpp
+  Generating Code...
+  .NETFramework,Version=v4.6.1.AssemblyAttributes.cpp
+  SoftwareIntegrityTester.vcxproj -> C:\Users\Ty\Desktop\11..29\PenguinsSwengFall2017-master\PenguinsSwengFall2017-master\SoftwareIntegrityTester\x64\Debug\SoftwareIntegrityTester.exe

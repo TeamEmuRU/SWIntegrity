@@ -1,0 +1,5 @@
+﻿  MainForm.cpp
+c:\users\joe dementri\downloads\penguinsswengfall2017-master\penguinsswengfall2017-master\softwareintegritytester\softwareintegritytester\FilterSettings.h(31): warning C4677: 'FilterSettings': signature of non-private member contains assembly private type 'Weakness'
+  c:\users\joe dementri\downloads\penguinsswengfall2017-master\penguinsswengfall2017-master\softwareintegritytester\softwareintegritytester\Weakness.h(5): note: see declaration of 'Weakness'
+c:\users\joe dementri\downloads\penguinsswengfall2017-master\penguinsswengfall2017-master\softwareintegritytester\softwareintegritytester\MainForm.h(20): warning C4067: unexpected tokens following preprocessor directive - expected a newline
+  SoftwareIntegrityTester.vcxproj -> C:\Users\Joe Dementri\Downloads\PenguinsSwengFall2017-master\PenguinsSwengFall2017-master\SoftwareIntegrityTester\x64\Debug\SoftwareIntegrityTester.exe

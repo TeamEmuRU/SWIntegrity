@@ -1,0 +1,46 @@
+  SoftwareIntegrityTester.FilterSettings.resources - Embedded, ContainedInManifestFile, 
+  SoftwareIntegrityTester.MainForm.resources - Embedded, ContainedInManifestFile, 
+  SoftwareIntegrityTester.UserSettings.resources - Embedded, ContainedInManifestFile, 
+ImageRuntimeVersion: v4.0.30319
+Assembly SoftwareIntegrityTester, Version=0.0.*, Culture=Invariant Language (Invariant Country): 
+	hash=SHA1, flags=PublicKey
+Assembly mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089: 
+	hash=None, flags=None
+Assembly System.Data, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089: 
+	hash=None, flags=None
+Assembly System, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089: 
+	hash=None, flags=None
+Assembly System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a: 
+	hash=None, flags=None
+Assembly System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089: 
+	hash=None, flags=None
+Assembly System.Xml, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089: 
+	hash=None, flags=None
+Class SoftwareIntegrityTester.FilterSettings: AutoLayout, AnsiClass, Class, Public, BeforeFieldInit
+  :System.Windows.Forms.Form
+    Void .ctor(System.Collections.Generic.List`1[Weakness]): PrivateScope, Public, HideBySig, SpecialName, RTSpecialName
+  Fields:
+    System.Collections.Generic.List`1[System.Object] checkedList : Public, Static
+Class SoftwareIntegrityTester.UserSettings: AutoLayout, AnsiClass, Class, Public, BeforeFieldInit
+  :System.Windows.Forms.Form
+    Void .ctor(): PrivateScope, Public, HideBySig, SpecialName, RTSpecialName
+  Fields:
+    System.String path : Public, Static
+  Properties:
+    Boolean useFullFilePath 'get ' : 
+  Methods:
+    get_useFullFilePath(): PrivateScope, Public, HideBySig, SpecialName
+    getPath(): PrivateScope, Public, HideBySig
+    setPath(String): PrivateScope, Public, HideBySig
+Class SoftwareIntegrityTester.MainForm: AutoLayout, AnsiClass, Class, Public, BeforeFieldInit
+  :System.Windows.Forms.Form
+    Void .ctor(): PrivateScope, Public, HideBySig, SpecialName, RTSpecialName
+  Fields:
+    Boolean isDisplayPathChecked : Public
+  Methods:
+    checkForWeakness1(StreamWriter): PrivateScope, Public, HideBySig
+    checkForWeakness2(StreamWriter): PrivateScope, Public, HideBySig
+    checkForWeakness3(StreamWriter): PrivateScope, Public, HideBySig
+    checkForWeakness4(StreamWriter): PrivateScope, Public, HideBySig
+    checkForWeakness5(StreamWriter): PrivateScope, Public, HideBySig
+    checkForWeakness6(StreamWriter): PrivateScope, Public, HideBySig
