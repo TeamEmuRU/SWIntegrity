@@ -36,9 +36,12 @@ public class Reader {
 			input.notify("Files found: Java: "+javaFiles.size()+" Ada: "+adaFiles.size()+" c++: "+cppFiles.size()+" other: "+otherFiles.size());
 		else 
 			System.out.println("Files found: Java: "+javaFiles.size()+" Ada: "+adaFiles.size()+" c++: "+cppFiles.size()+" other: "+otherFiles.size());
-		openJava();
-		openAda();
-		openCpp();
+		if(javaFiles.size()>0)
+			openJava();
+		if(adaFiles.size()>0)
+			openAda();
+		if(cppFiles.size()>0)
+			openCpp();
 		//TODO special case for other
 
 
@@ -53,7 +56,7 @@ public class Reader {
 			System.out.println(file); //for demonstartion purposes
 			//TODO analyze
 		}
-		System.out.println("all files read");
+		System.out.println("all java files read");
 	}
 	public void openAda() {
 		for(String s:adaFiles) {
@@ -61,7 +64,7 @@ public class Reader {
 			System.out.println(file);//for demonstartion purposes
 			//TODO analyze
 		}
-		System.out.println("all files read");
+		System.out.println("all ada files read");
 	}
 	public void openCpp() {
 		for(String s:cppFiles) {
@@ -69,7 +72,7 @@ public class Reader {
 			System.out.println(file);//for demonstartion purposes
 			//TODO analyze
 		}
-		System.out.println("all files read");
+		System.out.println("all c++ files read");
 	}
 
 	private String openFile(String fileName) {

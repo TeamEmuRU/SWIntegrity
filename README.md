@@ -6,6 +6,7 @@ Abby Beizer - Development Team<br/>
 INSTALATION<br/>
 install java<br/>
 C:\>set CLASSPATH=bin_directory<br/>
+in evniroment variables set the CLASSPATH to the directory when the SWint class file is stored
 RUN<br/>
 java SWint <options>
 
