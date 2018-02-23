@@ -36,11 +36,14 @@ public class Reader {
 			input.notify("Files found: Java: "+javaFiles.size()+" Ada: "+adaFiles.size()+" c++: "+cppFiles.size()+" other: "+otherFiles.size());
 		else 
 			System.out.println("Files found: Java: "+javaFiles.size()+" Ada: "+adaFiles.size()+" c++: "+cppFiles.size()+" other: "+otherFiles.size());
+		openJava();
+		openAda();
+		openCpp();
+		//TODO special case for other
 
 
 
-
-		//TODO analyze each file
+		
 
 
 	}
@@ -48,7 +51,7 @@ public class Reader {
 		for(String s:javaFiles) {
 			String file=openFile(s);
 			System.out.println(file); //for demonstartion purposes
-			//analyze
+			//TODO analyze
 		}
 		System.out.println("all files read");
 	}
@@ -56,7 +59,7 @@ public class Reader {
 		for(String s:adaFiles) {
 			String file=openFile(s);
 			System.out.println(file);//for demonstartion purposes
-			//analyze
+			//TODO analyze
 		}
 		System.out.println("all files read");
 	}
@@ -64,13 +67,12 @@ public class Reader {
 		for(String s:cppFiles) {
 			String file=openFile(s);
 			System.out.println(file);//for demonstartion purposes
-			//analyze
+			//TODO analyze
 		}
 		System.out.println("all files read");
 	}
 
 	private String openFile(String fileName) {
-		// TODO Auto-generated method stub
 		try {
 			fr = new FileReader(fileName);
 			br = new BufferedReader(fr);
@@ -118,7 +120,6 @@ public class Reader {
 		//sorts file for analysis
 		read(files);
 	}
-	//type defined as -j,-a,or -c
 	//sorts all files into seperate types based on their extensions
 	public void sortByType(List<String> filenames) {
 		for (String s:filenames){

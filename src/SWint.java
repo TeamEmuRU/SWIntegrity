@@ -10,7 +10,6 @@ public class SWint {
 	}
 
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
 		Reader r=new Reader();
 		if(args.length>0) {
 			//open current directory and view files
