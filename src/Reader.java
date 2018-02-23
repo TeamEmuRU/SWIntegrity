@@ -35,7 +35,7 @@ public class Reader {
 		if(input!=null)
 			input.notify("Files found: Java: "+javaFiles.size()+" Ada: "+adaFiles.size()+" c++: "+cppFiles.size()+" other: "+otherFiles.size());
 		else 
-			System.out.println("Files found: Java: "+javaFiles.size()+" Ada: "+adaFiles.size()+" c++: "+cppFiles.size()+" other: "+otherFiles.size());
+			SWint.notifyUser("Files found: Java: "+javaFiles.size()+" Ada: "+adaFiles.size()+" c++: "+cppFiles.size()+" other: "+otherFiles.size());
 		if(javaFiles.size()>0)
 			openJava();
 		if(adaFiles.size()>0)
@@ -53,7 +53,7 @@ public class Reader {
 	public void openJava() {
 		for(String s:javaFiles) {
 			String file=openFile(s);
-			System.out.println(file); //for demonstartion purposes
+			SWint.notifyUser(file); //for demonstartion purposes
 			//TODO analyze
 		}
 		System.out.println("all java files read");
@@ -61,10 +61,10 @@ public class Reader {
 	public void openAda() {
 		for(String s:adaFiles) {
 			String file=openFile(s);
-			System.out.println(file);//for demonstartion purposes
+			SWint.notifyUser(file);//for demonstartion purposes
 			//TODO analyze
 		}
-		System.out.println("all ada files read");
+		SWint.notifyUser("all ada files read");
 	}
 	public void openCpp() {
 		for(String s:cppFiles) {
@@ -72,7 +72,7 @@ public class Reader {
 			System.out.println(file);//for demonstartion purposes
 			//TODO analyze
 		}
-		System.out.println("all c++ files read");
+		SWint.notifyUser("all c++ files read");
 	}
 
 	private String openFile(String fileName) {
@@ -89,7 +89,7 @@ public class Reader {
 
 		}
 		catch(FileNotFoundException e) {
-			System.out.println("File not Found.");
+			SWint.notifyUser("File not Found.");
 			return null;
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -107,7 +107,7 @@ public class Reader {
 			return true;
 		}
 		catch(Exception e) {
-			System.out.println("File not found.");
+			SWint.notifyUser("File not found.");
 			return false;
 		}
 
@@ -134,7 +134,7 @@ public class Reader {
 				else if((temp[1].equals("cpp"))) {
 					cppFiles.add(s);
 				}
-				else if((temp[1].equals("adb"))) {
+				else if((temp[1].equals("adb"))||(temp[1].equals("ada"))) {
 					adaFiles.add(s);
 				}
 				else {

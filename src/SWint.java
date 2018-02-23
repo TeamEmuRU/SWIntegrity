@@ -49,6 +49,11 @@ public class SWint {
 			//input.run();
 			System.out.println("Invalid Input.");
 		}
+		
+	}
+	//TODO create method that allows us to notify the user, link all printlines to this
+	public static void notifyUser(String message) {
+		System.out.println(message);
 	}
 
 }
