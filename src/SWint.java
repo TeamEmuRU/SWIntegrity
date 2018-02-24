@@ -55,6 +55,10 @@ public class SWint {
 			//my baby
 			//input=new Input();
 			//input.run();
+			//default is to check all
+			r.openCpp();
+			r.openAda();
+			r.openJava();
 			System.out.println("Invalid Input.");
 		}
 		
@@ -62,6 +66,11 @@ public class SWint {
 	//TODO create method that allows us to notify the user, link all printlines to this
 	public static void notifyUser(String message) {
 		System.out.println(message);
+	}
+	public static String getResponse(String message) {
+		Scanner scanner=new Scanner(System.in);
+		System.out.println(message);
+		return scanner.nextLine();
 	}
 
 }
