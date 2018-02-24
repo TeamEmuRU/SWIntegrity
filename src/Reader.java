@@ -51,6 +51,7 @@ public class Reader {
 
 	}
 	public void openJava() {
+		SWint.notifyUser(javaFiles.size()+" Java Files Found");
 		for(String s:javaFiles) {
 			String file=openFile(s);
 			SWint.notifyUser(file); //for demonstartion purposes
@@ -59,6 +60,7 @@ public class Reader {
 		System.out.println("all java files read");
 	}
 	public void openAda() {
+		SWint.notifyUser(adaFiles.size()+" Ada Files Found");
 		for(String s:adaFiles) {
 			String file=openFile(s);
 			SWint.notifyUser(file);//for demonstartion purposes
@@ -67,6 +69,7 @@ public class Reader {
 		SWint.notifyUser("all ada files read");
 	}
 	public void openCpp() {
+		SWint.notifyUser(cppFiles.size()+" C++ Files Found");
 		for(String s:cppFiles) {
 			String file=openFile(s);
 			System.out.println(file);//for demonstartion purposes
@@ -128,13 +131,14 @@ public class Reader {
 		for (String s:filenames){
 			String[] temp=s.split("\\.");
 			if(temp.length>1) {
-				if((temp[1].equals("java"))) {
+				if(temp[1].equals("java")) {
 					javaFiles.add(s);
 				}
-				else if((temp[1].equals("cpp"))) {
+				else if(temp[1].equals("cpp")||temp[1].equalsIgnoreCase("cxx")||temp[1].equalsIgnoreCase("c")
+						||temp[1].equalsIgnoreCase("cc")||temp[1].equalsIgnoreCase("c++")) {
 					cppFiles.add(s);
 				}
-				else if((temp[1].equals("adb"))||(temp[1].equals("ada"))) {
+				else if(temp[1].equals("adb")||temp[1].equals("ada")) {
 					adaFiles.add(s);
 				}
 				else {
