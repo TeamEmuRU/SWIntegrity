@@ -6,7 +6,6 @@ import java.util.*;
 
 public class Reader {
 	Input input;
-	private FileReader fr;
 	private BufferedReader br;
 	private List<String> adaFiles;
 	private List<String> javaFiles;
@@ -30,6 +29,7 @@ public class Reader {
 	//important to input class only, is used to take the list of files given, sort them and notify the user of each file type
 	public void read(List<String> filenames) {
 		//sort files depending on their extension
+		
 		sortByType(filenames);
 
 		if(input!=null)
@@ -43,13 +43,7 @@ public class Reader {
 		if(cppFiles.size()>0)
 			openCpp();
 		//TODO special case for other
-
-
-
-		
-
-
-	}
+		}
 	public void openJava() {
 		SWint.notifyUser(javaFiles.size()+" Java Files Found");
 		for(String s:javaFiles) {
@@ -80,8 +74,8 @@ public class Reader {
 
 	private String openFile(String fileName) {
 		try {
-			fr = new FileReader(fileName);
-			br = new BufferedReader(fr);
+			
+			br = new BufferedReader(new FileReader(fileName));
 			String file="";
 			String sCurrentLine;
 			while ((sCurrentLine = br.readLine()) != null) {
@@ -92,7 +86,7 @@ public class Reader {
 
 		}
 		catch(FileNotFoundException e) {
-			SWint.notifyUser("File not Found.");
+			SWint.notifyUser(fileName+" not Found.");
 			return null;
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -106,11 +100,11 @@ public class Reader {
 	//checks file location to see if it exists
 	public boolean fileExists(String name) {
 		try {
-			fr = new FileReader(name);
+			new FileReader(name);
 			return true;
 		}
 		catch(Exception e) {
-			SWint.notifyUser("File not found.");
+			SWint.notifyUser(name+" not found.");
 			return false;
 		}
 
@@ -144,6 +138,7 @@ public class Reader {
 				else {
 					otherFiles.add(s);
 				}	
+				//TODO find a compiled list of extensions
 			}
 		}
 	}

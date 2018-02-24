@@ -37,11 +37,7 @@ public class SWint {
 			//TODO get all c++ files
 			r.openCpp();
 		}
-		else if(args[0].equals("-all")) {
-			r.openCpp();
-			r.openAda();
-			r.openJava();
-		}
+	
 		//then is should be a file name 
 		else {
 			
