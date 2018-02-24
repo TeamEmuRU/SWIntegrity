@@ -11,19 +11,17 @@ public class SWint {
 
 	public static void main(String[] args) {
 		Reader r=new Reader();
+		File folder = new File(System.getProperty("user.dir"));
+		File[] listOfFiles = folder.listFiles();
+		//add file names to list 
+		List<String> fileNames=new LinkedList<>();
+		for(File f:listOfFiles) {
+			fileNames.add(f.getAbsolutePath());
+		}
+		//sort that list by extension
+		r.sortByType(fileNames);
 		if(args.length>0) {
 			//open current directory and view files
-			if(args[0].charAt(0)=='-') {
-				File folder = new File(System.getProperty("user.dir"));
-				File[] listOfFiles = folder.listFiles();
-				//add file names to list 
-				List<String> fileNames=new LinkedList<>();
-				for(File f:listOfFiles) {
-					fileNames.add(f.getAbsolutePath());
-				}
-				//sort that list by extension
-				r.sortByType(fileNames);
-			}
 			//depending on the specification open the appropriate group
 		if(args[0].equals("-j")) {
 			//TODO get all java files
@@ -61,7 +59,7 @@ public class SWint {
 			r.openCpp();
 			r.openAda();
 			r.openJava();
-			System.out.println("Invalid Input.");
+			//System.out.println("Invalid Input.");
 		}
 		
 	}
