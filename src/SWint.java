@@ -38,6 +38,7 @@ public class SWint {
 			r.openCpp();
 		}
 		else if(args[0].equals("-all")) {
+			r.openOther();
 
 			r.openCpp();
 			r.openAda();
@@ -56,6 +57,7 @@ public class SWint {
 			//input=new Input();
 			//input.run();
 			//default is to check all
+			r.openOther();
 			r.openCpp();
 			r.openAda();
 			r.openJava();
@@ -67,10 +69,20 @@ public class SWint {
 	public static void notifyUser(String message) {
 		System.out.println(message);
 	}
-	public static String getResponse(String message) {
+	public static String getResponse(String message,List<String> validResponses) {
+		
 		Scanner scanner=new Scanner(System.in);
-		System.out.println(message);
-		return scanner.nextLine();
+		String response="";
+		boolean invalid=true;
+		while(invalid) {
+			System.out.println(message);
+			response=scanner.nextLine();
+			invalid=!validResponses.contains(response);
+			if(invalid) {
+				System.out.println("invalid response.");
+			}
+		}
+		return response;
 	}
 
 }

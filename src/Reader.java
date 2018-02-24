@@ -71,6 +71,31 @@ public class Reader {
 		}
 		SWint.notifyUser("all c++ files read");
 	}
+	public void openOther() {
+		List<String>validResponses=new ArrayList<String>();
+		validResponses.add("-j");
+		validResponses.add("-a");
+		validResponses.add("-c");
+		validResponses.add("-d");
+		;
+		String s;
+		for(Iterator<String> itty=otherFiles.iterator();itty.hasNext();) {
+			s=itty.next();
+			String response=SWint.getResponse("What kindof file is "+s+"? -j for java, -a for ada, -c for c++ or -d to discard",validResponses);
+			if(response.equals("-j")) {
+				javaFiles.add(s);
+			}
+			else if(response.equals("-a")) {
+				adaFiles.add(s);
+			}
+			else if(response.equals("-c")) {
+				cppFiles.add(s);
+			}
+			itty.remove();
+
+			
+		}
+	}
 
 	private String openFile(String fileName) {
 		try {
