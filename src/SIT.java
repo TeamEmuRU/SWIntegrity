@@ -7,83 +7,67 @@ import java.util.*;
  *
  */
 
-public class SWint {
-	public SWint() {
+public class SIT {
+	public SIT() {
 	}
 	/**
 	 * 
 	 * @param args takes no or one arguments, -j,-a,-c to designate each language type java, ada and c++ respectively 
 	 * 	no arguments default all files being checked */
-	
+
 
 	public static void main(String[] args) {
 		//init reader
-		Reader r;
-		if(args.length>0) {
+		Input input=new Input();
+		if(args.length==1) {
 			//open current directory and view files
+			
 			//depending on the specification open the appropriate group
-		if(args[0].equals("-j")) {
-			//TODO get all java files
-			r=collectAllFilesInDIrectory();
-			r.openJava();
-		}
-		else if(args[0].equals("-a")) {
-			//TODO get all Ada Files
-			r=collectAllFilesInDIrectory();
-			r.openAda();
-		}
-		else if(args[0].equals("-c")) {
-			//TODO get all c++ files
-			r=collectAllFilesInDIrectory();
-			r.openCpp();
-		}
-		else if(args[0].equals("-all")) {
-			r=collectAllFilesInDIrectory();
-			r.openOther();
-			r.openCpp();
-			r.openAda();
-			r.openJava();
+			if(args[0].equals("-j")) {
+				//TODO get all java files
+				input.collectAllFilesInDIrectory();
+				input.analyzeJava();
+			}
+			else if(args[0].equals("-a")) {
+				//TODO get all Ada Files
+				input.collectAllFilesInDIrectory();
+				input.analyzeAda();
+			}
+			else if(args[0].equals("-c")) {
+				//TODO get all c++ files
+				input.collectAllFilesInDIrectory();
+				input.analyzeCpp();
+			}
+			else if(args[0].equals("-all")) {
+				input.collectAllFilesInDIrectory();
+				input.analyzeCpp();
+				input.analyzeAda();
+				input.analyzeJava();
 
 
-		}
-		//then is should be a file name 
-		else {
-			r=collectAllFilesInDIrectory();
-			r.openSingleFile(args[0]);
-		}
+			}
+			//then is should be a file name 
+			else if(args[0].contains(".")) {
+				input.analyzeSingleFile(args[0]);
+			}
+			else {
+				notifyUser("Invalid Input");
+			}
 		}
 		else if(args.length==0){
 			//default is to open all files
-			r=collectAllFilesInDIrectory();
-			r.openOther();
-			r.openCpp();
-			r.openAda();
-			r.openJava();
+			input.collectAllFilesInDIrectory();
+			input.analyzeCpp();
+			input.analyzeAda();
+			input.analyzeJava();
 			//System.out.println("Invalid Input.");
 		}
 		else {
 			notifyUser("Invalid Input");
 		}
-		
+
 	}
-	/**collects the file names of all files in current directory and sends it to the reader to be sorted
-	 * @return a reader that contains the files
-	 */
-	public static Reader collectAllFilesInDIrectory() {
-		Reader r=new Reader();
-		//gather information on folder
-		File folder = new File(System.getProperty("user.dir"));
-		//gather individual
-		File[] listOfFiles = folder.listFiles();
-		//add file names to list 
-		List<String> fileNames=new LinkedList<>();
-		for(File f:listOfFiles) {
-			fileNames.add(f.getAbsolutePath());
-		}
-		//sort that list by extension
-		r.sortByType(fileNames);
-		return r;
-	}
+
 	//TODO create method that allows us to notify the user, link all print lines to this
 	/**
 	 * A static method called by other classes in order to update the user
@@ -106,7 +90,7 @@ public class SWint {
 		Scanner scanner=new Scanner(System.in);
 		//set a response
 		String response="";
-		
+
 		boolean invalid=true;
 		//while the user doesn't provide this method with a valid response it will prompt them for a correct response
 		while(invalid) {
@@ -115,7 +99,7 @@ public class SWint {
 			response=scanner.nextLine();
 			//check for valid response
 			invalid=!validResponses.contains(response);
-			//barret them if they dont get it right
+			//yell at them if they don't get it right
 			if(invalid) {
 				System.out.println("invalid response.");
 			}
