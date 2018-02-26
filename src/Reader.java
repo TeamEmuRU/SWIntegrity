@@ -12,7 +12,7 @@ import java.util.*;
 public class Reader {
 	/**
 	 * br-a reader for files
-	 * adaFiles- a collection of selected ada files
+	 * adaFiles- a collection of selected Ada files
 	 * javaFiles- a collection of selected java files
 	 * cppfiles- a collection of selected java files
 	 * otherFiles- a collection of other files that need to be sorted
@@ -34,7 +34,7 @@ public class Reader {
 		otherFiles=new LinkedList<>();
 	}
 	/**
-	 * A method that sorts a list of ambigous files and opens them appropriately
+	 * A method that sorts a list of ambiguous files and opens them appropriately
 	 * @param filenames a list that of filenames that are sorted and then opened
 	 */
 	public void read(List<String> filenames) {
@@ -57,13 +57,13 @@ public class Reader {
 		//open each file
 		for(String s:javaFiles) {
 			String file=openFile(s);
-			SWint.notifyUser(file); //for demonstartion purposes
+			SWint.notifyUser(file); //for demonstration purposes
 			//TODO analyze
 		}
 		System.out.println("all java files read");
 	}
 	/**
-	 * a method that opens ada files
+	 * a method that opens Ada files
 	 */
 	public void openAda() {
 		//notify user of amount of files in list
@@ -71,7 +71,7 @@ public class Reader {
 		//open each file
 		for(String s:adaFiles) {
 			String file=openFile(s);
-			SWint.notifyUser(file);//for demonstartion purposes
+			SWint.notifyUser(file);//for demonstration purposes
 			//TODO analyze
 		}
 		SWint.notifyUser("all ada files read");
@@ -85,7 +85,7 @@ public class Reader {
 		//open each file
 		for(String s:cppFiles) {
 			String file=openFile(s);
-			System.out.println(file);//for demonstartion purposes
+			System.out.println(file);//for demonstration purposes
 			//TODO analyze
 		}
 		SWint.notifyUser("all c++ files read");
@@ -104,7 +104,7 @@ public class Reader {
 		String fileName;
 		//set iterator and continue to iterate while there is another element
 		/**
-		 * this loop goes through each of the abmigous files asks the user what they are and adds them to the 
+		 * this loop goes through each of the ambiguous files asks the user what they are and adds them to the 
 		 * appropriate list
 		 */
 		for(Iterator<String> itty=otherFiles.iterator();itty.hasNext();) {
@@ -122,7 +122,7 @@ public class Reader {
 			else if(response.equals("-c")) {
 				cppFiles.add(fileName);
 			}
-			//since we sorted the filename, we can remove it from the list of ambigous files
+			//since we sorted the filename, we can remove it from the list of ambiguous files
 			itty.remove();
 
 			
@@ -171,7 +171,7 @@ public class Reader {
 	public boolean fileExists(String name) {
 		try {
 			//try to open the file with the given path, if it fails then it will throw an exception and notify the user that it does not exist
-			//retrun true if we make it through this line and false if not
+			//Return true if we make it through this line and false if not
 			new FileReader(name);
 			return true;
 		}
@@ -200,7 +200,7 @@ public class Reader {
 		read(files);
 	}
 	/**
-	 * seperate files by extension and if it it cannot be found add it to other for further processing
+	 * Separate files by extension and if it it cannot be found add it to other for further processing
 	 * @param filenames names of the that need to be sorted
 	 */
 	public void sortByType(List<String> filenames) {
@@ -220,15 +220,15 @@ public class Reader {
 						||temp[1].equalsIgnoreCase("cc")||temp[1].equalsIgnoreCase("c++")) {
 					cppFiles.add(s);
 				}
-				//checks for ada extensions
+				//checks for Ada extensions
 				else if(temp[1].equals("adb")||temp[1].equals("ada")) {
 					adaFiles.add(s);
 				}
-				//otherwise sort into other catagory
+				//otherwise sort into other category
 				else {
 					otherFiles.add(s);
 				}	
-				//TODO find a compiled list of extensions
+				
 			}
 		}
 	}

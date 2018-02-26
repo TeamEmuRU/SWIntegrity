@@ -9,8 +9,6 @@ import java.util.*;
 
 public class SWint {
 	public SWint() {
-		
-		
 	}
 	/**
 	 * 
@@ -19,6 +17,59 @@ public class SWint {
 	
 
 	public static void main(String[] args) {
+		//init reader
+		Reader r;
+		if(args.length>0) {
+			//open current directory and view files
+			//depending on the specification open the appropriate group
+		if(args[0].equals("-j")) {
+			//TODO get all java files
+			r=collectAllFilesInDIrectory();
+			r.openJava();
+		}
+		else if(args[0].equals("-a")) {
+			//TODO get all Ada Files
+			r=collectAllFilesInDIrectory();
+			r.openAda();
+		}
+		else if(args[0].equals("-c")) {
+			//TODO get all c++ files
+			r=collectAllFilesInDIrectory();
+			r.openCpp();
+		}
+		else if(args[0].equals("-all")) {
+			r=collectAllFilesInDIrectory();
+			r.openOther();
+			r.openCpp();
+			r.openAda();
+			r.openJava();
+
+
+		}
+		//then is should be a file name 
+		else {
+			r=collectAllFilesInDIrectory();
+			r.openSingleFile(args[0]);
+		}
+		}
+		else if(args.length==0){
+			//default is to open all files
+			r=collectAllFilesInDIrectory();
+			r.openOther();
+			r.openCpp();
+			r.openAda();
+			r.openJava();
+			//System.out.println("Invalid Input.");
+		}
+		else {
+			notifyUser("Invalid Input");
+		}
+		
+	}
+	/**collects the file names of all files in current directory and sends it to the reader to be sorted
+	 * @return a reader that contains the files
+	 */
+	public static Reader collectAllFilesInDIrectory() {
 		Reader r=new Reader();
 		//gather information on folder
 		File folder = new File(System.getProperty("user.dir"));
@@ -31,44 +82,7 @@ public class SWint {
 		}
 		//sort that list by extension
 		r.sortByType(fileNames);
-		if(args.length>0) {
-			//open current directory and view files
-			//depending on the specification open the appropriate group
-		if(args[0].equals("-j")) {
-			//TODO get all java files
-			r.openJava();
-		}
-		else if(args[0].equals("-a")) {
-			//TODO get all ada Files
-			r.openAda();
-		}
-		else if(args[0].equals("-c")) {
-			//TODO get all c++ files
-			r.openCpp();
-		}
-		else if(args[0].equals("-all")) {
-			r.openOther();
-			r.openCpp();
-			r.openAda();
-			r.openJava();
-
-
-		}
-		//then is should be a file name 
-		else {
-			
-			r.openSingleFile(args[0]);
-		}
-		}
-		else {
-			//default is to open all files
-			r.openOther();
-			r.openCpp();
-			r.openAda();
-			r.openJava();
-			//System.out.println("Invalid Input.");
-		}
-		
+		return r;
 	}
 	//TODO create method that allows us to notify the user, link all print lines to this
 	/**
