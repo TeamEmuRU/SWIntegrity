@@ -5,6 +5,7 @@ public class JavaAnalyzer extends Analyzer {
 	public void parse(String filename) {
 		// TODO Auto-generated method stub
 		String fileContents=openFile(filename);
+		SIT.notifyUser(fileContents);
 	}
 
 	@Override

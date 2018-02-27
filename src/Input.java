@@ -176,10 +176,6 @@ public class Input {
 				else if(temp[1].equals("adb")||temp[1].equals("ada")||temp[1].equals("ada")) {
 					adaFiles.add(s);
 				}
-				//otherwise sort into other category
-				else {
-					SIT.notifyUser(s+" is not an appropriate file type.");
-				}
 				
 			}
 		}
