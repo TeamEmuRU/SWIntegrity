@@ -25,24 +25,22 @@ public class SIT {
 			//depending on the specification open the appropriate group
 			if(args[0].equals("-j")) {
 				//TODO get all java files
-				input.collectAllFilesInDIrectory();
+				input.collectAllJavaFiles();
 				input.analyzeJava();
 			}
 			else if(args[0].equals("-a")) {
 				//TODO get all Ada Files
-				input.collectAllFilesInDIrectory();
+				input.collectAllAdaFiles();
 				input.analyzeAda();
 			}
 			else if(args[0].equals("-c")) {
 				//TODO get all c++ files
-				input.collectAllFilesInDIrectory();
+				input.collectAllCppFiles();
 				input.analyzeCpp();
 			}
 			else if(args[0].equals("-all")) {
-				input.collectAllFilesInDIrectory();
-				input.analyzeCpp();
-				input.analyzeAda();
-				input.analyzeJava();
+				List<String> filenames=input.collectAllFilesInDirectory();
+				input.analyzeAll(filenames);
 
 
 			}
@@ -56,10 +54,8 @@ public class SIT {
 		}
 		else if(args.length==0){
 			//default is to open all files
-			input.collectAllFilesInDIrectory();
-			input.analyzeCpp();
-			input.analyzeAda();
-			input.analyzeJava();
+			List<String> filenames=input.collectAllFilesInDirectory();
+			input.analyzeAll(filenames);
 			//System.out.println("Invalid Input.");
 		}
 		else {

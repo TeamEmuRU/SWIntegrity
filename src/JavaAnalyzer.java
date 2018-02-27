@@ -11,7 +11,7 @@ public class JavaAnalyzer extends Analyzer {
 	@Override
 	protected void analyze(String filename) {
 		// TODO Auto-generated method stub
-
+		parse(filename);
 	}
 
 }

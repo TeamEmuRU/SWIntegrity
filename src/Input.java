@@ -36,15 +36,13 @@ public class Input {
 	 * A method that sorts a list of ambiguous files and opens them appropriately
 	 * @param filenames-a list that of filenames that are sorted and then opened
 	 */
-	public void read(List<String> filenames) {
+	public void analyzeAll(List<String> filenames) {
 		//sort files depending on their extension
 		sortByType(filenames);
-		if(javaFiles.size()>0)
-			analyzeJava();
-		if(adaFiles.size()>0)
-			analyzeAda();
-		if(cppFiles.size()>0)
-			analyzeCpp();
+		
+		analyzeJava();
+		analyzeAda();
+		analyzeCpp();
 		//TODO special case for other
 	}
 	/**
@@ -99,7 +97,7 @@ public class Input {
 	/**collects the file names of all files in current directory and sends it to the reader to be sorted
 	 * @return a reader that contains the files
 	 */
-	public void collectAllFilesInDIrectory() {
+	public List<String> collectAllFilesInDirectory() {
 		//gather information on folder
 		File folder = new File(System.getProperty("user.dir"));
 		//gather individual
@@ -110,7 +108,40 @@ public class Input {
 			fileNames.add(f.getAbsolutePath());
 		}
 		//sort that list by extension
-		sortByType(fileNames);
+		return fileNames;
+	}
+	/**
+	 * search through directory and collect all java files
+	 */
+	public void collectAllJavaFiles() {
+		List<String> filenames=collectAllFilesInDirectory();
+		for(String name:filenames) {
+			if(isJavaFile(name)) {
+				javaFiles.add(name);
+			}
+		}
+	}
+	/**
+	 * search through directory and collect all ada files
+	 */
+	public void collectAllAdaFiles() {
+		List<String> filenames=collectAllFilesInDirectory();
+		for(String name:filenames) {
+			if(isAdaFile(name)) {
+				adaFiles.add(name);
+			}
+		}
+	}
+	/**
+	 * search through directory and collect all java files
+	 */
+	public void collectAllCppFiles() {
+		List<String> filenames=collectAllFilesInDirectory();
+		for(String name:filenames) {
+			if(isCppFile(name)) {
+				cppFiles.add(name);
+			}
+		}
 	}
 	
 
@@ -124,7 +155,8 @@ public class Input {
 		try {
 			//try to open the file with the given path, if it fails then it will throw an exception and notify the user that it does not exist
 			//Return true if we make it through this line and false if not
-			new FileReader(name);
+			FileReader f=new FileReader(name);
+			f.close();
 			return true;
 		}
 		catch(Exception e) {
@@ -143,42 +175,94 @@ public class Input {
 		if(!fileExists(name)) {
 			return;
 		}
-		//if so add it to a list 
-		List<String> files= new LinkedList<String>();
-
-		files.add(name);
-		//sorts file for analysis
-		//pass that list to read
-		read(files);
+		//check to see which type it is
+		if(isJavaFile(name)) {
+			javaFiles.add(name);
+			analyzeJava();
+		}
+		else if(isAdaFile(name)) {
+			adaFiles.add(name);
+			analyzeAda();
+		}
+		else if(isCppFile(name)) {
+			cppFiles.add(name);
+			analyzeCpp();
+		}
+		else {
+			SIT.notifyUser(name+"is not a valid file type.");
+		}
 	}
 	/**
 	 * Separate files by extension and if it it cannot be found add it to other for further processing
 	 * @param filenames names of the that need to be sorted
 	 */
+	//TODO move these extensions into a JSON file
 	public void sortByType(List<String> filenames) {
 		//check each file's extension
 		for (String s:filenames){
-			//split the file basses on a .
-			String[] temp=s.split("\\.");
-			//if there is an extension(the splits leads to a only one string)
-			if(temp.length>1) {
 				//checks for java extensions
-				if(temp[1].equals("java")) {
+				if(isJavaFile(s)) {
 					javaFiles.add(s);
 				}
 				//checks for c++ extensions
 				//TODO change c to C
-				else if(temp[1].equals("cpp")||temp[1].equalsIgnoreCase("cxx")||temp[1].equalsIgnoreCase("C")
-						||temp[1].equalsIgnoreCase("cc")||temp[1].equalsIgnoreCase("c++")) {
+				else if(isAdaFile(s)) {
 					cppFiles.add(s);
 				}
 				//checks for Ada extensions
-				else if(temp[1].equals("adb")||temp[1].equals("ada")||temp[1].equals("ada")) {
+				else if(isCppFile(s)) {
 					adaFiles.add(s);
 				}
 				
-			}
+			
 		}
+		
+	}
+	/**
+	 * check to see if file is java file
+	 * @param filename- name to check
+	 * @return if the file is a java file
+	 */
+	public boolean isJavaFile(String filename) {
+		//split the file basses on a .
+		String[] temp=filename.split("\\.");
+		//if there is an extension(the splits leads to a only one string)
+		if(temp.length>1) {
+			return temp[1].equals("java");
+		}
+		return false;
+	}
+	/**
+	 * check to see if file is ada file
+	 * @param filename- name to check
+	 * @return if the file is a ada file
+	 */
+	public boolean isAdaFile(String filename) {
+		
+		//split the file basses on a .
+		String[] temp=filename.split("\\.");
+		//if there is an extension(the splits leads to a only one string)
+		if(temp.length>1) {
+			return temp[1].equals("adb")||temp[1].equals("ada")||temp[1].equals("ada");
+		}
+		return false;
+		
+	}
+	/**
+	 * check to see if file is c++ file
+	 * @param filename- name to check
+	 * @return if the file is a c++ file
+	 */
+	public boolean isCppFile(String filename) {
+		
+		//split the file basses on a .
+		String[] temp=filename.split("\\.");
+		//if there is an extension(the splits leads to a only one string)
+		if(temp.length>1) {
+			return temp[1].equals("cpp")||temp[1].equalsIgnoreCase("cxx")||temp[1].equalsIgnoreCase("C")
+					||temp[1].equalsIgnoreCase("cc")||temp[1].equalsIgnoreCase("c++");
+		}
+		return false;
 	}
 
 }
