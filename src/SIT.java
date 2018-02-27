@@ -1,28 +1,30 @@
+/**
+ * The driver of the SIT project. Is responsible for acting as the user interface and handling output.
+ * 
+ * @author Jamie Tyler Walder
+ */
+
 import java.io.File;
 import java.util.*;
-/**
- * The driver of the SIT project, it takes in the arguments and passes them accordingly as well as 
- * acts as the 'VIEW' for our project
- * @author Tyler
- *
- */
+
 
 public class SIT {
 	public SIT() {
 	}
+	
 	/**
-	 * 
-	 * @param args takes no or one arguments, -j,-a,-c to designate each language type java, ada and c++ respectively 
-	 * 	no arguments default all files being checked */
+	 * @param args Takes one or fewer arguments. -j,-a,-c designate the languages Java, Ada and C++ respectively 
+	 * If no arguments are entered, all files will be selected by default.
+	 */
 
 
 	public static void main(String[] args) {
 		//init reader
-		Input input=new Input();
-		if(args.length==1) {
+		Input input = new Input();
+		if(args.length == 1) {
 			//open current directory and view files
 			
-			//depending on the specification open the appropriate group
+			//depending on the specification, open the appropriate group
 			if(args[0].equals("-j")) {
 				//TODO get all java files
 				input.collectAllJavaFiles();
@@ -52,49 +54,47 @@ public class SIT {
 				notifyUser("Invalid Input");
 			}
 		}
-		else if(args.length==0){
+		else if(args.length == 0){
 			//default is to open all files
 			List<String> filenames=input.collectAllFilesInDirectory();
 			input.analyzeAll(filenames);
-			//System.out.println("Invalid Input.");
 		}
 		else {
-			notifyUser("Invalid Input");
+			notifyUser("Command not recognized");
 		}
 
 	}
 
-	//TODO create method that allows us to notify the user, link all print lines to this
 	/**
-	 * A static method called by other classes in order to update the user
+	 * A static method called by other classes to present output to the user
 	 * 
-	 * @param message prints the parameter passed in 
+	 * @param message A String to print to the user interface
 	 */
 	public static void notifyUser(String message) {
 		System.out.println(message);
 	}
+	
 	/**
-	 * Takes in a message to prompt a user and a list of valid responses this method only exits when 
-	 * the user provides it with a valid response
-	 * @param message prompting message
-	 * @param validResponses a list of acceptable responses that should be handled by the calling class upon return  
-	 * @return the appropriate response provided by the user
-	 * the calling class must specify what the options are
+	 * Collects a response from the user to a given prompt.
+	 * The calling class must specify what valid responses are
+	 * @param message The prompting message
+	 * @param validResponses A list of acceptable responses that should be handled by the calling class upon return  
+	 * @return The appropriate response provided by the user
 	 */
 	public static String getResponse(String message,List<String> validResponses) {
 		//start scanner
-		Scanner scanner=new Scanner(System.in);
+		Scanner scanner = new Scanner(System.in);
 		//set a response
-		String response="";
+		String response = "";
 
-		boolean invalid=true;
+		boolean invalid = true;
 		//while the user doesn't provide this method with a valid response it will prompt them for a correct response
 		while(invalid) {
 			System.out.println(message);
 			//collect next line
-			response=scanner.nextLine();
+			response = scanner.nextLine();
 			//check for valid response
-			invalid=!validResponses.contains(response);
+			invalid =! validResponses.contains(response);
 			//yell at them if they don't get it right
 			if(invalid) {
 				System.out.println("invalid response.");
@@ -102,5 +102,4 @@ public class SIT {
 		}
 		return response;
 	}
-
 }
