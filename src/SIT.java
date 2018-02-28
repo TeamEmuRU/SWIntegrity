@@ -18,84 +18,99 @@ public class SIT {
 		
 		//init reader
 		Input input = new Input();
+		List<String> fileList = new LinkedList<String>(); //a list of files designated by the user
 		
 		
-		if(args.length == 0){
+		if(args.length == 0)
+		{
 			//If no arguments specified, print a help statement
 			notifyUser("Enter \"help\" for valid commands.");
 		}
 		//If arguments are specified
-		else {
+		else 
+		{
 			//depending on the first argument, process files of the specified type
 			//java
-			if(args[0].equals("-j")) {
+			if(args[0].equals("-j")) 
+			{
 				//All files of this type
 				if(args.length == 1)
 				{
-					input.collectAllJavaFiles();
+					input.addJavaFilesInDirectory("user.dir");	//By default, searches the current directory
 				}
 				//Multiple files selected by name
 				else
 				{
-					List<String> fileList = new LinkedList<String>();
 					for(int i = 1; i < args.length; i++)
 					{
 						fileList.add(args[i]);
 					}
-					input.sortByType(fileList);
+					input.addFiles(fileList);
 				}
-				input.analyzeJava();
+				input.analyze();
 			}
 			//ada
 			else if(args[0].equals("-a")) {
 				//All files of this type
 				if(args.length == 1)
 				{
-					input.collectAllAdaFiles();
+					input.addAdaFilesInDirectory("user.dir");
 				}
 				//Multiple files selected by name
 				else
 				{
-					List<String> fileList = new LinkedList<String>();
 					for(int i = 1; i < args.length; i++)
 					{
 						fileList.add(args[i]);
 					}
-					input.sortByType(fileList);
+					input.addFiles(fileList);
 				}
-				input.analyzeAda();
+				input.analyze();
 			}
 			//c++
 			else if(args[0].equals("-c")) {
 				//All files of this type
 				if(args.length == 1)
 				{
-					input.collectAllCppFiles();
+					input.addCppFilesInDirectory("user.dir");
 				}
 				//Multiple files selected by name
 				else
 				{
-					List<String> fileList = new LinkedList<String>();
 					for(int i = 1; i < args.length; i++)
 					{
 						fileList.add(args[i]);
 					}
-					input.sortByType(fileList);
+					input.addFiles(fileList);
 				}
-				input.analyzeCpp();
+				input.analyze();
 			}
 			//all files
 			else if(args[0].equals("-all")) {
-				List<String> filenames = input.collectAllFilesInDirectory();
-				input.analyzeAll(filenames);
+				input.addAllFilesInDirectory(args[0]);
+				input.analyze();
 			}
 			//then it should be a file name 
 			//TODO: Use File class to detect whether this is a directory
-			else if(args[0].contains(".")) {
-				input.analyzeSingleFile(args[0]);
-			}
-			else {
-				notifyUser("Invalid Input");
+			else
+			{
+				File f = new File(args[0]);
+				if(f.isFile())
+				{
+					fileList.add(args[0]);
+					input.addFiles(fileList);
+					input.analyze();
+				}
+				else if(f.isDirectory())
+				{
+					input.addAllFilesInDirectory(args[0]);
+					input.analyze();
+				}
+				else
+				{
+					notifyUser("One or more arguments were invalid input");
+				}
+				
 			}
 		}
 	}

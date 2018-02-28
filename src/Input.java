@@ -26,19 +26,28 @@ public class Input {
 	 * Initializes each file list
 	 */
 	public Input() {
-		// TODO Auto-generated constructor stub
 		adaFiles = new LinkedList<>();
 		javaFiles = new LinkedList<>();
 		cppFiles = new LinkedList<>();
 	}
 	
 	/**
+	 * Add any number of files to the input class.
+	 * Calls the sortByType function
+	 * @param filenames A list of files to add
+	 */
+	public void addFiles(List<String> filenames)
+	{
+		//sort files depending on their extension
+		//and add files to the appropriate linked list
+		sortByType(filenames);
+	}
+	
+	/**
 	 * Analyzes sorted lists of files for vulnerabilities
 	 * @param filenames A list that of filenames
 	 */
-	public void analyzeAll(List<String> filenames) {
-		//sort files depending on their extension
-		sortByType(filenames);
+	public void analyze() {
 		
 		analyzeJava();
 		analyzeAda();
@@ -47,20 +56,53 @@ public class Input {
 	}
 	
 	/**
+	 * Separate files by extension and add each file to its appropriate file list
+	 * If the extension is not recognized, do not add it to any list.
+	 * @param filenames Names of the that need to be sorted
+	 */
+	//TODO move these extensions into an enum class
+	//TODO: make this function private to the input class, remove from main
+	public void sortByType(List<String> filenames) {
+		//check each file's extension
+		for (String s : filenames)
+		{
+			//Validate the file before sorting
+			if(validFile(s))
+			{
+				//checks for java extensions
+				if(isJavaFile(s)) 
+				{
+					javaFiles.add(s);
+				}
+				//checks for c++ extensions
+				else if(isCppFile(s)) 
+				{
+					cppFiles.add(s);
+				}
+				//checks for Ada extensions
+				else if(isAdaFile(s)) 
+				{
+					adaFiles.add(s);
+				}
+			}	
+		}
+	}
+	
+	
+	/**
 	 * Analyzes Java files for vulnerabilities by invoking an Analyzer object
 	 */
-	public void analyzeJava() {
+	private void analyzeJava() {
 		//notify user of amount of files in list
-		SIT.notifyUser(javaFiles.size()+" Java Files Found");
+		SIT.notifyUser(javaFiles.size() + " Java Files Found");
 		
 		//set the analyzer to the appropriate type
 		analyzer = new JavaAnalyzer();
 		
 		//analyze each file
-		for(String filename:javaFiles) {
+		for(String filename : javaFiles) {
 			analyzer.analyze(filename);
-			SIT.notifyUser(filename+" has been analyzed.");
-			//TODO analyze
+			SIT.notifyUser(filename + " has been analyzed.");
 		}
 		System.out.println("all java files read");
 	}
@@ -68,14 +110,15 @@ public class Input {
 	/**
 	 * Analyzes Ada files for vulnerabilities by invoking an Analyzer object
 	 */
-	public void analyzeAda() {
+	private void analyzeAda() {
 		//notify user of amount of files in list
 		SIT.notifyUser(adaFiles.size()+" Ada Files Found");
 		
 		//set the analyzer to the appropriate type
 		analyzer = new AdaAnalyzer();
+		
 		//analyze each file
-		for(String filename:adaFiles) {
+		for(String filename : adaFiles) {
 			analyzer.analyze(filename);
 			SIT.notifyUser(filename+" has been analyzed.");
 			//TODO analyze
@@ -85,13 +128,15 @@ public class Input {
 	/**
 	 * Analyzes C++ files for vulnerabilities by invoking an Analyzer object
 	 */
-	public void analyzeCpp() {
+	private void analyzeCpp() {
 		//notify user of amount of files in list
-		SIT.notifyUser(cppFiles.size()+" C++ Files Found");
+		SIT.notifyUser(cppFiles.size() + " C++ Files Found");
+		
 		//set the analyzer to the appropriate type
-		analyzer=new CppAnalyzer();
+		analyzer= new CppAnalyzer();
+		
 		//analyze each file
-		for(String filename:cppFiles) {
+		for(String filename : cppFiles) {
 			analyzer.analyze(filename);
 			SIT.notifyUser(filename+" has been analyzed.");
 			//TODO analyze
@@ -104,18 +149,25 @@ public class Input {
 	 * The files are then sorted into their appropriate lists
 	 * @return a reader that contains the files
 	 */
-	public List<String> collectAllFilesInDirectory() {
+	//TODO: Make this function private to the Input class. Replace its usage in main
+	public List<String> addAllFilesInDirectory(String dir) {
 		//gather information on folder
-		File folder = new File(System.getProperty("user.dir"));
+		File folder = new File(dir);
 		
 		//gather individual
 		File[] listOfFiles = folder.listFiles();
 		
 		//add file names to list 
-		List<String> fileNames=new LinkedList<>();
-		for(File f:listOfFiles) {
-			fileNames.add(f.getAbsolutePath());
+		List<String> fileNames = new LinkedList<>();
+		for(File f : listOfFiles) 
+		{
+			if(f.isFile())
+			{
+				fileNames.add(f.getAbsolutePath());
+			}
+			
 		}
+		addFiles(fileNames);
 		
 		//sort that list by extension
 		return fileNames;
@@ -124,10 +176,14 @@ public class Input {
 	/**
 	 * Search through directory and collect all Java files
 	 */
-	public void collectAllJavaFiles() {
-		List<String> filenames=collectAllFilesInDirectory();
-		for(String name:filenames) {
-			if(isJavaFile(name)) {
+	//TODO: Make this function private to the Input class. Replace its usage in main
+	public void addJavaFilesInDirectory(String dir) 
+	{
+		List<String> filenames = addAllFilesInDirectory(dir);
+		for(String name:filenames) 
+		{
+			if(isJavaFile(name)) 
+			{
 				javaFiles.add(name);
 			}
 		}
@@ -136,10 +192,14 @@ public class Input {
 	/**
 	 * Search through directory and collect all Ada files
 	 */
-	public void collectAllAdaFiles() {
-		List<String> filenames=collectAllFilesInDirectory();
-		for(String name:filenames) {
-			if(isAdaFile(name)) {
+	//TODO: Make this function private to the Input class. Replace its usage in main
+	public void addAdaFilesInDirectory(String dir) 
+	{
+		List<String> filenames = addAllFilesInDirectory(dir);
+		for(String name:filenames) 
+		{
+			if(isAdaFile(name)) 
+			{
 				adaFiles.add(name);
 			}
 		}
@@ -148,8 +208,9 @@ public class Input {
 	/**
 	 * Search through directory and collect all C++ files
 	 */
-	public void collectAllCppFiles() {
-		List<String> filenames=collectAllFilesInDirectory();
+	//TODO: Make this function private to the Input class. Replace its usage in main
+	public void addCppFilesInDirectory(String dir) {
+		List<String> filenames =  addAllFilesInDirectory(dir);
 		for(String name:filenames) {
 			if(isCppFile(name)) {
 				cppFiles.add(name);
@@ -163,6 +224,8 @@ public class Input {
 	 * @param name A filename
 	 * @return true if the file exists and has a valid extension
 	 */
+	//TODO: Decide if we need this function --> extension validation is done in other methods
+	//We could use isFile() rather than having another method call.
 	public boolean validFile(String name) {
 		
 		boolean valid = false;
@@ -180,62 +243,7 @@ public class Input {
 			SIT.notifyUser(name + " not found.");
 		}
 		//TODO: validate file extension
-		
-	
 		return valid;
-	}
-	
-	/**
-	 * Validates and analyzes a single file
-	 * @param name A filename
-	 */
-	public void analyzeSingleFile(String name) {
-		//does the file exist
-		if(!validFile(name)) {
-			return;
-		}
-		//check to see which type it is
-		if(isJavaFile(name)) {
-			javaFiles.add(name);
-			analyzeJava();
-		}
-		else if(isAdaFile(name)) {
-			adaFiles.add(name);
-			analyzeAda();
-		}
-		else if(isCppFile(name)) {
-			cppFiles.add(name);
-			analyzeCpp();
-		}
-		else {
-			SIT.notifyUser(name + "does not have a valid file extension.");
-		}
-	}
-	
-	/**
-	 * Separate files by extension. 
-	 * If the extension is not recognized, do not add it to any list.
-	 * @param filenames Names of the that need to be sorted
-	 */
-	//TODO move these extensions into an enum class
-	//TODO: make this function private to the input class, remove from main
-	public void sortByType(List<String> filenames) {
-		//check each file's extension
-		for (String s:filenames){
-				//checks for java extensions
-				if(isJavaFile(s)) {
-					javaFiles.add(s);
-				}
-				//checks for c++ extensions
-				//TODO change c to C
-				else if(isAdaFile(s)) {
-					cppFiles.add(s);
-				}
-				//checks for Ada extensions
-				else if(isCppFile(s)) {
-					adaFiles.add(s);
-				}
-		}
 	}
 	
 	/**
@@ -245,10 +253,12 @@ public class Input {
 	 */
 	public boolean isJavaFile(String filename) {
 		//split the file basses on a .
-		String[] temp=filename.split("\\.");
-		//if there is an extension(the splits leads to a only one string)
+		String[] temp = filename.split("\\.");
+		//if there is an extension(the splits leads to more than one)
+		//Use the last split to evaluate the extension (covers absolute paths)
 		if(temp.length>1) {
-			return temp[1].equals("java");
+			int split = temp.length - 1;
+			return temp[split].equals("java");
 		}
 		return false;
 	}
@@ -259,11 +269,13 @@ public class Input {
 	 */
 	public boolean isAdaFile(String filename) {
 		
-		//split the file basses on a .
+		//split the file bases on a .
 		String[] temp=filename.split("\\.");
-		//if there is an extension(the splits leads to a only one string)
-		if(temp.length>1) {
-			return temp[1].equals("adb")||temp[1].equals("ada")||temp[1].equals("ada");
+		//if there is an extension(the splits leads to more than one)
+		//Use the last split to evaluate the extension (covers absolute paths)
+		if(temp.length > 1) {
+			int split = temp.length - 1;
+			return temp[split].equals("adb")||temp[split].equals("ada")||temp[split].equals("ada");
 		}
 		return false;
 		
@@ -273,14 +285,17 @@ public class Input {
 	 * @param filename Name of file to validate
 	 * @return true if the file is a C++ file
 	 */
+	//TODO: Accept header files in this method or in a separate method
 	public boolean isCppFile(String filename) {
 		
 		//split the file basses on a .
 		String[] temp=filename.split("\\.");
-		//if there is an extension(the splits leads to a only one string)
-		if(temp.length>1) {
-			return temp[1].equals("cpp")||temp[1].equalsIgnoreCase("cxx")||temp[1].equalsIgnoreCase("C")
-					||temp[1].equalsIgnoreCase("cc")||temp[1].equalsIgnoreCase("c++");
+		//if there is an extension(the splits leads to more than one)
+		//Use the last split to evaluate the extension (covers absolute paths)
+		if(temp.length > 1) {
+			int split = temp.length - 1;
+			return temp[split].equals("cpp")||temp[split].equalsIgnoreCase("cxx")||temp[split].equalsIgnoreCase("C")
+					||temp[split].equalsIgnoreCase("cc")||temp[split].equalsIgnoreCase("c++");
 		}
 		return false;
 	}
