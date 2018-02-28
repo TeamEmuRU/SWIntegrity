@@ -3,9 +3,10 @@
  * based on their file types
  * 
  * @author Jamie Tyler Walder
+ * @author Abby Beizer
  */
 
-import java.io.BufferedReader;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -63,6 +64,7 @@ public class Input {
 		}
 		System.out.println("all java files read");
 	}
+	
 	/**
 	 * Analyzes Ada files for vulnerabilities by invoking an Analyzer object
 	 */
@@ -71,7 +73,7 @@ public class Input {
 		SIT.notifyUser(adaFiles.size()+" Ada Files Found");
 		
 		//set the analyzer to the appropriate type
-		analyzer=new AdaAnalyzer();
+		analyzer = new AdaAnalyzer();
 		//analyze each file
 		for(String filename:adaFiles) {
 			analyzer.analyze(filename);
@@ -161,22 +163,26 @@ public class Input {
 	 * @param name A filename
 	 * @return true if the file exists and has a valid extension
 	 */
-	public boolean fileExists(String name) {
-		try {
-			//try to open the file with the given path
-			//if it fails then it will throw an exception and notify the user that it does not exist
-			//Return true if we make it through this line and false if not
-			FileReader f = new FileReader(name);
-			f.close();
-			
-			//TODO: validate file extension
-			
-			return true;
+	public boolean validFile(String name) {
+		
+		boolean valid = false;
+	
+		//try to open the file with the given path
+		//if it fails then it will throw an exception and notify the user that it does not exist
+		//Return true if we make it through this line and false if not
+		File f = new File(name);
+		if(f.isFile())
+		{
+			valid = true;
 		}
-		catch(Exception e) {
+		else
+		{
 			SIT.notifyUser(name + " not found.");
-			return false;
 		}
+		//TODO: validate file extension
+		
+	
+		return valid;
 	}
 	
 	/**
@@ -185,7 +191,7 @@ public class Input {
 	 */
 	public void analyzeSingleFile(String name) {
 		//does the file exist
-		if(!fileExists(name)) {
+		if(!validFile(name)) {
 			return;
 		}
 		//check to see which type it is
