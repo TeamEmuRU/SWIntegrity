@@ -7,46 +7,89 @@
 import java.io.File;
 import java.util.*;
 
-
 public class SIT {
-	public SIT() {
-	}
 	
 	/**
 	 * @param args Takes one or fewer arguments. -j,-a,-c designate the languages Java, Ada and C++ respectively 
 	 * If no arguments are entered, all files will be selected by default.
 	 */
-
-
 	public static void main(String[] args) {
+		
 		//init reader
 		Input input = new Input();
-		if(args.length == 1) {
-			//open current directory and view files
-			
-			//depending on the specification, open the appropriate group
+		
+		
+		if(args.length == 0){
+			//If no arguments specified, print a help statement
+			notifyUser("Enter \"help\" for valid commands.");
+		}
+		//If arguments are specified
+		else {
+			//depending on the first argument, process files of the specified type
+			//java
 			if(args[0].equals("-j")) {
-				//TODO get all java files
-				input.collectAllJavaFiles();
+				//All files of this type
+				if(args.length == 1)
+				{
+					input.collectAllJavaFiles();
+				}
+				//Multiple files selected by name
+				else
+				{
+					List<String> fileList = new LinkedList<String>();
+					for(int i = 1; i < args.length; i++)
+					{
+						fileList.add(args[i]);
+					}
+					input.sortByType(fileList);
+				}
 				input.analyzeJava();
 			}
+			//ada
 			else if(args[0].equals("-a")) {
-				//TODO get all Ada Files
-				input.collectAllAdaFiles();
+				//All files of this type
+				if(args.length == 1)
+				{
+					input.collectAllAdaFiles();
+				}
+				//Multiple files selected by name
+				else
+				{
+					List<String> fileList = new LinkedList<String>();
+					for(int i = 1; i < args.length; i++)
+					{
+						fileList.add(args[i]);
+					}
+					input.sortByType(fileList);
+				}
 				input.analyzeAda();
 			}
+			//c++
 			else if(args[0].equals("-c")) {
-				//TODO get all c++ files
-				input.collectAllCppFiles();
+				//All files of this type
+				if(args.length == 1)
+				{
+					input.collectAllCppFiles();
+				}
+				//Multiple files selected by name
+				else
+				{
+					List<String> fileList = new LinkedList<String>();
+					for(int i = 1; i < args.length; i++)
+					{
+						fileList.add(args[i]);
+					}
+					input.sortByType(fileList);
+				}
 				input.analyzeCpp();
 			}
+			//all files
 			else if(args[0].equals("-all")) {
-				List<String> filenames=input.collectAllFilesInDirectory();
+				List<String> filenames = input.collectAllFilesInDirectory();
 				input.analyzeAll(filenames);
-
-
 			}
-			//then is should be a file name 
+			//then it should be a file name 
+			//TODO: Use File class to detect whether this is a directory
 			else if(args[0].contains(".")) {
 				input.analyzeSingleFile(args[0]);
 			}
@@ -54,15 +97,6 @@ public class SIT {
 				notifyUser("Invalid Input");
 			}
 		}
-		else if(args.length == 0){
-			//default is to open all files
-			List<String> filenames=input.collectAllFilesInDirectory();
-			input.analyzeAll(filenames);
-		}
-		else {
-			notifyUser("Command not recognized");
-		}
-
 	}
 
 	/**

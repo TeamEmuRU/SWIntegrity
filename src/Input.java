@@ -26,9 +26,9 @@ public class Input {
 	 */
 	public Input() {
 		// TODO Auto-generated constructor stub
-		adaFiles=new LinkedList<>();
-		javaFiles=new LinkedList<>();
-		cppFiles=new LinkedList<>();
+		adaFiles = new LinkedList<>();
+		javaFiles = new LinkedList<>();
+		cppFiles = new LinkedList<>();
 	}
 	
 	/**
@@ -212,6 +212,7 @@ public class Input {
 	 * @param filenames Names of the that need to be sorted
 	 */
 	//TODO move these extensions into an enum class
+	//TODO: make this function private to the input class, remove from main
 	public void sortByType(List<String> filenames) {
 		//check each file's extension
 		for (String s:filenames){
