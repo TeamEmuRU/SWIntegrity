@@ -23,8 +23,10 @@ public class SIT {
 		
 		if(args.length == 0)
 		{
-			//If no arguments specified, print a help statement
-			notifyUser("Enter \"help\" for valid commands.");
+			//If no arguments specified, process all files with known extensions
+			//in the current directory
+			input.addAllFilesInDirectory(args[0]);
+			input.analyze();
 		}
 		//If arguments are specified
 		else 
