@@ -25,7 +25,7 @@ public class SIT {
 		{
 			//If no arguments specified, process all files with known extensions
 			//in the current directory
-			input.addAllFilesInDirectory(args[0]);
+			input.addFiles(input.getAllFilesInDirectory(System.getProperty("user.dir")));
 			input.analyze();
 		}
 		//If arguments are specified
@@ -38,7 +38,7 @@ public class SIT {
 				//All files of this type
 				if(args.length == 1)
 				{
-					input.addJavaFilesInDirectory("user.dir");	//By default, searches the current directory
+					input.addJavaFilesInDirectory(System.getProperty("user.dir"));	//By default, searches the current directory
 				}
 				//Multiple files selected by name
 				else
@@ -56,7 +56,7 @@ public class SIT {
 				//All files of this type
 				if(args.length == 1)
 				{
-					input.addAdaFilesInDirectory("user.dir");
+					input.addAdaFilesInDirectory(System.getProperty("user.dir"));
 				}
 				//Multiple files selected by name
 				else
@@ -74,7 +74,7 @@ public class SIT {
 				//All files of this type
 				if(args.length == 1)
 				{
-					input.addCppFilesInDirectory("user.dir");
+					input.addCppFilesInDirectory(System.getProperty("user.dir"));
 				}
 				//Multiple files selected by name
 				else
@@ -88,8 +88,21 @@ public class SIT {
 				input.analyze();
 			}
 			//all files
-			else if(args[0].equals("-all")) {
-				input.addAllFilesInDirectory(args[0]);
+			else if(args[0].equals("-r")) {
+				if(args.length == 1)
+				{
+					input.addFiles(input.getAllFilesInDirectoryAndSubDirectories(System.getProperty("user.dir")));
+				}
+				else {
+					
+					for(int i = 1; i < args.length; i++)
+					{
+						fileList.addAll(input.getAllFilesInDirectoryAndSubDirectories(args[i]));
+					}
+					input.addFiles(fileList);
+					}
+				
+				
 				input.analyze();
 			}
 			//then it should be a file name 
@@ -105,7 +118,7 @@ public class SIT {
 				}
 				else if(f.isDirectory())
 				{
-					input.addAllFilesInDirectory(args[0]);
+					input.getAllFilesInDirectory(args[0]);
 					input.analyze();
 				}
 				else
@@ -152,6 +165,7 @@ public class SIT {
 				System.out.println("invalid response.");
 			}
 		}
+		scanner.close();
 		return response;
 	}
 }

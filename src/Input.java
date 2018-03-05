@@ -48,10 +48,12 @@ public class Input {
 	 * @param filenames A list that of filenames
 	 */
 	public void analyze() {
-		
-		analyzeJava();
-		analyzeAda();
-		analyzeCpp();
+		if(javaFiles.size()>0)
+			analyzeJava();
+		if(adaFiles.size()>0)
+			analyzeAda();
+		if(cppFiles.size()>0)
+			analyzeCpp();
 		//TODO special case for other
 	}
 	
@@ -147,10 +149,11 @@ public class Input {
 	/**
 	 * Collects the filenames of all files in current directory.
 	 * The files are then sorted into their appropriate lists
+	 * @param directory to gather all files from
 	 * @return a reader that contains the files
 	 */
 	//TODO: Make this function private to the Input class. Replace its usage in main
-	public List<String> addAllFilesInDirectory(String dir) {
+	public List<String> getAllFilesInDirectory(String dir) {
 		//gather information on folder
 		File folder = new File(dir);
 		
@@ -167,10 +170,55 @@ public class Input {
 			}
 			
 		}
-		addFiles(fileNames);
+		//addFiles(fileNames);
 		
 		//sort that list by extension
 		return fileNames;
+	}
+	/**
+	 * Helper method for addAllFilesInDirectoryAndSubDirectories, this method gathers all directories in a directory, much in the same way 
+	 * addAllFilesInDirectory does
+	 * @param dir the directory you wish to call this method on
+	 * @return a list of directories in the given directory
+	 */
+	private List<String> getAllDirectoriesInDirectory(String dir){
+		//create a new file for director
+		File folder=new File(dir);
+		//get file names
+		File[] listOfFiles = folder.listFiles();
+		//create new list to hold directory names
+		List<String> fileNames = new LinkedList<>();
+		//collect all directories
+		for(File f : listOfFiles) 
+		{
+			if(f.isDirectory())
+			{
+				fileNames.add(f.getAbsolutePath());
+			}
+			
+		}
+		return fileNames;
+	}
+	/**
+	 * This method is used to recursively call a directory and get all files within that Directory as well as all files inside directories within those 
+	 * directories
+	 * @param dir the path of the directory you wish to call the method on 
+	 * @return all files within that directory and it's subdirectories
+	 */
+	public List<String> getAllFilesInDirectoryAndSubDirectories(String dir) {
+		//gather all files in this directory
+		List<String> allFiles=getAllFilesInDirectory(dir);
+		//gather all directories within this directory
+		List<String> allDirectories=getAllDirectoriesInDirectory(dir);
+		//for each subdirectory, gather all files within that directory and it's subdirectories and then add them to the list of 
+		//files from the directory that came before it 
+		for(String subDir:allDirectories) {
+			//the recursive call will continue until it hits the bottom of the directory tree, at which case get all Directories in directory will return zero 
+			//and this for loop wont run 
+			allFiles.addAll(getAllFilesInDirectoryAndSubDirectories(subDir));
+		}
+		return allFiles;
+		
 	}
 	
 	/**
@@ -179,7 +227,7 @@ public class Input {
 	//TODO: Make this function private to the Input class. Replace its usage in main
 	public void addJavaFilesInDirectory(String dir) 
 	{
-		List<String> filenames = addAllFilesInDirectory(dir);
+		List<String> filenames = getAllFilesInDirectory(dir);
 		for(String name:filenames) 
 		{
 			if(isJavaFile(name)) 
@@ -195,7 +243,7 @@ public class Input {
 	//TODO: Make this function private to the Input class. Replace its usage in main
 	public void addAdaFilesInDirectory(String dir) 
 	{
-		List<String> filenames = addAllFilesInDirectory(dir);
+		List<String> filenames = getAllFilesInDirectory(dir);
 		for(String name:filenames) 
 		{
 			if(isAdaFile(name)) 
@@ -210,7 +258,7 @@ public class Input {
 	 */
 	//TODO: Make this function private to the Input class. Replace its usage in main
 	public void addCppFilesInDirectory(String dir) {
-		List<String> filenames =  addAllFilesInDirectory(dir);
+		List<String> filenames =  getAllFilesInDirectory(dir);
 		for(String name:filenames) {
 			if(isCppFile(name)) {
 				cppFiles.add(name);
