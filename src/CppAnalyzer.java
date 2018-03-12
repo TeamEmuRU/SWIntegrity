@@ -58,10 +58,10 @@ public class CppAnalyzer extends Analyzer
 						mComment = false;
 					}
 					//if the current line does not terminate the comment,
-					//remove all characters from the current line
+					//then it continues to the next line
 					else
 					{
-						line = new String("");
+						continue;
 					}
 				}
 				
@@ -69,10 +69,10 @@ public class CppAnalyzer extends Analyzer
 				line = line.replaceAll("//.*$", "");
 				//removes single-line comments in the format "/* --- */"
 				line = line.replaceAll("/\\*.*\\*/", "");
-				//removes all characters following "/*" and flags the next line as within the comment
+				//removes all characters following "/*" and flags the next line as a continuation of a multi-line comment
 				if(line.contains("/*"))
 				{
-					line = line.replace("/\\*.*$", "");
+					line = line.replaceAll("/\\*.*$", "");
 					mComment = true;
 				}
 				
