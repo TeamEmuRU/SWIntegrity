@@ -2,8 +2,8 @@
  * The Input class validates files and organizes them into lists
  * based on their file types
  * 
- * @author Jamie Tyler Walder
  * @author Abby Beizer
+ * @author Jamie Tyler Walder
  */
 
 

@@ -1,8 +1,11 @@
 /**
  * The driver of the SIT project. Is responsible for acting as the user interface and handling output.
  * 
- * @author Jamie Tyler Walder
+ * @version 0.1
+ * 
+ * @author Joseph Antaki
  * @author Abby Beizer
+ * @author Jamie Tyler Walder
  */
 
 import java.io.File;
