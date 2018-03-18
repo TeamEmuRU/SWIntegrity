@@ -107,24 +107,9 @@ public class SIT {
 			}
 			//display help information
 			else if(args[0].equals("-help") || args[0].equals("?")){
-				notifyUser("This Software Integrity Tester (SIT) analyzes Java, Ada, and C++ source code");
-				notifyUser("for security weaknesses and vulnerabilities.\n");
-				notifyUser("Usage: SIT <options> <directory name or filenames>");
-				notifyUser("where possible options include:");
-				notifyUser("(No options or directory/files specified)");
-				notifyUser("	Analyze all supported source code files in the current directory");
-				notifyUser("-j");
-				notifyUser("	Analyze all Java source code files in the specified directory");
-				notifyUser("-a");
-				notifyUser("	Analyze all Ada source code files in the specified directory");
-				notifyUser("-c");
-				notifyUser("	Analyze all C++ source code and header files in the specified directory");
-				notifyUser("-r");
-				notifyUser("	Analyze all specified source code files in the specified directory, and"); 
-				notifyUser("	all of its subdirectories");
+				displayHelp();
 			}
 			//then it should be a file name 
-			//TODO: Use File class to detect whether this is a directory
 			else
 			{
 				File f = new File(args[0]);
@@ -185,5 +170,27 @@ public class SIT {
 		}
 		scanner.close();
 		return response;
+	}
+	
+	/**
+	 * Displays valid commands for using this application to the user
+	 */
+	private static void displayHelp()
+	{
+		notifyUser("This Software Integrity Tester (SIT) analyzes Java, Ada, and C++ source code");
+		notifyUser("for security weaknesses and vulnerabilities.\n");
+		notifyUser("Usage: SIT <options> <directory name or filenames>");
+		notifyUser("where possible options include:");
+		notifyUser("(No options or directory/files specified)");
+		notifyUser("	Analyze all supported source code files in the current directory");
+		notifyUser("-j");
+		notifyUser("	Analyze all Java source code files in the specified directory");
+		notifyUser("-a");
+		notifyUser("	Analyze all Ada source code files in the specified directory");
+		notifyUser("-c");
+		notifyUser("	Analyze all C++ source code and header files in the specified directory");
+		notifyUser("-r");
+		notifyUser("	Analyze all specified source code files in the specified directory, and"); 
+		notifyUser("	all of its subdirectories");
 	}
 }
