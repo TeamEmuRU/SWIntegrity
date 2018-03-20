@@ -20,11 +20,8 @@ import java.util.Set;
 
 public class CppAnalyzer extends Analyzer
 {
-	//make sure to remake to private
-	List<String> variablesList;
+	private List<String> variablesList;
 	private Set<String> keywords;
-	
-	
 	
 	
 	/**
@@ -33,13 +30,20 @@ public class CppAnalyzer extends Analyzer
 	public CppAnalyzer()
 	{
 		super();
+		//Instantiate variables
 		variablesList = new LinkedList<String>();
-		keywords=createKeywordSet();
+		keywords = new HashSet<>();
+		
+		//Create keyword set
+		createKeywordSet();
 	}
 	
-	private Set<String> createKeywordSet() {
-		// TODO Auto-generated method stub
-		Set<String> keywords=new HashSet<>();
+	/**
+	 * Creates a set of reserved C++ keywords.
+	 * Words that appear within this set are not recognized as valid class or variable names.
+	 */
+	private void createKeywordSet() 
+	{
 		keywords.add("public");
 		keywords.add("private");
 		keywords.add("protected");
@@ -70,76 +74,119 @@ public class CppAnalyzer extends Analyzer
 		keywords.add("-");
 		keywords.add("\"");
 		//TODO add the rest
-		
-		
-		return keywords;
+		//Can use http://en.cppreference.com/w/cpp/keyword as a reference
 	}
-	public String flattenCode(String s) {
-		String finalString=s.trim().replace("\n", "").replace("\t","").replaceAll("\r", "");
+	
+	//TODO: Add javadoc
+	public String flattenCode(String s) 
+	{
+		String finalString = s.trim().replace("\n", "").replace("\t","").replaceAll("\r", "");
 				
-		finalString=finalString.replace("=", " = ");
-		finalString=finalString.replace("(", " ( ");
-		finalString=finalString.replace(")", " ) ");
-		finalString=finalString.replace(";", " ; ");
-		finalString=finalString.replace("{", " { ");
-		finalString=finalString.replace("}", " } ");
-		finalString=finalString.replace("[", " [ ");
-		finalString=finalString.replace("]", " ] ");
-		finalString=finalString.replace(":", " : ");
-		finalString=finalString.replace(":", " : ");
-		finalString=finalString.replace("\"", " \" ");
-		finalString=finalString.replace(",", " , ");
-		
-		
+		finalString = finalString.replace("=", " = ");
+		finalString = finalString.replace("(", " ( ");
+		finalString = finalString.replace(")", " ) ");
+		finalString = finalString.replace(";", " ; ");
+		finalString = finalString.replace("{", " { ");
+		finalString = finalString.replace("}", " } ");
+		finalString = finalString.replace("[", " [ ");
+		finalString = finalString.replace("]", " ] ");
+		finalString = finalString.replace(":", " : ");
+		finalString = finalString.replace(":", " : ");
+		finalString = finalString.replace("\"", " \" ");
+		finalString = finalString.replace(",", " , ");
 		
 		return finalString;
 	}
 	
-	public boolean isCodeBreak(char c) {
-		return c=='{'||c=='}'||c==';'||c==':'||c=='=';
+	//TODO: Add javadoc
+	private boolean isCodeBreak(char c) 
+	{
+		return ( c =='{' || c == '}' || c == ';' || c == ':' || c == '=' ) ;
 	}
-	public String removeExtras(String s) {
-		return s.replace(")", "");
+	
+	//TODO: Add javadoc
+	private void removeExtras(String s) 
+	{
+		s.replace(")", "");
 	}
-	public boolean isValidVarName(String name) {
+	
+	/**
+	 * Identifies whether a given String can be used as a variable name without conflicting with reserved C++ keywords.
+	 * @param name The String to validate
+	 * @return true if the String does not conflict with the list of reserved C++ keywords.
+	 */
+	private boolean isValidVarName(String name) 
+	{
+		boolean valid = true;
+		//Set the flag to false if the name conflicts with reserved keywords
 		if(keywords.contains(name))
-			return false;
+		{
+			valid = false;
+		}
 		
-
-		return true;
+		return valid;
 	}
-	public boolean isValidClassName(String name) {
+	
+	/**
+	 * Identifies whether a given String can be used as a class name without conflicting with reserved C++ keywords.
+	 * @param name The String to validate
+	 * @return true if the String does not conflict with the list of reserved C++ keywords.
+	 */
+	private boolean isValidClassName(String name) 
+	{
+		boolean valid = true;
+		//Set the flag to false if the name conflicts with reserved keywords
 		if(keywords.contains(name))
-			return false;
-		return true;
+		{
+			valid = false;
+		}
+		
+		return valid;
 	}
-	public void extractVariables(String s) {
-		String words[]=s.split(" ");
-		ArrayList<String> list=new ArrayList<>(Arrays.asList(words));
-		Iterator<String> itty=list.iterator();
-		boolean stringSwitch=false;
-		while(itty.hasNext()) {
-			String word=itty.next();
+	
+	
+	public void extractVariables(String s) 
+	{
+		//Create an array of all words separated by a space
+		String words[] = s.split(" ");
+		//Transform the array into an ArrayList
+		ArrayList<String> list = new ArrayList<>(Arrays.asList(words));
+		
+		Iterator<String> itty = list.iterator();
+		boolean stringSwitch = false;
+		while(itty.hasNext()) 
+		{
+			String word = itty.next();
+			//Remove any blank words in the ArrayList
 			if(word.equals(""))
-				itty.remove();
-			else if(word.equals("\"")) {
-				stringSwitch=!stringSwitch;
+			{
 				itty.remove();
 			}
-			else if(stringSwitch&&!word.equals("\"")) {
+			//TODO: Tell me what this does
+			else if(word.equals("\"")) 
+			{
+				stringSwitch = !stringSwitch;
+				itty.remove();
+			}
+			//TODO: Tell me what this does
+			else if(stringSwitch && !word.equals("\"")) 
+			{
 				itty.remove();
 			}
 			
 		}
 		
-		words=list.toArray(new String[list.size()]);
-		for(int i=0;i<words.length-2;i++) {
-			if(!keywords.contains(words[i])&&!keywords.contains(words[i+1])) {
-				if((!words[i+2].contains("("))&&isValidClassName(words[i])&&isValidVarName(words[i+1])) {
-					variablesList.add(words[i+1]+":"+words[i]);
+		words = list.toArray(new String[list.size()]);
+		for(int i = 0; (i < words.length - 2);i++) 
+		{
+			if( !keywords.contains(words[i]) && !keywords.contains(words[i+1]) ) 
+			{
+				if( (!words[i+2].contains("(")) && isValidClassName(words[i]) && isValidVarName(words[i+1]))
+				{
+					variablesList.add(words[i+1] + ":" + words[i]);
 				}
 			}
-		}
+		}//end for
 	}
 	
 	@Override
