@@ -9,13 +9,23 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class CppAnalyzer extends Analyzer
 {
-
-	private List<String> variablesList;
+	//make sure to remake to private
+	List<String> variablesList;
+	private Set<String> keywords;
+	
+	
+	
 	
 	/**
 	 * Default constructor
@@ -24,6 +34,112 @@ public class CppAnalyzer extends Analyzer
 	{
 		super();
 		variablesList = new LinkedList<String>();
+		keywords=createKeywordSet();
+	}
+	
+	private Set<String> createKeywordSet() {
+		// TODO Auto-generated method stub
+		Set<String> keywords=new HashSet<>();
+		keywords.add("public");
+		keywords.add("private");
+		keywords.add("protected");
+		keywords.add("static");
+		keywords.add("final");
+		keywords.add("void");
+		keywords.add("if");
+		keywords.add("elif");
+		keywords.add("else");
+		keywords.add("extends");
+		keywords.add("import");
+		keywords.add("abstract");
+		keywords.add("new");
+		keywords.add("null");
+		keywords.add("try");
+		keywords.add("catch");
+		keywords.add("class");
+		keywords.add("return");
+		keywords.add(";");
+		keywords.add("(");
+		keywords.add(")");
+		keywords.add("{");
+		keywords.add("}");
+		keywords.add("=");
+		keywords.add("+");
+		keywords.add("%");
+		keywords.add("/");
+		keywords.add("-");
+		keywords.add("\"");
+		//TODO add the rest
+		
+		
+		return keywords;
+	}
+	public String flattenCode(String s) {
+		String finalString=s.trim().replace("\n", "").replace("\t","").replaceAll("\r", "");
+				
+		finalString=finalString.replace("=", " = ");
+		finalString=finalString.replace("(", " ( ");
+		finalString=finalString.replace(")", " ) ");
+		finalString=finalString.replace(";", " ; ");
+		finalString=finalString.replace("{", " { ");
+		finalString=finalString.replace("}", " } ");
+		finalString=finalString.replace("[", " [ ");
+		finalString=finalString.replace("]", " ] ");
+		finalString=finalString.replace(":", " : ");
+		finalString=finalString.replace(":", " : ");
+		finalString=finalString.replace("\"", " \" ");
+		finalString=finalString.replace(",", " , ");
+		
+		
+		
+		return finalString;
+	}
+	
+	public boolean isCodeBreak(char c) {
+		return c=='{'||c=='}'||c==';'||c==':'||c=='=';
+	}
+	public String removeExtras(String s) {
+		return s.replace(")", "");
+	}
+	public boolean isValidVarName(String name) {
+		if(keywords.contains(name))
+			return false;
+		
+
+		return true;
+	}
+	public boolean isValidClassName(String name) {
+		if(keywords.contains(name))
+			return false;
+		return true;
+	}
+	public void extractVariables(String s) {
+		String words[]=s.split(" ");
+		ArrayList<String> list=new ArrayList<>(Arrays.asList(words));
+		Iterator<String> itty=list.iterator();
+		boolean stringSwitch=false;
+		while(itty.hasNext()) {
+			String word=itty.next();
+			if(word.equals(""))
+				itty.remove();
+			else if(word.equals("\"")) {
+				stringSwitch=!stringSwitch;
+				itty.remove();
+			}
+			else if(stringSwitch&&!word.equals("\"")) {
+				itty.remove();
+			}
+			
+		}
+		
+		words=list.toArray(new String[list.size()]);
+		for(int i=0;i<words.length-2;i++) {
+			if(!keywords.contains(words[i])&&!keywords.contains(words[i+1])) {
+				if((!words[i+2].contains("("))&&isValidClassName(words[i])&&isValidVarName(words[i+1])) {
+					variablesList.add(words[i+1]+":"+words[i]);
+				}
+			}
+		}
 	}
 	
 	@Override
