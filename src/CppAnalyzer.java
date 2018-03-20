@@ -117,11 +117,11 @@ public class CppAnalyzer extends Analyzer
 		return result.trim();
 	}
 	/**
-	 * Identifies whether a given String can be used as a variable name without conflicting with reserved C++ keywords.
+	 * Identifies whether a given String can be used as a variable or class name without conflicting with reserved C++ keywords.
 	 * @param name The String to validate
 	 * @return true if the String does not conflict with the list of reserved C++ keywords.
 	 */
-	private boolean isValidVarName(String name) 
+	private boolean isValidName(String name) 
 	{
 		boolean valid = true;
 		//Set the flag to false if the name conflicts with reserved keywords
@@ -132,24 +132,7 @@ public class CppAnalyzer extends Analyzer
 		
 		return valid;
 	}
-	
-	/**
-	 * Identifies whether a given String can be used as a class name without conflicting with reserved C++ keywords.
-	 * @param name The String to validate
-	 * @return true if the String does not conflict with the list of reserved C++ keywords.
-	 */
-	private boolean isValidClassName(String name) 
-	{
-		boolean valid = true;
-		//Set the flag to false if the name conflicts with reserved keywords
-		if(keywords.contains(name))
-		{
-			valid = false;
-		}
-		
-		return valid;
-	}
-	
+
 	/**
 	 * extracts variable names and their types from a cleaned string
 	 * @param s formatted code to pull variables from
@@ -192,7 +175,7 @@ public class CppAnalyzer extends Analyzer
 			if( !keywords.contains(words[i]) && !keywords.contains(words[i+1]) ) 
 			{
 				//we check for validity of class name and var name as well as it not being a mthod name by checking for the (
-				if( (!words[i+2].contains("(")) && isValidClassName(words[i]) && isValidVarName(words[i+1]))
+				if( (!words[i+2].contains("(")) && isValidName(words[i]))
 				{
 					//if it is we declare the variable name:type
 					variablesList.add(words[i+1] + ":" + words[i]);
