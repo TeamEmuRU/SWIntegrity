@@ -77,11 +77,15 @@ public class CppAnalyzer extends Analyzer
 		//Can use http://en.cppreference.com/w/cpp/keyword as a reference
 	}
 	
-	//TODO: Add javadoc
+	/**
+	 * a method that transforms code into an easier to work with format
+	 * @param s code which need to be formatted
+	 * @return a string containing all significant symbols seperated by spaces
+	 */
 	public String flattenCode(String s) 
 	{
 		String finalString = s.trim().replace("\n", "").replace("\t","").replaceAll("\r", "");
-				
+		//Separate all special characters		
 		finalString = finalString.replace("=", " = ");
 		finalString = finalString.replace("(", " ( ");
 		finalString = finalString.replace(")", " ) ");
@@ -94,22 +98,24 @@ public class CppAnalyzer extends Analyzer
 		finalString = finalString.replace(":", " : ");
 		finalString = finalString.replace("\"", " \" ");
 		finalString = finalString.replace(",", " , ");
+		//Create an array of all words separated by a space
+		String words[] = finalString.split(" ");
+		//Transform the array into an ArrayList
+		ArrayList<String> list = new ArrayList<>(Arrays.asList(words));
+		Iterator<String> itty = list.iterator();
+		String result="";
+		while(itty.hasNext()) {
+			String word = itty.next();
+			//Remove any blank words in the ArrayList
+			if(!word.equals(""))
+			{
+				result+=word+" ";
+			}
+		}
 		
-		return finalString;
+		
+		return result.trim();
 	}
-	
-	//TODO: Add javadoc
-	private boolean isCodeBreak(char c) 
-	{
-		return ( c =='{' || c == '}' || c == ';' || c == ':' || c == '=' ) ;
-	}
-	
-	//TODO: Add javadoc
-	private void removeExtras(String s) 
-	{
-		s.replace(")", "");
-	}
-	
 	/**
 	 * Identifies whether a given String can be used as a variable name without conflicting with reserved C++ keywords.
 	 * @param name The String to validate
@@ -144,31 +150,32 @@ public class CppAnalyzer extends Analyzer
 		return valid;
 	}
 	
-	
+	/**
+	 * extracts variable names and their types from a cleaned string
+	 * @param s formatted code to pull variables from
+	 */
 	public void extractVariables(String s) 
 	{
 		//Create an array of all words separated by a space
 		String words[] = s.split(" ");
 		//Transform the array into an ArrayList
 		ArrayList<String> list = new ArrayList<>(Arrays.asList(words));
-		
+		//start iterator
 		Iterator<String> itty = list.iterator();
+		//set a switch keep track of when we are in a string
 		boolean stringSwitch = false;
+		//the following loop removes strings, it is unfortunate but in order to detect varaibles strings must not be present
 		while(itty.hasNext()) 
 		{
 			String word = itty.next();
-			//Remove any blank words in the ArrayList
-			if(word.equals(""))
-			{
-				itty.remove();
-			}
-			//TODO: Tell me what this does
-			else if(word.equals("\"")) 
+			
+			//if we run into the begining of a string we turn the switch on and remove the first character, this gets activated again at the end of the switch
+			if(word.equals("\"")) 
 			{
 				stringSwitch = !stringSwitch;
 				itty.remove();
 			}
-			//TODO: Tell me what this does
+			//while inside of a string we remove it
 			else if(stringSwitch && !word.equals("\"")) 
 			{
 				itty.remove();
@@ -176,13 +183,18 @@ public class CppAnalyzer extends Analyzer
 			
 		}
 		
+		//put words back into an array
 		words = list.toArray(new String[list.size()]);
+		//search each word for mathing pattern
 		for(int i = 0; (i < words.length - 2);i++) 
 		{
+			//if the first two wards are not keywords we check further
 			if( !keywords.contains(words[i]) && !keywords.contains(words[i+1]) ) 
 			{
+				//we check for validity of class name and var name as well as it not being a mthod name by checking for the (
 				if( (!words[i+2].contains("(")) && isValidClassName(words[i]) && isValidVarName(words[i+1]))
 				{
+					//if it is we declare the variable name:type
 					variablesList.add(words[i+1] + ":" + words[i]);
 				}
 			}
