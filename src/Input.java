@@ -45,7 +45,6 @@ public class Input {
 	
 	/**
 	 * Analyzes sorted lists of files for vulnerabilities
-	 * @param filenames A list that of filenames
 	 */
 	public void analyze() {
 		if(javaFiles.size()>0)
@@ -149,7 +148,7 @@ public class Input {
 	/**
 	 * Collects the filenames of all files in current directory.
 	 * The files are then sorted into their appropriate lists
-	 * @param directory to gather all files from
+	 * @param dir The directory to gather all files from
 	 * @return a reader that contains the files
 	 */
 	//TODO: Make this function private to the Input class. Replace its usage in main
@@ -223,6 +222,7 @@ public class Input {
 	
 	/**
 	 * Search through directory and collect all Java files
+	 * @param dir The directory to pull files from
 	 */
 	//TODO: Make this function private to the Input class. Replace its usage in main
 	public void addJavaFilesInDirectory(String dir) 
@@ -239,6 +239,7 @@ public class Input {
 	
 	/**
 	 * Search through directory and collect all Ada files
+	 * @param dir The directory to pull files from
 	 */
 	//TODO: Make this function private to the Input class. Replace its usage in main
 	public void addAdaFilesInDirectory(String dir) 
@@ -255,6 +256,7 @@ public class Input {
 	
 	/**
 	 * Search through directory and collect all C++ files
+	 * @param dir The directory to pull files from
 	 */
 	//TODO: Make this function private to the Input class. Replace its usage in main
 	public void addCppFilesInDirectory(String dir) {
