@@ -286,7 +286,7 @@ public class CppAnalyzer extends Analyzer
 	
 	@Override
 	protected void analyze(String filename) {
-		
+		parse(filename);
 	}
 
 }
