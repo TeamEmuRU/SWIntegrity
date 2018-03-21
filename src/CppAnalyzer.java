@@ -72,7 +72,15 @@ public class CppAnalyzer extends Analyzer
 		keywords.add("%");
 		keywords.add("/");
 		keywords.add("-");
+		keywords.add("cout");
+		keywords.add("<<");
+		keywords.add(">>");
+		keywords.add("cin");
+		keywords.add("#include");
+		keywords.add(":");
 		keywords.add("\"");
+		//TODO remove this after, for effect only
+		keywords.add("<iostream>");
 		//TODO add the rest
 		//Can use http://en.cppreference.com/w/cpp/keyword as a reference
 	}
@@ -195,7 +203,7 @@ public class CppAnalyzer extends Analyzer
 		 * 		TODO: ignore comment symbols that are used as string literals
 		 * TODO: Process the line for variable names
 		 */
-		
+		String file="";
 		try {
 			BufferedReader br = new BufferedReader(new FileReader(filename));
 			String line;
@@ -237,7 +245,6 @@ public class CppAnalyzer extends Analyzer
 					mComment = true;
 				}
 				
-				System.out.println(line);
 				
 				//After removal of comments, process remaining characters
 				
@@ -255,10 +262,14 @@ public class CppAnalyzer extends Analyzer
 				
 				/* Then locate variables */
 				//TODO: Prevent opening file twice
-				String file = openFile(filename);
-				extractVariables(file);
-			
+				
+				file+=line;
 			}
+			String s=flattenCode(file);
+			System.out.print(s);
+			extractVariables(s);
+			//TODO remove me!
+			System.out.println(variablesList);
 		}
 		catch(FileNotFoundException fnf)	//from FileReader
 		{
@@ -268,6 +279,7 @@ public class CppAnalyzer extends Analyzer
 		{
 			SIT.notifyUser("Error reading the contents of " + filename + "." );
 		}
+		
 		
 	}
 
