@@ -1,5 +1,11 @@
 // 'Hello World!' program 
- 
+
+/* Hello World */
+
+/*
+ * Hello World
+ */
+
 #include <iostream>
  
 int main()
