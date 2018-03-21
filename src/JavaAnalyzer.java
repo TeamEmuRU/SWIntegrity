@@ -91,6 +91,7 @@ public class JavaAnalyzer extends Analyzer {
     {
         //Create an array of all words separated by a space
         String words[] = s.split(" ");
+        //extract String and primitive variables
         searchForType(words, "String");
         searchForType(words, "boolean");
         searchForType(words, "byte");
@@ -100,6 +101,12 @@ public class JavaAnalyzer extends Analyzer {
         searchForType(words, "long");
         searchForType(words, "float");
         searchForType(words, "double");
+        //extract all other variables
+        for (int i = 2; i < words.length; i++) {
+            if((!words[i-1].equals(")"))&&(words[i].equals("=") || words[i].equals(";")) && Character.isUpperCase(words[i-2].charAt(0))){
+                variablesList.add(words[i-1]);
+            }
+        }
         //Transform the array into an ArrayList
         ArrayList<String> list = new ArrayList<>(Arrays.asList(words));
         //start iterator
