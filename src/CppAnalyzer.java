@@ -87,6 +87,10 @@ public class CppAnalyzer extends Analyzer
 		//TODO add the rest
 		//Can use http://en.cppreference.com/w/cpp/keyword as a reference
 	}
+	/**
+	 * scans files and pulls out all literals 
+	 * @param file file contents to be scanned
+	 */
 	public void extractLiterals(String file) {
 		String[] words=file.replace("\\\"", "").replace("\\","").split(" ");
 		String litteral="";
@@ -242,7 +246,12 @@ public class CppAnalyzer extends Analyzer
 			}
 			//check to see if this is an assigment
 			else if(words[i].equals("=")&&!words[i+1].equals("=")) {
+				//create stack to keep track of temporary scopes
+				Stack<String> temp=new Stack<>();
+				//flag if the variable was found in scope
+				boolean found=false;
 				//if it is get the varaible
+				while(!found) {
 				for(Variable v:variablesList) {
 					//if the variable name and scope match add the assignment
 					if(v.getName().equals(words[i-1])&&v.getScope().equals(scopes.toString())) {
@@ -257,8 +266,20 @@ public class CppAnalyzer extends Analyzer
 						}
 						//add word to assignments
 						v.getAssignments().put(i, assignment);
+						//we found the varaible
+						found=true;
 				}
+					//if we didnt find it back out a scope and try again
+				
 			}
+				if(!found) {
+					temp.push(scopes.pop());
+				}
+				}
+				//repopulate the scope appropriately
+				while(!temp.isEmpty()) {
+					scopes.push(temp.pop());
+				}
 		}
 		}//end for
 	}
