@@ -272,7 +272,7 @@ public class CppAnalyzer extends Analyzer
 					//if we didnt find it back out a scope and try again
 				
 			}
-				if(!found) {
+				if(!found&&!scopes.isEmpty()) {
 					temp.push(scopes.pop());
 				}
 				}
