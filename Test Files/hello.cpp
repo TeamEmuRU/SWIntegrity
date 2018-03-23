@@ -7,7 +7,10 @@
  */
 
 #include <iostream>
- 
+ class test{
+ 	int i=1;
+ 	String b="nope";
+ };
 int main()
 {
   std::cout << "Hello World!" << std::endl;
