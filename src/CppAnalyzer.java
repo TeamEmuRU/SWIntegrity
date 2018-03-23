@@ -11,17 +11,22 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Stack;
 
 public class CppAnalyzer extends Analyzer
 {
-	private List<String> variablesList;
+	private List<Variable> variablesList;
 	private Set<String> keywords;
+	//literals of the file
+	private List<String> literals;
+
 	
 	
 	/**
@@ -31,9 +36,9 @@ public class CppAnalyzer extends Analyzer
 	{
 		super();
 		//Instantiate variables
-		variablesList = new LinkedList<String>();
+		variablesList = new LinkedList<Variable>();
 		keywords = new HashSet<>();
-		
+		literals=new LinkedList<>();
 		//Create keyword set
 		createKeywordSet();
 	}
@@ -78,12 +83,28 @@ public class CppAnalyzer extends Analyzer
 		keywords.add("cin");
 		keywords.add("#include");
 		keywords.add(":");
-		keywords.add("\"");
-		//TODO remove this after, for effect only
-		keywords.add("<iostream>");
+		
 		//TODO add the rest
 		//Can use http://en.cppreference.com/w/cpp/keyword as a reference
 	}
+	public void extractLiterals(String file) {
+		String[] words=file.replace("\\\"", "").replace("\\","").split(" ");
+		String litteral="";
+		boolean inLiteral=false;
+		for(String word:words) {
+			if(word.equals("\"")) {
+				inLiteral=!inLiteral;
+				if(!inLiteral) {
+					literals.add(litteral);
+					litteral="";
+				}
+			}
+			if(inLiteral) {
+				litteral+=word+" ";
+			}
+		}
+	}
+	
 	
 	/**
 	 * a method that transforms code into an easier to work with format
@@ -103,9 +124,15 @@ public class CppAnalyzer extends Analyzer
 		finalString = finalString.replace("[", " [ ");
 		finalString = finalString.replace("]", " ] ");
 		finalString = finalString.replace(":", " : ");
-		finalString = finalString.replace(":", " : ");
+		finalString = finalString.replace("+", " + ");
 		finalString = finalString.replace("\"", " \" ");
 		finalString = finalString.replace(",", " , ");
+		finalString = finalString.replace("-", " - ");
+		finalString = finalString.replace("/", " / ");
+		finalString = finalString.replace("%", " % ");
+		finalString = finalString.replace("*", " * ");
+		
+		
 		//Create an array of all words separated by a space
 		String words[] = finalString.split(" ");
 		//Transform the array into an ArrayList
@@ -148,7 +175,7 @@ public class CppAnalyzer extends Analyzer
 	public void extractVariables(String s) 
 	{
 		s = flattenCode(s);
-		
+		s=s.replace("\\\"", "");
 		//Create an array of all words separated by a space
 		String words[] = s.split(" ");
 		//Transform the array into an ArrayList
@@ -178,6 +205,10 @@ public class CppAnalyzer extends Analyzer
 		
 		//put words back into an array
 		words = list.toArray(new String[list.size()]);
+		//create list to store scopes
+		Stack<String> scopes=new Stack<>();
+		//create a scope id to differentiate scopes
+		int scopeID=0;
 		//search each word for mathing pattern
 		for(int i = 0; (i < words.length - 2);i++) 
 		{
@@ -188,9 +219,47 @@ public class CppAnalyzer extends Analyzer
 				if( (!words[i+2].contains("(")) && isValidName(words[i]))
 				{
 					//if it is we declare the variable name:type
-					variablesList.add(words[i+1] + ":" + words[i]);
+					variablesList.add(new Variable(words[i+1], words[i], scopes.toString(),i ));
 				}
 			}
+			//add a new scope if the a new scope keywords is found
+			if(words[i].equals("class")||(!keywords.contains(words[i]) && !keywords.contains(words[i+1])&&words[i+2].equals("("))) {
+				scopes.push(words[i+1]+"-"+scopeID);
+				scopeID++;
+					
+				}
+			else if(words[i].equals("if")||words[i].equals("else")||words[i].equals("for")||words[i].equals("while")||words[i].equals("try")||words[i].equals("catch")) {
+				scopes.push(words[i]+"-"+scopeID);
+				scopeID++;
+			}
+			//exit scope if character is found
+			else if(words[i].equals("}")) {
+				scopes.pop();
+			}
+			else if(words[i].equals("#include")) {
+				//skip word if import
+				i++;
+			}
+			//check to see if this is an assigment
+			else if(words[i].equals("=")&&!words[i+1].equals("=")) {
+				//if it is get the varaible
+				for(Variable v:variablesList) {
+					//if the variable name and scope match add the assignment
+					if(v.getName().equals(words[i-1])&&v.getScope().equals(scopes.toString())) {
+						//start a place to capture everything after the initialization
+						int place=i+1;
+						//start string to capture assignment
+						String assignment="";
+						//capture assignment until ; is reached
+						while(!words[place].equals(";")) {
+							assignment+=words[place];
+							place++;
+						}
+						//add word to assignments
+						v.getAssignments().put(i, assignment);
+				}
+			}
+		}
 		}//end for
 	}
 	
@@ -203,6 +272,7 @@ public class CppAnalyzer extends Analyzer
 		 * 		TODO: ignore comment symbols that are used as string literals
 		 * TODO: Process the line for variable names
 		 */
+		
 		String file="";
 		try {
 			BufferedReader br = new BufferedReader(new FileReader(filename));
@@ -268,8 +338,10 @@ public class CppAnalyzer extends Analyzer
 			String s=flattenCode(file);
 			System.out.print(s);
 			extractVariables(s);
+			extractLiterals(s);
 			//TODO remove me!
 			System.out.println(variablesList);
+			System.out.println(literals);
 		}
 		catch(FileNotFoundException fnf)	//from FileReader
 		{
@@ -287,6 +359,100 @@ public class CppAnalyzer extends Analyzer
 	@Override
 	protected void analyze(String filename) {
 		parse(filename);
+	}
+	private class Variable{
+		String name;
+		String type;
+		String scope;
+		//Line on which this variable is created 
+		int symbolNumber;
+		//line on which the assignment is followed by the reference
+		Map<Integer,String> assignments;
+		
+		public Variable(String name, String type, String scope, int line) {
+			super();
+			this.name = name;
+			this.type = type;
+			this.scope = scope;
+			this.symbolNumber = line;
+			assignments=new HashMap<>();
+		}
+		public String getName() {
+			return name;
+		}
+		public void setName(String name) {
+			this.name = name;
+		}
+		public String getType() {
+			return type;
+		}
+		public void setType(String type) {
+			this.type = type;
+		}
+		public String getScope() {
+			return scope;
+		}
+		public void setScope(String scope) {
+			this.scope = scope;
+		}
+		public int getLine() {
+			return symbolNumber;
+		}
+		public void setLine(int line) {
+			this.symbolNumber = line;
+		}
+		public Map<Integer, String> getAssignments() {
+			return assignments;
+		}
+		public void setAssignments(Map<Integer, String> assignments) {
+			this.assignments = assignments;
+		}
+		
+		@Override
+		public String toString() {
+			return "Variable [name=" + name + ", type=" + type + ", scope=" + scope + ", symbolNumber=" + symbolNumber
+					+ ", assignments=" + assignments +  "]";
+		}
+		@Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = 1;
+			result = prime * result + getOuterType().hashCode();
+			result = prime * result + ((name == null) ? 0 : name.hashCode());
+			result = prime * result + ((scope == null) ? 0 : scope.hashCode());
+			return result;
+		}
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj)
+				return true;
+			if (obj == null)
+				return false;
+			if (getClass() != obj.getClass())
+				return false;
+			Variable other = (Variable) obj;
+			if (!getOuterType().equals(other.getOuterType()))
+				return false;
+			if (name == null) {
+				if (other.name != null)
+					return false;
+			} else if (!name.equals(other.name))
+				return false;
+			if (scope == null) {
+				if (other.scope != null)
+					return false;
+			} else if (!scope.equals(other.scope))
+				return false;
+			return true;
+		}
+		private CppAnalyzer getOuterType() {
+			return CppAnalyzer.this;
+		}
+		
+		
+		
+		
+		
 	}
 
 }
