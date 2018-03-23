@@ -113,7 +113,7 @@ public class CppAnalyzer extends Analyzer
 	/**
 	 * a method that transforms code into an easier to work with format
 	 * @param s code which need to be formatted
-	 * @return a string containing all significant symbols seperated by spaces
+	 * @return a string containing all significant symbols separated by spaces
 	 */
 	public String flattenCode(String s) 
 	{
@@ -179,51 +179,54 @@ public class CppAnalyzer extends Analyzer
 	public void extractVariables(String s) 
 	{
 		s = flattenCode(s);
-		s=s.replace("\\\"", "");
+		s = s.replace("\\\"", "");
 		//Create an array of all words separated by a space
 		String words[] = s.split(" ");
+		
 		//Transform the array into an ArrayList
 		ArrayList<String> list = new ArrayList<>(Arrays.asList(words));
-		//start iterator
+		//Initialize an iterator
 		Iterator<String> itty = list.iterator();
-		//set a switch keep track of when we are in a string
-		boolean stringSwitch = false;
-		//the following loop removes strings, it is unfortunate but in order to detect varaibles strings must not be present
+		
+		//set a flag to keep track of when we are in a string
+		boolean stringFlag = false;
+		//the following loop removes strings. In order to detect variables, strings must not be present
 		while(itty.hasNext()) 
 		{
 			String word = itty.next();
 			
-			//if we run into the begining of a string we turn the switch on and remove the first character, this gets activated again at the end of the switch
+			//if we run into the beginning of a string, enable the flag and remove the first character
+			//The flag is disabled again at the end of the String
 			if(word.equals("\"")) 
 			{
-				stringSwitch = !stringSwitch;
+				stringFlag = !stringFlag;
 				itty.remove();
 			}
-			//while inside of a string we remove it
-			else if(stringSwitch && !word.equals("\"")) 
+			//while inside of a string, remove the word from the list
+			else if(stringFlag) 
 			{
 				itty.remove();
 			}
-			
-		}
+		}//end while
 		
 		//put words back into an array
 		words = list.toArray(new String[list.size()]);
+		
 		//create list to store scopes
 		Stack<String> scopes=new Stack<>();
 		//create a scope id to differentiate scopes
-		int scopeID=0;
+		int scopeID = 0;
 		//search each word for mathing pattern
-		for(int i = 0; (i < words.length - 2);i++) 
+		for(int i = 0; (i < words.length - 2); i++) 
 		{
-			//if the first two wards are not keywords we check further
+			//if the first two words are not keywords, check further
 			if( !keywords.contains(words[i]) && !keywords.contains(words[i+1]) ) 
 			{
 				//we check for validity of class name and var name as well as it not being a mthod name by checking for the (
-				if( (!words[i+2].contains("(")) && isValidName(words[i]))
+				if( (!words[i+2].contains("(")) && isValidName(words[i]) )
 				{
-					//if it is we declare the variable name:type
-					variablesList.add(new Variable(words[i+1], words[i], scopes.toString(),i ));
+					//if it is, we declare the variable name:type
+					variablesList.add(new Variable(words[i+1], words[i], scopes.toString(), i));
 				}
 			}
 			//add a new scope if the a new scope keywords is found
@@ -244,43 +247,50 @@ public class CppAnalyzer extends Analyzer
 				//skip word if import
 				i++;
 			}
-			//check to see if this is an assigment
-			else if(words[i].equals("=")&&!words[i+1].equals("=")) {
+			//check to see if this is an assignment
+			else if(words[i].equals("=")&&!words[i+1].equals("=")) 
+			{
 				//create stack to keep track of temporary scopes
-				Stack<String> temp=new Stack<>();
+				Stack<String> temp = new Stack<>();
 				//flag if the variable was found in scope
-				boolean found=false;
-				//if it is get the varaible
-				while(!found) {
-				for(Variable v:variablesList) {
-					//if the variable name and scope match add the assignment
-					if(v.getName().equals(words[i-1])&&v.getScope().equals(scopes.toString())) {
-						//start a place to capture everything after the initialization
-						int place=i+1;
-						//start string to capture assignment
-						String assignment="";
-						//capture assignment until ; is reached
-						while(!words[place].equals(";")) {
-							assignment+=words[place];
-							place++;
+				boolean found = false;
+				//if it is get the variable
+				while(!found) 
+				{
+					for(Variable v:variablesList) 
+					{
+						//if the variable name and scope match add the assignment
+						if(v.getName().equals(words[i-1])&&v.getScope().equals(scopes.toString())) 
+						{
+							//start a place to capture everything after the initialization
+							int place=i+1;
+							//start string to capture assignment
+							String assignment = "";
+							//capture assignment until ; is reached
+							while(!words[place].equals(";")) 
+							{
+								assignment+=words[place];
+								place++;
+							}
+							//add word to assignments
+							v.getAssignments().put(i, assignment);
+							//we found the variable, so set flag to true
+							found = true;
 						}
-						//add word to assignments
-						v.getAssignments().put(i, assignment);
-						//we found the varaible
-						found=true;
-				}
-					//if we didnt find it back out a scope and try again
+						//if we didnt find it back out a scope and try again
+					}
+					if(!found&&!scopes.isEmpty()) 
+					{
+						temp.push(scopes.pop());
+					}
+				}//end while
 				
-			}
-				if(!found&&!scopes.isEmpty()) {
-					temp.push(scopes.pop());
-				}
-				}
 				//repopulate the scope appropriately
-				while(!temp.isEmpty()) {
+				while(!temp.isEmpty()) 
+				{
 					scopes.push(temp.pop());
 				}
-		}
+			}
 		}//end for
 	}
 	
@@ -294,7 +304,7 @@ public class CppAnalyzer extends Analyzer
 		 * TODO: Process the line for variable names
 		 */
 		
-		String file="";
+		String file = "";
 		try {
 			BufferedReader br = new BufferedReader(new FileReader(filename));
 			String line;
@@ -356,7 +366,8 @@ public class CppAnalyzer extends Analyzer
 				
 				file+=line;
 			}
-			String s=flattenCode(file);
+			
+			String s = flattenCode(file);
 			System.out.print(s);
 			extractVariables(s);
 			extractLiterals(s);
