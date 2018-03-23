@@ -11,6 +11,8 @@
  	int i=1;
  	String b="nope";
  };
+ 
+ //Main function
 int main()
 {
   std::cout << "Hello World!" << std::endl;

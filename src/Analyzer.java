@@ -30,7 +30,7 @@ public abstract class Analyzer {
 			String sCurrentLine;
 			//while the file has lines take each line and add it to the return String
 			while ((sCurrentLine = br.readLine()) != null) {
-				file+=sCurrentLine;
+				file += sCurrentLine + "\n";
 			}
 			return file;
 		}

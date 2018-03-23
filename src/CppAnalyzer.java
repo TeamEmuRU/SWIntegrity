@@ -1,14 +1,12 @@
 /**
- * The CppAnalyzer parses 
+ * The CppAnalyzer parses a file into its variables and literals,
+ * then utilizes this information to aid in analyzing the file against vulnerabilities
  * 
  * @author Abby Beizer
+ * @author Jamie Tyler Walder
  */
 
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -41,6 +39,20 @@ public class CppAnalyzer extends Analyzer
 		literals=new LinkedList<>();
 		//Create keyword set
 		createKeywordSet();
+	}
+	
+	@Override
+	public void parse(String filename) 
+	{
+	
+		String file = openFile(filename);			
+		file = flattenCode(file);
+		//TODO: remove print statement
+		System.out.print(file);
+		extractVariables(file);
+		extractLiterals(file);
+		//TODO remove print statement
+		System.out.println(variablesList);
 	}
 	
 	/**
@@ -88,25 +100,39 @@ public class CppAnalyzer extends Analyzer
 		//Can use http://en.cppreference.com/w/cpp/keyword as a reference
 	}
 	/**
-	 * scans files and pulls out all literals 
+	 * Scans files and pulls out all literals 
 	 * @param file file contents to be scanned
 	 */
-	public void extractLiterals(String file) {
-		String[] words=file.replace("\\\"", "").replace("\\","").split(" ");
-		String litteral="";
-		boolean inLiteral=false;
-		for(String word:words) {
-			if(word.equals("\"")) {
-				inLiteral=!inLiteral;
-				if(!inLiteral) {
-					literals.add(litteral);
-					litteral="";
+	public void extractLiterals(String file) 
+	{
+		//removes escape characters and splits the file at spaces
+		String[] words = file.replace("\\\"", "").replace("\\","").split(" ");
+		
+		String literal = "";
+		//Flag to track whether the current word is a part of a string literal
+		boolean inLiteral = false;
+		//For each word in the file, if the word occurs between two quotation marks
+		//then it is a string literal
+		for(String word : words) 
+		{
+			if(word.equals("\"")) 
+			{
+				inLiteral =! inLiteral;
+				
+				//If the current word ends the literal, add the literal to the list
+				//and clear the variable to capture the next literal in the file
+				if(!inLiteral) 
+				{
+					literals.add(literal);
+					literal = "";
 				}
 			}
-			if(inLiteral) {
-				litteral+=word+" ";
+			//If the string is part of a literal, concatenate the word to the rest of the phrase
+			if(inLiteral) 
+			{
+				literal += (word + " ");
 			}
-		}
+		}//end for
 	}
 	
 	
@@ -117,6 +143,14 @@ public class CppAnalyzer extends Analyzer
 	 */
 	public String flattenCode(String s) 
 	{
+		
+		/* First, remove any comments from the file */	
+		//removes single-line and multi-line comments in the format /* --- */
+		s = s.replaceAll("/\\*((?:.*\\r?\\n?)*)\\*/", "");
+		//removes single-line comments in the format "//"
+		s = s.replaceAll("//.*\n", "");
+		
+		/* Next, add spaces around special characters to make the next steps of processing easier */
 		String finalString = s.trim().replace("\n", "").replace("\t","").replaceAll("\r", "");
 		//Separate all special characters		
 		finalString = finalString.replace("=", " = ");
@@ -142,17 +176,16 @@ public class CppAnalyzer extends Analyzer
 		//Transform the array into an ArrayList
 		ArrayList<String> list = new ArrayList<>(Arrays.asList(words));
 		Iterator<String> itty = list.iterator();
-		String result="";
-		while(itty.hasNext()) {
+		String result = "";
+		while(itty.hasNext()) 
+		{
 			String word = itty.next();
 			//Remove any blank words in the ArrayList
 			if(!word.equals(""))
 			{
-				result += word + " ";
+				result += (word + " ");
 			}
 		}
-		
-		
 		return result.trim();
 	}
 	/**
@@ -168,7 +201,6 @@ public class CppAnalyzer extends Analyzer
 		{
 			valid = false;
 		}
-		
 		return valid;
 	}
 
@@ -212,38 +244,42 @@ public class CppAnalyzer extends Analyzer
 		//put words back into an array
 		words = list.toArray(new String[list.size()]);
 		
-		//create list to store scopes
-		Stack<String> scopes=new Stack<>();
-		//create a scope id to differentiate scopes
-		int scopeID = 0;
-		//search each word for mathing pattern
+		Stack<String> scopes=new Stack<>();	// list to store scopes
+		int scopeID = 0;	//a scope id to differentiate scopes
+		
+		//search each word for matching pattern
 		for(int i = 0; (i < words.length - 2); i++) 
 		{
-			//if the first two words are not keywords, check further
+			//if the first two words are not keywords, this may signify a variable declaration
 			if( !keywords.contains(words[i]) && !keywords.contains(words[i+1]) ) 
 			{
-				//we check for validity of class name and var name as well as it not being a mthod name by checking for the (
+				//we check for validity of class name and var name as well as it not being a method name by checking for the (
+				//TODO: Right now, the check for && isValidName(words[i]) is repetitive after the check for !keywords.contains(words[i])
 				if( (!words[i+2].contains("(")) && isValidName(words[i]) )
 				{
 					//if it is, we declare the variable name:type
 					variablesList.add(new Variable(words[i+1], words[i], scopes.toString(), i));
 				}
 			}
-			//add a new scope if the a new scope keywords is found
-			if(words[i].equals("class")||(!keywords.contains(words[i]) && !keywords.contains(words[i+1])&&words[i+2].equals("("))) {
+			//add a new scope if the keywords is found
+			if(words[i].equals("class")||(!keywords.contains(words[i]) && !keywords.contains(words[i+1])&&words[i+2].equals("("))) 
+			{
 				scopes.push(words[i+1]+"-"+scopeID);
 				scopeID++;
 					
-				}
-			else if(words[i].equals("if")||words[i].equals("else")||words[i].equals("for")||words[i].equals("while")||words[i].equals("try")||words[i].equals("catch")) {
+			}
+			else if(words[i].equals("if")||words[i].equals("else")||words[i].equals("for")||words[i].equals("while")||words[i].equals("try")||words[i].equals("catch")) 
+			{
 				scopes.push(words[i]+"-"+scopeID);
 				scopeID++;
 			}
 			//exit scope if character is found
-			else if(words[i].equals("}")) {
+			else if(words[i].equals("}")) 
+			{
 				scopes.pop();
 			}
-			else if(words[i].equals("#include")) {
+			else if(words[i].equals("#include")) 
+			{
 				//skip word if import
 				i++;
 			}
@@ -277,7 +313,7 @@ public class CppAnalyzer extends Analyzer
 							//we found the variable, so set flag to true
 							found = true;
 						}
-						//if we didnt find it back out a scope and try again
+						//if we didn't find it, back out a scope and try again
 					}
 					if(!found&&!scopes.isEmpty()) 
 					{
@@ -292,99 +328,6 @@ public class CppAnalyzer extends Analyzer
 				}
 			}
 		}//end for
-	}
-	
-	@Override
-	public void parse(String filename) {
-		
-		
-		/*
-		 * First, remove any comments from the line
-		 * 		TODO: ignore comment symbols that are used as string literals
-		 * TODO: Process the line for variable names
-		 */
-		
-		String file = "";
-		try {
-			BufferedReader br = new BufferedReader(new FileReader(filename));
-			String line;
-			boolean mComment = false;	//whether the current line occurs between the symbols /* and */
-			
-			//Runs until end of file
-			while( (line = br.readLine()) != null)
-			{
-				/* First, remove any comments from the line */
-				
-				//If the previous line began or continued a multi-line comment
-				if(mComment)
-				{
-					//If the current line terminates the comment,
-					//remove all text before the terminating character
-					//and set flag to false
-					if(line.contains("*/"))
-					{
-						line = line.replaceAll("^.*\\*/", "");
-						mComment = false;
-					}
-					//if the current line does not terminate the comment,
-					//then it continues to the next line
-					else
-					{
-						continue;
-					}
-				}
-				
-				//removes single-line comments in the format "/* --- */"
-				line = line.replaceAll("/\\*.*\\*/", "");
-				//removes single-line comments in the format "//"
-				line = line.replaceAll("//.*$", "");
-			
-				//removes all characters following "/*" and flags the next line as a continuation of a multi-line comment
-				if(line.contains("/*"))
-				{
-					line = line.replaceAll("/\\*.*$", "");
-					mComment = true;
-				}
-				
-				
-				//After removal of comments, process remaining characters
-				
-				
-				//ignore lines that are blank
-				if(line.length() == 0) {
-					continue;
-				}
-				
-				
-				
-				/* Then locate conditional statements */
-				//TODO: Conditional statements
-				
-				
-				/* Then locate variables */
-				//TODO: Prevent opening file twice
-				
-				file+=line;
-			}
-			
-			String s = flattenCode(file);
-			System.out.print(s);
-			extractVariables(s);
-			extractLiterals(s);
-			//TODO remove me!
-			System.out.println(variablesList);
-			System.out.println(literals);
-		}
-		catch(FileNotFoundException fnf)	//from FileReader
-		{
-			SIT.notifyUser("Eror: File " + filename + " could not be parsed.");
-		}
-		catch(IOException io)	//from BufferedReader
-		{
-			SIT.notifyUser("Error reading the contents of " + filename + "." );
-		}
-		
-		
 	}
 
 	
