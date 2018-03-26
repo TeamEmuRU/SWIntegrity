@@ -24,7 +24,7 @@ public class AdaAnalyzer extends Analyzer{
 		this.variables = new LinkedList<>();
 		this.literals = new LinkedList<>();
 		this.symbolToLine = new HashMap<>();
-		String[] specialSymbols= {":",";",")","(","+","-","/","\\","*","\\\"","\n","\t","\r","=","."};
+		String[] specialSymbols= {":",";",")","(","+","-","/","\\","*","\\\"","\n","\t","\r","=",".","\""};
 		String[] keyWords= {"abort","else","new","return","abs","elsif","not","reverse",
 				"abstract","end","null","accept","entry","select","access","exception","of",
 				"separate","aliased","exit","or","subtype","all","others","synchronized","and",
@@ -53,7 +53,16 @@ public class AdaAnalyzer extends Analyzer{
 		String[] words=file.split(" ");
 		int scopeID=0;
 		Stack<String> scopes=new Stack<>();
+		boolean inComment=false;
+		String comment="";
 		for(int i=0;i<words.length;i++) {
+			if(words[i].equals("\"")) {
+				inComment=!inComment;
+				comment=comment.replace("\"", "");
+				if(!comment.equals(""))
+					literals.add(comment);
+			}
+			if(!inComment) {
 			if(i+2<words.length&&isVarName(words[i])&&words[i+1].equals(":")&&isVarName(words[i+2])) {
 				variables.add(new Variable(words[i],words[i+2],scopes.toString(),symbolToLine.get(i)));
 			}
@@ -65,11 +74,42 @@ public class AdaAnalyzer extends Analyzer{
 				scopeID++;
 			}
 			if(words[i].equals("function")||words[i].equals("procedure")||words[i].equals("body")){
-				scopes.push(words[i+1]+scopeID);
+				scopes.push(words[i+1]+"-"+scopeID);
 				scopeID++;
+			}
+			if(words[i].equals(":")&&words[i+1].equals("=")) {
+				Stack<String> tempScope=new Stack<>();
+				boolean found=false;
+				while(!found&&!scopes.isEmpty()) {
+				
+					for(Variable var:variables) {
+						if(var.getName().equals(words[i-1])&&var.getScope().equals(scopes.toString())) {
+							int index=i+1;
+							String assignment="";
+							while(!words[index].equals(";")) {
+								assignment+=words[index]+" ";
+								index++;
+							}
+							var.getAssignments().put(symbolToLine.get(i), assignment);
+							found=true;
+						}
+					}
+					if(!found&&!scopes.isEmpty()) {
+						tempScope.push(scopes.pop());
+					}
+					
+				}
+				while(!tempScope.isEmpty()) {
+					scopes.push(tempScope.pop());
+				}
+			}
+			}
+			else {
+				comment+=words[i];
 			}
 		}
 		System.out.println(variables);
+		System.out.println(literals);
 	}
 	public String flattenCodeAndMap(String file) {
 		for(String symbol:specialSymbols) {
@@ -92,11 +132,12 @@ public class AdaAnalyzer extends Analyzer{
 			if(words2.get(i).equals("-")&&words2.get(i+1).equals("-")) {
 				inComment=true;
 			}
-			if(words2.get(i).equals("\n")||words2.get(i).equals("\r")) {
+			if(words2.get(i).equals("\n")) {
 				lineID++;
 				if(inComment)
 					inComment=false;
 			}
+			else if(words2.get(i).equals("\r"));
 			else if(inComment);
 			else if(words2.get(i).equals(""));
 			else {
@@ -104,7 +145,6 @@ public class AdaAnalyzer extends Analyzer{
 				symbolToLine.put(symbolID, lineID);
 				symbolID++;
 			}
-			//System.out.println(words[i]);
 		}
 		
 		
