@@ -33,7 +33,7 @@ public class JavaAnalyzer extends Analyzer {
      * @return the formatted line of code
      */
 	public String flattenCode(String s)
-	{
+	{	
 		String finalString = s.trim().replaceAll("\n", "").replaceAll("\t","").replaceAll("\r", "").replaceAll("\f", "");
 		//Separate all special characters
         finalString = finalString.replace("=", " = ");
@@ -89,6 +89,8 @@ public class JavaAnalyzer extends Analyzer {
      */
     public void extractVariables(String s)
     {
+    	s = flattenCode(s);
+    	
         //Create an array of all words separated by a space
         String words[] = s.split(" ");
         //extract String and primitive variables
@@ -113,12 +115,12 @@ public class JavaAnalyzer extends Analyzer {
         Iterator<String> itty = list.iterator();
         //set a switch keep track of when we are in a string
         boolean stringSwitch = false;
-        //the following loop removes strings, it is unfortunate but in order to detect varaibles strings must not be present
+        //the following loop removes strings, it is unfortunate but in order to detect variables strings must not be present
         while(itty.hasNext())
         {
             String word = itty.next();
 
-            //if we run into the begining of a string we turn the switch on and remove the first character, this gets activated again at the end of the switch
+            //if we run into the beginning of a string we turn the switch on and remove the first character, this gets activated again at the end of the switch
             if(word.equals("\""))
             {
                 stringSwitch = !stringSwitch;
@@ -188,7 +190,7 @@ public class JavaAnalyzer extends Analyzer {
 
 				/* Second, extract the variables: */
 
-				extractVariables(flattenCode(line));
+				extractVariables(line);
 
 			}
             }
