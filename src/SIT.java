@@ -14,125 +14,69 @@ import java.util.*;
 public class SIT {
 	
 	/**
-	 * @param args Takes one or fewer arguments. -j,-a,-c designate the languages Java, Ada and C++ respectively 
+	 * @param args Takes a series of tags, followed by a list of file or directory names.
+	 * Possible tags include -j,-a,-c designating the languages Java, Ada and C++ respectively,
+	 * -r to search all subfolders in the currect directory, and -help or ? to display help information.
 	 * If no arguments are entered, all files will be selected by default.
 	 */
 	public static void main(String[] args) {
-		
+
 		//init reader
 		Input input = new Input();
 		List<String> fileList = new LinkedList<String>(); //a list of files designated by the user
-		
-		
-		if(args.length == 0)
-		{
+
+
+		if (args.length == 0) {
 			//If no arguments specified, process all files with known extensions
 			//in the current directory
 			input.addFiles(input.getAllFilesInDirectory(System.getProperty("user.dir")));
 			input.analyze();
 		}
 		//If arguments are specified
-		else 
-		{
-			//depending on the first argument, process files of the specified type
-			//java
-			if(args[0].equals("-j")) 
-			{
-				//All files of this type
-				if(args.length == 1)
-				{
-					input.addJavaFilesInDirectory(System.getProperty("user.dir"));	//By default, searches the current directory
+		else {
+			//iterate through tag arguments and handle them accordingly
+			boolean tagZone = true;
+			int nonTagsStart = 0;
+			for (int i = 0; i < args.length && tagZone; i++) {
+				switch (args[i]) {
+					//By default, searches the current directory
+					case "-j":
+						input.addJavaFilesInDirectory(System.getProperty("user.dir"));
+						break;
+					case "-a":
+						input.addAdaFilesInDirectory(System.getProperty("user.dir"));
+						break;
+					case "-c":
+						input.addCppFilesInDirectory(System.getProperty("user.dir"));
+						break;
+					case "-r":
+						input.addFiles(input.getAllFilesInDirectoryAndSubDirectories(System.getProperty("user.dir")));
+						break;
+					case "-help":
+					case "?":
+						displayHelp();
+						break;
+					default:
+						tagZone = false;
+						nonTagsStart = i;
+						break;
 				}
-				//Multiple files selected by name
-				else
-				{
-					for(int i = 1; i < args.length; i++)
-					{
+			}
+			//add explicit file or directory names to fileList, if the user supplied them
+			if (!tagZone) {
+				for (int i = nonTagsStart; i < args.length; i++) {
+					File f = new File(args[i]);
+					if (f.isFile()) {
 						fileList.add(args[i]);
+						input.addFiles(fileList);
+					} else if (f.isDirectory()) {
+						input.getAllFilesInDirectory(args[i]);
+					} else {
+						notifyUser("One or more arguments were invalid input");
 					}
-					input.addFiles(fileList);
 				}
-				input.analyze();
 			}
-			//ada
-			else if(args[0].equals("-a")) {
-				//All files of this type
-				if(args.length == 1)
-				{
-					input.addAdaFilesInDirectory(System.getProperty("user.dir"));
-				}
-				//Multiple files selected by name
-				else
-				{
-					for(int i = 1; i < args.length; i++)
-					{
-						fileList.add(args[i]);
-					}
-					input.addFiles(fileList);
-				}
-				input.analyze();
-			}
-			//c++
-			else if(args[0].equals("-c")) {
-				//All files of this type
-				if(args.length == 1)
-				{
-					input.addCppFilesInDirectory(System.getProperty("user.dir"));
-				}
-				//Multiple files selected by name
-				else
-				{
-					for(int i = 1; i < args.length; i++)
-					{
-						fileList.add(args[i]);
-					}
-					input.addFiles(fileList);
-				}
-				input.analyze();
-			}
-			//all files
-			else if(args[0].equals("-r")) {
-				if(args.length == 1)
-				{
-					input.addFiles(input.getAllFilesInDirectoryAndSubDirectories(System.getProperty("user.dir")));
-				}
-				else {
-					
-					for(int i = 1; i < args.length; i++)
-					{
-						fileList.addAll(input.getAllFilesInDirectoryAndSubDirectories(args[i]));
-					}
-					input.addFiles(fileList);
-					}
-				
-				
-				input.analyze();
-			}
-			//display help information
-			else if(args[0].equals("-help") || args[0].equals("?")){
-				displayHelp();
-			}
-			//then it should be a file name 
-			else
-			{
-				File f = new File(args[0]);
-				if(f.isFile())
-				{
-					fileList.add(args[0]);
-					input.addFiles(fileList);
-					input.analyze();
-				}
-				else if(f.isDirectory())
-				{
-					input.getAllFilesInDirectory(args[0]);
-					input.analyze();
-				}
-				else
-				{
-					notifyUser("One or more arguments were invalid input");
-				}
-				
-			}
+			input.analyze();
 		}
 	}
 
@@ -180,20 +124,20 @@ public class SIT {
 	 */
 	private static void displayHelp()
 	{
+		notifyUser("");
 		notifyUser("This Software Integrity Tester (SIT) analyzes Java, Ada, and C++ source code");
 		notifyUser("for security weaknesses and vulnerabilities.\n");
 		notifyUser("Usage: SIT <options> <directory name or filenames>");
 		notifyUser("where possible options include:");
+		notifyUser("");
 		notifyUser("(No options or directory/files specified)");
 		notifyUser("	Analyze all supported source code files in the current directory");
-		notifyUser("-j");
-		notifyUser("	Analyze all Java source code files in the specified directory");
-		notifyUser("-a");
-		notifyUser("	Analyze all Ada source code files in the specified directory");
-		notifyUser("-c");
-		notifyUser("	Analyze all C++ source code and header files in the specified directory");
-		notifyUser("-r");
-		notifyUser("	Analyze all specified source code files in the specified directory, and"); 
-		notifyUser("	all of its subdirectories");
+		notifyUser("");
+		notifyUser("-j  Analyze all Java source code files in the specified directory");
+		notifyUser("-a  Analyze all Ada source code files in the specified directory");
+		notifyUser("-c  Analyze all C++ source code and header files in the specified directory");
+		notifyUser("-r  Analyze all specified source code files in the specified directory, and");
+		notifyUser("    all of its subdirectories");
+		notifyUser("");
 	}
 }
