@@ -16,13 +16,14 @@ public class SIT {
 	/**
 	 * @param args Takes a series of tags, followed by a list of file or directory names.
 	 * Possible tags include -j,-a,-c designating the languages Java, Ada and C++ respectively,
-	 * -r to search all subfolders in the currect directory, and -help or ? to display help information.
+	 * -r to search all subfolders in the current directory, and -help or ? to display help information.
 	 * If no arguments are entered, all files will be selected by default.
 	 */
 	public static void main(String[] args) {
-
+		
 		//init reader
 		Input input = new Input();
+		//TODO: remove usage of fileList
 		List<String> fileList = new LinkedList<String>(); //a list of files designated by the user
 
 
@@ -33,11 +34,13 @@ public class SIT {
 			input.analyze();
 		}
 		//If arguments are specified
-		else {
+		else 
+		{
 			//iterate through tag arguments and handle them accordingly
 			boolean tagZone = true;
 			int nonTagsStart = 0;
-			for (int i = 0; i < args.length && tagZone; i++) {
+			for (int i = 0; i < args.length && tagZone; i++) 
+			{
 				switch (args[i]) {
 					//By default, searches the current directory
 					case "-j":
@@ -63,22 +66,72 @@ public class SIT {
 				}
 			}
 			//add explicit file or directory names to fileList, if the user supplied them
-			if (!tagZone) {
-				for (int i = nonTagsStart; i < args.length; i++) {
-					File f = new File(args[i]);
-					if (f.isFile()) {
+			if (!tagZone) 
+			{
+				boolean nameFragment = false;	//Flag for whether the current argument is part of a file or 
+												//dir name (one that contains whitespace)
+				File f = new File("");
+				//This starts after the tags are processed
+				for (int i = nonTagsStart; i < args.length; i++) 
+				{
+					//If the current argument is part of a file or dir name,
+					//add the word to the rest of the file name, and skip the rest of the for loop
+					//Else if the flag is set to false, then assign the current argument as a filename
+					//and proceed as normal
+					if(nameFragment)		
+					{
+						File temp = new File(args[i]);
+						if(!temp.isFile() && !temp.isDirectory())
+						{
+							//nameFragment remains true
+							f = new File(f.toString() + " " + args[i]);
+							notifyUser(f.toString());
+						}
+						//If f is a file or directory, then add it to the input and set the nameFragment flag to false
+						if(f.isFile()) 
+						{
+							//TODO: Remove usage of fileList
+							fileList.add(f.getAbsolutePath());
+							input.addFiles(fileList);
+							notifyUser(f.toString() + " is a file ");
+							nameFragment = false;
+							continue;
+						} 
+						else if(f.isDirectory())
+						{
+							input.getAllFilesInDirectory(f.getAbsolutePath());
+							notifyUser("add all files in dir " + f.toString());
+							nameFragment = false;
+							continue;
+						}
+					}
+
+					f = new File(args[i]);
+						
+					//If f is a file or directory, then add it to the input and set the nameFragment flag to false
+					if (f.isFile()) 
+					{
 						fileList.add(args[i]);
 						input.addFiles(fileList);
-					} else if (f.isDirectory()) {
+						notifyUser(f.toString() + " is a file ");
+						nameFragment = false;
+					} 
+					else if (f.isDirectory())
+					{
 						input.getAllFilesInDirectory(args[i]);
-					} else {
-						notifyUser("One or more arguments were invalid input");
-					}
-				}
+						notifyUser("add all files in dir " + f.toString() + " ");
+						nameFragment = false;
+					} 
+					else 
+					{
+						nameFragment = true;
+					}//end if
+				}//end for
 			}
-			input.analyze();
 		}
+			input.analyze();
 	}
+
 
 	/**
 	 * A static method called by other classes to present output to the user

@@ -43,6 +43,8 @@ public class Input {
 		sortByType(filenames);
 	}
 	
+	//TODO: Create method for accepting an individual file
+	
 	/**
 	 * Analyzes sorted lists of files for vulnerabilities
 	 */
