@@ -8,9 +8,6 @@
 
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
 import java.util.*;
 
 
@@ -31,6 +28,221 @@ public class Input {
 		cppFiles = new LinkedList<>();
 	}
 	
+	
+	
+	
+	///////////////////////////
+	//	Process User Input   //
+	//						 //
+	///////////////////////////
+	
+	public void processInput(String[] args)
+	{
+		if (args.length == 0) {
+			//If no arguments specified, process all files with known extensions
+			//in the current directory
+			this.addFiles(getAllFilesInDirectory(System.getProperty("user.dir")));
+			this.analyze();
+		}
+		//If arguments are specified
+		else 
+		{
+			//iterate through tag arguments and handle them accordingly
+			boolean tagZone = true;
+			int nonTagsStart = 0;
+			for (int i = 0; i < args.length && tagZone; i++) 
+			{
+				switch (args[i]) {
+					//By default, searches the current directory
+					case "-j":
+						addJavaFilesInDirectory(System.getProperty("user.dir"));
+						break;
+					case "-a":
+						addAdaFilesInDirectory(System.getProperty("user.dir"));
+						break;
+					case "-c":
+						addCppFilesInDirectory(System.getProperty("user.dir"));
+						break;
+					case "-r":
+						addFiles(getAllFilesInDirectoryAndSubDirectories(System.getProperty("user.dir")));
+						break;
+					case "-all":
+						addFiles(getAllFilesInDirectory(System.getProperty("user.dir")));
+						break;
+					case "-help":
+					case "?":
+						SIT.displayHelp();
+						break;
+					default:
+						tagZone = false;
+						nonTagsStart = i;
+						break;
+				}
+			}
+			//add explicit file or directory names to fileList, if the user supplied them
+			if (!tagZone) 
+			{
+				boolean nameFragment = false;	//Flag for whether the current argument is part of a file or 
+												//dir name (one that contains whitespace)
+				boolean hasTag = false;	//Flag for whether the next argument is a modifying tag for the
+											//current file or directory
+				File f = new File("");
+				
+				//This starts after the tags are processed
+				for (int i = nonTagsStart; i < args.length; i++) 
+				{
+					//If the previous run of the loop detected that this argument was a tag,
+					//Move right to the next argument
+					if(hasTag)
+					{
+						hasTag = false;
+						continue;
+					}
+					
+					//If the current argument is part of a file or dir name,
+					//add the word to the rest of the file name, and skip the rest of the for loop
+					//Else if the flag is set to false, then add the previous filename to the input and
+					//process the current argument
+					//Then proceed as normal
+					if(nameFragment)	
+					{
+						File temp = new File(args[i]);
+						//If temp is not a file or directory on its own
+						if(!temp.isFile() && !temp.isDirectory())
+						{
+							//nameFragment remains true
+							f = new File(f.toString() + " " + args[i]);
+						}
+						//If the newly-concatenated f is a file or directory,
+						//add it to the input and set the nameFragment flag to false
+						if(f.isFile() || f.isDirectory()) 
+						{
+							try
+							{
+								hasTag = detectTag(f.getAbsolutePath(), args[i + 1]);
+							}
+							catch(ArrayIndexOutOfBoundsException ar)
+							{
+								hasTag = detectTag(f.getAbsolutePath(), "");
+							}
+							
+							nameFragment = false;
+						} 
+					}
+					
+					//Process only the current argument
+					f = new File(args[i]);
+						
+					//If f is a file or directory, then add it to the input and set the nameFragment flag to false
+					if (f.isFile() || f.isDirectory()) 
+					{
+						try
+						{
+							hasTag = detectTag(f.getAbsolutePath(), args[i + 1]);
+						}
+						catch(ArrayIndexOutOfBoundsException ar)
+						{
+							hasTag = detectTag(f.getAbsolutePath(), "");
+						}
+						
+						nameFragment = false;
+					} 
+					else 
+					{
+						nameFragment = true;
+					}//end if
+				}//end for
+			}
+		}
+			this.analyze();
+	}
+	
+	/**
+	 * If the tag matches a known filetype tag, then the file is added to the appropriate list as if it were that type
+	 * @param filename The name of the file currently being processed
+	 * @param argument The argument following the current filename
+	 * @return True if argument is a tag
+	 */
+	private boolean detectTag(String filename, String argument)
+	{	
+		File f = new File(filename);
+	
+		switch (argument) {
+		//Default is if the next argument is not a tag for this file
+		case "-j":
+		{
+			if(f.isFile())
+				javaFiles.add(filename);
+			else if(f.isDirectory())
+				addJavaFilesInDirectory(filename);
+			else
+				SIT.notifyUser("Invalid file or directory name");
+			return true;
+		}
+		case "-a":
+		{
+			SIT.notifyUser("Added " + filename + "\n");
+			if(f.isFile())
+				adaFiles.add(filename);
+			else if(f.isDirectory())
+				addAdaFilesInDirectory(filename);
+			else
+				SIT.notifyUser("Invalid file or directory name");
+			return true;
+		}
+		case "-c":
+		{
+			if(f.isFile())
+				cppFiles.add(filename);
+			else if(f.isDirectory())
+				addCppFilesInDirectory(filename);
+			else
+				SIT.notifyUser("Invalid file or directory name");
+			return true;
+		}
+		case "-r":
+		{
+			if(f.isFile())
+				SIT.notifyUser("Invalid argument for " + filename);
+			else if (f.isDirectory())
+				this.addFiles(this.getAllFilesInDirectoryAndSubDirectories(filename));
+			else
+				SIT.notifyUser("Invalid file or directory name");
+		}
+		case "-all":
+			if(f.isFile())
+				SIT.notifyUser("Invalid argument for " + filename);
+			else if (f.isDirectory())
+				this.addFiles(this.getAllFilesInDirectory(filename));
+			else
+				SIT.notifyUser("Invalid file or directory name");
+		default:
+			if(argument.startsWith("-"))
+			{
+				SIT.notifyUser("The program has encountered an invalid argument\n");
+				return true;
+			}
+			else
+			{
+				if(f.isFile())
+					addFile(filename);
+				else if(f.isDirectory())
+					getAllFilesInDirectory(filename);
+				else
+					SIT.notifyUser("Invalid file or directory name");
+				return false;
+			}
+		}
+	}
+	
+	
+	
+	
+	////////////////////////////////
+	//	Adding and sorting files  //
+	//							  //
+	////////////////////////////////
+	
 	/**
 	 * Add any number of files to the input class.
 	 * Calls the sortByType function
@@ -43,19 +255,16 @@ public class Input {
 		sortByType(filenames);
 	}
 	
-	//TODO: Create method for accepting an individual file
-	
 	/**
-	 * Analyzes sorted lists of files for vulnerabilities
+	 * Add a single file to the input class
+	 * Calls the sortByType function
+	 * @param filename A single file to add
 	 */
-	public void analyze() {
-		if(javaFiles.size()>0)
-			analyzeJava();
-		if(adaFiles.size()>0)
-			analyzeAda();
-		if(cppFiles.size()>0)
-			analyzeCpp();
-		//TODO special case for other
+	private void addFile(String filename)
+	{
+		List<String> fileList = new LinkedList<>();
+		fileList.add(filename);
+		sortByType(fileList);
 	}
 	
 	/**
@@ -64,8 +273,7 @@ public class Input {
 	 * @param filenames Names of the that need to be sorted
 	 */
 	//TODO move these extensions into an enum class
-	//TODO: make this function private to the input class, remove from main
-	public void sortByType(List<String> filenames) {
+	private void sortByType(List<String> filenames) {
 		//check each file's extension
 		for (String s : filenames)
 		{
@@ -91,62 +299,6 @@ public class Input {
 		}
 	}
 	
-	
-	/**
-	 * Analyzes Java files for vulnerabilities by invoking an Analyzer object
-	 */
-	private void analyzeJava() {
-		//notify user of amount of files in list
-		SIT.notifyUser(javaFiles.size() + " Java Files Found");
-		
-		//set the analyzer to the appropriate type
-		analyzer = new JavaAnalyzer();
-		
-		//analyze each file
-		for(String filename : javaFiles) {
-			analyzer.analyze(filename);
-			SIT.notifyUser(filename + " has been analyzed.");
-		}
-		System.out.println("all java files read");
-	}
-	
-	/**
-	 * Analyzes Ada files for vulnerabilities by invoking an Analyzer object
-	 */
-	private void analyzeAda() {
-		//notify user of amount of files in list
-		SIT.notifyUser(adaFiles.size()+" Ada Files Found");
-		
-		//set the analyzer to the appropriate type
-		analyzer = new AdaAnalyzer();
-		
-		//analyze each file
-		for(String filename : adaFiles) {
-			analyzer.analyze(filename);
-			SIT.notifyUser(filename+" has been analyzed.");
-			//TODO analyze
-		}
-		SIT.notifyUser("all ada files read");
-	}
-	/**
-	 * Analyzes C++ files for vulnerabilities by invoking an Analyzer object
-	 */
-	private void analyzeCpp() {
-		//notify user of amount of files in list
-		SIT.notifyUser(cppFiles.size() + " C++ Files Found");
-		
-		//set the analyzer to the appropriate type
-		analyzer= new CppAnalyzer();
-		
-		//analyze each file
-		for(String filename : cppFiles) {
-			analyzer.analyze(filename);
-			SIT.notifyUser(filename+" has been analyzed.");
-			//TODO analyze
-		}
-		SIT.notifyUser("all c++ files read");
-	}
-	
 	/**
 	 * Collects the filenames of all files in current directory.
 	 * The files are then sorted into their appropriate lists
@@ -163,19 +315,26 @@ public class Input {
 		
 		//add file names to list 
 		List<String> fileNames = new LinkedList<>();
-		for(File f : listOfFiles) 
-		{
-			if(f.isFile())
-			{
-				fileNames.add(f.getAbsolutePath());
-			}
-			
-		}
-		//addFiles(fileNames);
 		
-		//sort that list by extension
+		if(listOfFiles.length > 0)
+		{
+			for(File f : listOfFiles) 
+			{
+				if(f.isFile())
+				{
+					fileNames.add(f.getAbsolutePath());
+				}
+				
+			}
+			//addFiles(fileNames);
+			
+			//sort that list by extension
+		}
+		
 		return fileNames;
 	}
+	
+	
 	/**
 	 * Helper method for addAllFilesInDirectoryAndSubDirectories, this method gathers all directories in a directory, much in the same way 
 	 * addAllFilesInDirectory does
@@ -351,5 +510,84 @@ public class Input {
 		}
 		return false;
 	}
+	
+	
+	
+	
+	
+	///////////////////////////
+	//	 Analysis of Files   //
+	//						 //
+	///////////////////////////
+	
+	/**
+	 * Analyzes sorted lists of files for vulnerabilities
+	 */
+	public void analyze() {
+		if(javaFiles.size()>0)
+			analyzeJava();
+		if(adaFiles.size()>0)
+			analyzeAda();
+		if(cppFiles.size()>0)
+			analyzeCpp();
+		//TODO special case for other
+	}
+	
+	/**
+	 * Analyzes Java files for vulnerabilities by invoking an Analyzer object
+	 */
+	private void analyzeJava() {
+		//notify user of amount of files in list
+		SIT.notifyUser(javaFiles.size() + " Java Files Found");
+		
+		//set the analyzer to the appropriate type
+		analyzer = new JavaAnalyzer();
+		
+		//analyze each file
+		for(String filename : javaFiles) {
+			analyzer.analyze(filename);
+			SIT.notifyUser(filename + " has been analyzed.");
+		}
+		System.out.println("all java files read");
+	}
+	
+	/**
+	 * Analyzes Ada files for vulnerabilities by invoking an Analyzer object
+	 */
+	private void analyzeAda() {
+		//notify user of amount of files in list
+		SIT.notifyUser(adaFiles.size()+" Ada Files Found");
+		
+		//set the analyzer to the appropriate type
+		analyzer = new AdaAnalyzer();
+		
+		//analyze each file
+		for(String filename : adaFiles) {
+			analyzer.analyze(filename);
+			SIT.notifyUser(filename+" has been analyzed.");
+			//TODO analyze
+		}
+		SIT.notifyUser("all ada files read");
+	}
+	/**
+	 * Analyzes C++ files for vulnerabilities by invoking an Analyzer object
+	 */
+	private void analyzeCpp() {
+		//notify user of amount of files in list
+		SIT.notifyUser(cppFiles.size() + " C++ Files Found");
+		
+		//set the analyzer to the appropriate type
+		analyzer= new CppAnalyzer();
+		
+		//analyze each file
+		for(String filename : cppFiles) {
+			analyzer.analyze(filename);
+			SIT.notifyUser(filename+" has been analyzed.");
+			//TODO analyze
+		}
+		SIT.notifyUser("all c++ files read");
+	}
+	
+
 
 }

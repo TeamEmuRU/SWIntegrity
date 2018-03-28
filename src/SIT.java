@@ -11,7 +11,12 @@
 import java.io.File;
 import java.util.*;
 
+
+
+
 public class SIT {
+	
+
 	
 	/**
 	 * @param args Takes a series of tags, followed by a list of file or directory names.
@@ -20,116 +25,9 @@ public class SIT {
 	 * If no arguments are entered, all files will be selected by default.
 	 */
 	public static void main(String[] args) {
-		
-		//init reader
 		Input input = new Input();
-		//TODO: remove usage of fileList
-		List<String> fileList = new LinkedList<String>(); //a list of files designated by the user
 
-
-		if (args.length == 0) {
-			//If no arguments specified, process all files with known extensions
-			//in the current directory
-			input.addFiles(input.getAllFilesInDirectory(System.getProperty("user.dir")));
-			input.analyze();
-		}
-		//If arguments are specified
-		else 
-		{
-			//iterate through tag arguments and handle them accordingly
-			boolean tagZone = true;
-			int nonTagsStart = 0;
-			for (int i = 0; i < args.length && tagZone; i++) 
-			{
-				switch (args[i]) {
-					//By default, searches the current directory
-					case "-j":
-						input.addJavaFilesInDirectory(System.getProperty("user.dir"));
-						break;
-					case "-a":
-						input.addAdaFilesInDirectory(System.getProperty("user.dir"));
-						break;
-					case "-c":
-						input.addCppFilesInDirectory(System.getProperty("user.dir"));
-						break;
-					case "-r":
-						input.addFiles(input.getAllFilesInDirectoryAndSubDirectories(System.getProperty("user.dir")));
-						break;
-					case "-help":
-					case "?":
-						displayHelp();
-						break;
-					default:
-						tagZone = false;
-						nonTagsStart = i;
-						break;
-				}
-			}
-			//add explicit file or directory names to fileList, if the user supplied them
-			if (!tagZone) 
-			{
-				boolean nameFragment = false;	//Flag for whether the current argument is part of a file or 
-												//dir name (one that contains whitespace)
-				File f = new File("");
-				//This starts after the tags are processed
-				for (int i = nonTagsStart; i < args.length; i++) 
-				{
-					//If the current argument is part of a file or dir name,
-					//add the word to the rest of the file name, and skip the rest of the for loop
-					//Else if the flag is set to false, then assign the current argument as a filename
-					//and proceed as normal
-					if(nameFragment)		
-					{
-						File temp = new File(args[i]);
-						if(!temp.isFile() && !temp.isDirectory())
-						{
-							//nameFragment remains true
-							f = new File(f.toString() + " " + args[i]);
-							notifyUser(f.toString());
-						}
-						//If f is a file or directory, then add it to the input and set the nameFragment flag to false
-						if(f.isFile()) 
-						{
-							//TODO: Remove usage of fileList
-							fileList.add(f.getAbsolutePath());
-							input.addFiles(fileList);
-							notifyUser(f.toString() + " is a file ");
-							nameFragment = false;
-							continue;
-						} 
-						else if(f.isDirectory())
-						{
-							input.getAllFilesInDirectory(f.getAbsolutePath());
-							notifyUser("add all files in dir " + f.toString());
-							nameFragment = false;
-							continue;
-						}
-					}
-
-					f = new File(args[i]);
-						
-					//If f is a file or directory, then add it to the input and set the nameFragment flag to false
-					if (f.isFile()) 
-					{
-						fileList.add(args[i]);
-						input.addFiles(fileList);
-						notifyUser(f.toString() + " is a file ");
-						nameFragment = false;
-					} 
-					else if (f.isDirectory())
-					{
-						input.getAllFilesInDirectory(args[i]);
-						notifyUser("add all files in dir " + f.toString() + " ");
-						nameFragment = false;
-					} 
-					else 
-					{
-						nameFragment = true;
-					}//end if
-				}//end for
-			}
-		}
-			input.analyze();
+		input.processInput(args);
 	}
 
 
@@ -141,6 +39,7 @@ public class SIT {
 	public static void notifyUser(String message) {
 		System.out.println(message);
 	}
+	
 	
 	/**
 	 * Collects a response from the user to a given prompt.
@@ -175,7 +74,7 @@ public class SIT {
 	/**
 	 * Displays valid commands for using this application to the user
 	 */
-	private static void displayHelp()
+	public static void displayHelp()
 	{
 		notifyUser("");
 		notifyUser("This Software Integrity Tester (SIT) analyzes Java, Ada, and C++ source code");
