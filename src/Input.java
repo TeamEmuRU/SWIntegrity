@@ -41,7 +41,7 @@ public class Input {
 		if (args.length == 0) {
 			//If no arguments specified, process all files with known extensions
 			//in the current directory
-			this.addFiles(getAllFilesInDirectory(System.getProperty("user.dir")));
+			addFiles(getAllFilesInDirectory(System.getProperty("user.dir")));
 			this.analyze();
 		}
 		//If arguments are specified
@@ -84,7 +84,7 @@ public class Input {
 			{
 				boolean nameFragment = false;	//Flag for whether the current argument is part of a file or 
 												//dir name (one that contains whitespace)
-				boolean hasTag = false;	//Flag for whether the next argument is a modifying tag for the
+				boolean hasTag = false;		//Flag for whether the next argument is a modifying tag for the
 											//current file or directory
 				File f = new File("");
 				
@@ -96,6 +96,7 @@ public class Input {
 					if(hasTag)
 					{
 						hasTag = false;
+						nameFragment = false;
 						continue;
 					}
 					
@@ -111,7 +112,7 @@ public class Input {
 						if(!temp.isFile() && !temp.isDirectory())
 						{
 							//nameFragment remains true
-							f = new File(f.toString() + " " + args[i]);
+							f = new File(f.getAbsolutePath() + " " + args[i]);
 						}
 						//If the newly-concatenated f is a file or directory,
 						//add it to the input and set the nameFragment flag to false
@@ -123,10 +124,11 @@ public class Input {
 							}
 							catch(ArrayIndexOutOfBoundsException ar)
 							{
-								hasTag = detectTag(f.getAbsolutePath(), "");
+								hasTag = detectTag(f.getAbsolutePath(), " ");
 							}
 							
 							nameFragment = false;
+							continue;
 						} 
 					}
 					
@@ -142,7 +144,7 @@ public class Input {
 						}
 						catch(ArrayIndexOutOfBoundsException ar)
 						{
-							hasTag = detectTag(f.getAbsolutePath(), "");
+							hasTag = detectTag(f.getAbsolutePath(), " ");
 						}
 						
 						nameFragment = false;
@@ -181,7 +183,6 @@ public class Input {
 		}
 		case "-a":
 		{
-			SIT.notifyUser("Added " + filename + "\n");
 			if(f.isFile())
 				adaFiles.add(filename);
 			else if(f.isDirectory())
@@ -205,17 +206,21 @@ public class Input {
 			if(f.isFile())
 				SIT.notifyUser("Invalid argument for " + filename);
 			else if (f.isDirectory())
-				this.addFiles(this.getAllFilesInDirectoryAndSubDirectories(filename));
+				addFiles(getAllFilesInDirectoryAndSubDirectories(filename));
 			else
 				SIT.notifyUser("Invalid file or directory name");
+			return true;
 		}
 		case "-all":
+		{
 			if(f.isFile())
 				SIT.notifyUser("Invalid argument for " + filename);
 			else if (f.isDirectory())
-				this.addFiles(this.getAllFilesInDirectory(filename));
+				addFiles(getAllFilesInDirectory(filename));
 			else
 				SIT.notifyUser("Invalid file or directory name");
+			return true;
+		}
 		default:
 			if(argument.startsWith("-"))
 			{
@@ -227,12 +232,12 @@ public class Input {
 				if(f.isFile())
 					addFile(filename);
 				else if(f.isDirectory())
-					getAllFilesInDirectory(filename);
+					addFiles(getAllFilesInDirectory(filename));
 				else
 					SIT.notifyUser("Invalid file or directory name");
 				return false;
 			}
-		}
+		}//end switch
 	}
 	
 	
@@ -264,6 +269,7 @@ public class Input {
 	{
 		List<String> fileList = new LinkedList<>();
 		fileList.add(filename);
+		
 		sortByType(fileList);
 	}
 	
@@ -316,21 +322,18 @@ public class Input {
 		//add file names to list 
 		List<String> fileNames = new LinkedList<>();
 		
-		if(listOfFiles.length > 0)
+		for(File f : listOfFiles) 
 		{
-			for(File f : listOfFiles) 
+			if(f.isFile())
 			{
-				if(f.isFile())
-				{
-					fileNames.add(f.getAbsolutePath());
-				}
-				
+				fileNames.add(f.getAbsolutePath());
 			}
-			//addFiles(fileNames);
 			
-			//sort that list by extension
 		}
+		//addFiles(fileNames);
 		
+		//sort that list by extension
+	
 		return fileNames;
 	}
 	
