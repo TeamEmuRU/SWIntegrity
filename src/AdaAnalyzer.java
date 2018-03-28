@@ -9,7 +9,9 @@ import java.util.Set;
 import java.util.Stack;
 
 public class AdaAnalyzer extends Analyzer{
-	List<Variable> variables;
+	Map<String,Variable> variables;
+	Map<String,Variable> externalVariables;
+	List<String> externalFunctionCalls;
 	List<String> literals;
 	//mapping from symbol to line lookup
 	Map<Integer,Integer> symbolToLine;
@@ -25,9 +27,11 @@ public class AdaAnalyzer extends Analyzer{
 	public AdaAnalyzer() {
 		super();
 		
-		this.variables = new LinkedList<>();
+		this.variables = new HashMap<>();
 		this.literals = new LinkedList<>();
 		this.symbolToLine = new HashMap<>();
+		this.externalVariables=new HashMap<>();
+		this.externalFunctionCalls=new LinkedList<>();
 		//initialize lists of character and keywords
 		String[] specialSymbols= {":",";",")","(","+","-","/","\\","*","\\\"","\n","\t","\r","=",".","\""};
 		String[] keyWords= {"abort","else","new","return","abs","elsif","not","reverse",
@@ -98,7 +102,7 @@ public class AdaAnalyzer extends Analyzer{
 			if(!inLiteral) {
 				//check to see if literal is a variable initialization
 			if(i+2<words.length&&isVarName(words[i])&&words[i+1].equals(":")&&isVarName(words[i+2])) {
-				variables.add(new Variable(words[i],words[i+2],scopes.toString(),symbolToLine.get(i)));
+				variables.put(words[i]+scopes.toString(),new Variable(words[i],words[i+2],scopes.toString(),symbolToLine.get(i)));
 			}
 			//check for the end of a scope and pop if so
 			if(words[i].equals("end")||words[i].equals("else")||words[i].equals("elsif")) {
@@ -114,6 +118,13 @@ public class AdaAnalyzer extends Analyzer{
 				scopes.push(words[i+1]+"-"+scopeID);
 				scopeID++;
 			}
+			//look for external varialbes
+			if(words[i].equals(".")&&isVarName(words[i+1])&&isVarName(words[i-1])&&!words[i+2].equals("(")&&!scopes.isEmpty()) {
+				externalVariables.put(words[i-1]+words[i]+words[i+1],new Variable(words[i-1]+words[i]+words[i+1], null, null, symbolToLine.get(i)));
+			}
+			if(words[i].equals(".")&&isVarName(words[i+1])&&isVarName(words[i-1])&&words[i+2].equals("(")&&!scopes.isEmpty()) {
+				externalFunctionCalls.add(words[i+1]);
+			}
 			//check for assignment
 			if(words[i].equals(":")&&words[i+1].equals("=")) {
 				//set stack to catch scopes f we need to 
@@ -123,11 +134,12 @@ public class AdaAnalyzer extends Analyzer{
 				//keep looking until we find the variable
 				while(!found&&!scopes.isEmpty()) {
 				//check each variable
-					for(Variable var:variables) {
+					Variable var=variables.get(words[i-1]+scopes.toString());
+					if(var!=null) {
 						//check each variable to see if this words is that variable
 						if(var.getName().equals(words[i-1])&&var.getScope().equals(scopes.toString())) {
 							//start loop to collect assignment
-							int index=i+1;
+							int index=i+2;
 							//set assigment to capture assignment
 							String assignment="";
 							//loop and collect until end of statement 
@@ -151,6 +163,26 @@ public class AdaAnalyzer extends Analyzer{
 				while(!tempScope.isEmpty()) {
 					scopes.push(tempScope.pop());
 				}
+				//it must be an external variable then 
+				if(!found) {
+					Variable var= externalVariables.get(words[i-3]+words[i-2]+words[i-1]);
+					if(var!=null) {
+					int index=i+1;
+					//set assigment to capture assignment
+					String assignment="";
+					//loop and collect until end of statement 
+					while(!words[index].equals(";")) {
+						assignment+=words[index]+" ";
+						index++;
+					}
+					//add assignment to list and record it'sline
+					
+					var.getAssignments().put(symbolToLine.get(i), assignment);
+					//signify that we found it
+					found=true;
+					}
+				}
+				
 			}
 			}
 			else {
@@ -160,6 +192,8 @@ public class AdaAnalyzer extends Analyzer{
 		}
 		System.out.println(variables);
 		System.out.println(literals);
+		System.out.println(externalVariables);
+		System.out.println(externalFunctionCalls);
 	}
 	/**
 	 * flattens code and records symbol's lines
@@ -221,7 +255,7 @@ public class AdaAnalyzer extends Analyzer{
 	@Override
 	protected void analyze(String filename) {
 		// TODO Auto-generated method stub
-		
+		parse(filename);
 	}
 	private class Variable{
 		String name;
