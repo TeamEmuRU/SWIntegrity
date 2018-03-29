@@ -329,6 +329,14 @@ public class CppAnalyzer extends Analyzer
 			}
 		}//end for
 	}
+	private boolean literalContains(String search) {
+		for(String literal:literals) {
+			if(literal.contains(search)) {
+				return true;
+			}
+		}
+		return false;
+	}
 
 	
 	@Override
