@@ -329,6 +329,12 @@ public class CppAnalyzer extends Analyzer
 			}
 		}//end for
 	}
+	
+	/**
+         * Given a search string, returns whether or not that string was found within a literal
+         * @param search the string to look for
+	 * @return true if the search string was found within a literal
+         */
 	private boolean literalContains(String search) {
 		for(String literal:literals) {
 			if(literal.contains(search)) {
