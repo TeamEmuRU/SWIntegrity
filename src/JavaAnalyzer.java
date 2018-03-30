@@ -3,6 +3,7 @@
  *
  * @author Joseph Antaki
  * @author Abby Beizer
+ * @author Jamie Tyler Walder
  */
 
 import java.io.BufferedReader;
@@ -17,6 +18,7 @@ import java.util.HashSet;
 
 public class JavaAnalyzer extends Analyzer {
 	private Set<String> variablesList;
+	private Set<String> literalsList;
 
     /**
      * The main constructor. Initializes list of variables.
@@ -25,6 +27,28 @@ public class JavaAnalyzer extends Analyzer {
 		super();
 		//instantiate map of variables
 		variablesList = new HashSet<>();
+		literalsList = new HashSet<>();
+	}
+	
+       /**
+	* Reads an array of characters, extracts String literals represented inside, and stores them.
+	* @param arr an array of characters
+        */
+	private void extractLiterals(char[] arr) {
+	    boolean inString = false;
+	    String literal = "";
+	    for(int i=0; i<arr.length; i++) {
+	        if(arr[i] == '\"') {
+		    inString = !inString;
+		    if(literal.length() != 0) {
+			literalsList.add(literal);
+			literal = "";
+		    }
+		}
+		else if(inString) {
+		    literal += arr[i];
+		}
+	    }
 	}
 
     /**
@@ -88,9 +112,7 @@ public class JavaAnalyzer extends Analyzer {
      * @param s The line of code to extract variables from
      */
     public void extractVariables(String s)
-    {
-    	s = flattenCode(s);
-    	
+    { 	
         //Create an array of all words separated by a space
         String words[] = s.split(" ");
         //extract String and primitive variables
@@ -113,17 +135,18 @@ public class JavaAnalyzer extends Analyzer {
         ArrayList<String> list = new ArrayList<>(Arrays.asList(words));
         //start iterator
         Iterator<String> itty = list.iterator();
-        //set a switch keep track of when we are in a string
+        //set a switch to keep track of when we are in a string.
         boolean stringSwitch = false;
-        //the following loop removes strings, it is unfortunate but in order to detect variables strings must not be present
+	String literal = "";
+        //the following loop removes Strings. It is unfortunate but in order to detect variables strings must not be present
         while(itty.hasNext())
         {
             String word = itty.next();
 
-            //if we run into the beginning of a string we turn the switch on and remove the first character, this gets activated again at the end of the switch
+            //if we run into the beginning of a string we turn on the switch and remove the quote character, this happens again at the end of the String
             if(word.equals("\""))
             {
-                stringSwitch = !stringSwitch;
+		stringSwitch = !stringSwitch;
                 itty.remove();
             }
             //while inside of a string we remove it
@@ -188,8 +211,10 @@ public class JavaAnalyzer extends Analyzer {
 					continue;
 				}
 
-				/* Second, extract the variables: */
-
+				/* Second, extract the literals and variables: */
+				
+				extractLiterals(line.toCharArray());
+				line = flattenCode(line);
 				extractVariables(line);
 
 			}
@@ -201,6 +226,8 @@ public class JavaAnalyzer extends Analyzer {
 				SIT.notifyUser("Error reading the contents of " + filename + "." );
 			}
             System.out.println(variablesList);
+	    System.out.print("Literals: ");
+	    System.out.println(literalsList);
 	}
 
 
