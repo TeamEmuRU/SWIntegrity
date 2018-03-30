@@ -29,11 +29,27 @@ public class JavaAnalyzer extends Analyzer {
 		variablesList = new HashSet<>();
 		literalsList = new HashSet<>();
 	}
+
+    /**
+    * Returns the set of variables.
+	* @return the set of variables.
+    */
+	public Set<String> getVariablesList() {
+		return variablesList;
+	}
 	
-       /**
+	/**
+    * Returns the set of String literals.
+	* @return the set of String literals .
+    */
+	public Set<String> getLiteralsList() {
+		return literalsList;
+	}
+	
+    /**
 	* Reads an array of characters, extracts String literals represented inside, and stores them.
 	* @param arr an array of characters
-        */
+    */
 	private void extractLiterals(char[] arr) {
 	    boolean inString = false;
 	    String literal = "";
