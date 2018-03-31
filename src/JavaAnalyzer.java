@@ -261,9 +261,69 @@ public class JavaAnalyzer extends Analyzer {
 	    //System.out.println(literalsList);
 	}
 
+//	@Override
+//	protected void analyze(String filename) {
+//		parse(filename);
+//	}
+	
+	
+	
+	//This is the java SQL injection vulnerability; hard-coded into the program until the database is implemented
 	@Override
-	protected void analyze(String filename) {
-		parse(filename);
+    /**
+     * Method that analyzes a file for possible vulnerability to SQL injections 
+     * @param fileName the name of the file to be analyzed
+     */
+	public void analyze(String fileName) {
+		
+		String DBkeywords[] = {"SELECT", "UNION", "WHERE", "FROM", "HAVING", "JOIN", "ORDER BY"}; //a list of key words used in SQL
+		String keyInMethods[] = {".NEXT",".READ", ".GET"}; //a list of methods used to obtain input from the user, list can be extended later
+		String contents = "";
+		String currentLine = "";
+		boolean badSQL = false; // a boolean to see if this vulnerability exists
+		
+		try{
+			BufferedReader br = new BufferedReader(new FileReader(fileName));
+		
+			while((currentLine = br.readLine()) != null){
+				contents += currentLine;
+			}
+			//checks the two java library api imports see if being used
+			//if no then skips all analysis to return false no vulnerabilities
+			if(contents.contains("java.sql") || contents.contains("jdbc")){
+				contents = contents.toUpperCase();
+				
+				for(String word : DBkeywords){//iterates through the key word list to see if they
+											  //appear in the string of the program code.
+					
+					//if said keyword appears, checks for specific
+					// statements that hackers use for SQL Injection.
+					// %00 is a null byte used by attackers in many different
+					// types of vulnerabilities.
+					if(contents.contains(word)){
+						
+//						if(contents.contains("1=1") || contents.contains("%00") || contents.contains("'")){
+//							badSQL = true;									    
+//						}	
+						
+						//if keywords were found, check to see if the program collects user input
+						for(String inputWord : keyInMethods){
+							if(contents.contains(inputWord)){
+								badSQL = true;
+							}
+							
+						}
+					} 													     
+				}
+			} 
+		}
+		catch (IOException e){
+			System.out.println("FileNotFoundException in "
+					+ "Java SQL analyze");
+		}
+		
+		//Display whether or possible sql injections were detected
+		System.out.println("At risk of SQL injection: "+badSQL);
 	}
 
 }
