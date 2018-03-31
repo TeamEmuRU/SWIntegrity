@@ -349,6 +349,57 @@ public class CppAnalyzer extends Analyzer
 	protected void analyze(String filename) {
 		parse(filename);
 	}
+
+	private void sqlCppAnalyze(String fileName) {
+		
+		String DBkeywords[] = {"SELECT", "UNION", "WHERE", "FROM", "HAVING", "JOIN", "ORDER BY"}; //A List of key words used in SQL
+		//a list of the most common c++ libraries to use for databases
+		String DBlibraries[] = {"MYSQL","SQL","SQLAPI", "SQLITE3","SOCI", "OTL", "LMDB++", "DTL", "LMDB", "MONGOXX"};
+		String contents = "";
+		String currentLine = "";
+		boolean badSQL = false; // a boolean to see if this vulnerability exists
+		
+		try{
+			BufferedReader br = new BufferedReader(new FileReader(fileName));
+		
+			while((currentLine = br.readLine()) != null){
+				contents += currentLine;
+			}
+			
+			//change everything to uppercase to deal with case sensitivity
+			contents = contents.toUpperCase();
+			
+			//check to see if a database library was used for c++,
+			//if you find one, there is a possibility for SQL injection
+			//if you don't, then there's a strong indicator that there won't be any SQL injections
+			for(String lib : DBlibraries) {	
+				if(contents.contains(lib)){
+					
+					for(String word : DBkeywords){//iterates through the key word list to see if they
+								      //appear in the string of the program code.
+					
+						//search for keywords that might indicate an SQL statement	
+						if(contents.contains(word)){
+							
+							//if keywords were found, check to see if the program calls for user input
+							if(contents.contains("CIN >>")){
+								badSQL = true;
+							}
+								
+							
+						} 													     
+					}
+				} 
+			}
+		}
+		catch (IOException e){
+			System.out.println("FileNotFoundException in "
+					+ "c++ SQL analyze");
+		}
+		//Display whether possible sql injections were detected
+		System.out.println("At risk for possible SQL injections: "+badSQL);
+	}
+
 	private class Variable{
 		String name;
 		String type;

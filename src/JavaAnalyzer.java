@@ -266,24 +266,18 @@ public class JavaAnalyzer extends Analyzer {
 	    //System.out.println(literalsList);
 	}
 
-//	@Override
-//	protected void analyze(String filename) {
-//		parse(filename);
-//	}
+	@Override
+	protected void analyze(String filename) {
+		parse(filename);
+	}
 	
 	
 	
 	//This is the java SQL injection vulnerability; hard-coded into the program until the database is implemented
-	@Override
     /**
      * Method that analyzes a file for possible vulnerability to SQL injections 
      * @param fileName the name of the file to be analyzed
      */
-	public void analyze(String filename) {
-		parse(filename);
-		
-	}
-	
 	private void sqlVuln(String fileName)
 	{
 		String DBkeywords[] = {"SELECT", "UNION", "WHERE", "FROM", "HAVING", "JOIN", "ORDER BY"}; //a list of key words used in SQL
@@ -332,7 +326,7 @@ public class JavaAnalyzer extends Analyzer {
 					+ "Java SQL analyze");
 		}
 		
-		//Display whether or possible sql injections were detected
+		//Display whether possible sql injections were detected
 		System.out.println("At risk of SQL injection: "+badSQL);
 	}
 
