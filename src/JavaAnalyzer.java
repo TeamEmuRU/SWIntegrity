@@ -15,10 +15,14 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.HashSet;
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
 
 public class JavaAnalyzer extends Analyzer {
 	private Set<String> variablesList;
 	private Set<String> literalsList;
+	private Pattern NON_ALPHA_NUMERIC;
+
 
     /**
      * The main constructor. Initializes list of variables.
@@ -28,6 +32,9 @@ public class JavaAnalyzer extends Analyzer {
 		//instantiate map of variables
 		variablesList = new HashSet<>();
 		literalsList = new HashSet<>();
+		//Create a regex pattern to catch special characters
+		String regex = "[\\W&&\\S]";
+		NON_ALPHA_NUMERIC = Pattern.compile(regex);
 	}
 
     /**
@@ -73,27 +80,22 @@ public class JavaAnalyzer extends Analyzer {
      * @return the formatted line of code
      */
 	public String flattenCode(String s)
-	{	
-		String finalString = s.trim().replaceAll("\n", "").replaceAll("\t","").replaceAll("\r", "").replaceAll("\f", "");
+	{
+		//Remove all whitespace characters that are not regular spaces
+		String finalString = s.trim().replaceAll("[\n|\t|\r|\f]", "");
 		//Separate all special characters
-        finalString = finalString.replace("=", " = ");
-        finalString = finalString.replace("(", " ( ");
-        finalString = finalString.replace(")", " ) ");
-        finalString = finalString.replace(";", " ; ");
-        finalString = finalString.replace("{", " { ");
-        finalString = finalString.replace("}", " } ");
-        finalString = finalString.replace("[", " [ ");
-        finalString = finalString.replace("]", " ] ");
-        finalString = finalString.replace(":", " : ");
-        finalString = finalString.replace(":", " : ");
-        finalString = finalString.replace("\"", " \" ");
-        finalString = finalString.replace(",", " , ");
+		Matcher match = NON_ALPHA_NUMERIC.matcher(finalString);
+		String found = "";
+		while(match.find()) {
+			found = match.group();
+			finalString = finalString.replace(found, " "+found+" ");
+		}
 		//Create an array of all words separated by a space
 		String words[] = finalString.split(" ");
 		//Transform the array into an ArrayList
 		ArrayList<String> list = new ArrayList<>(Arrays.asList(words));
 		Iterator<String> itty = list.iterator();
-		String result="";
+		String result = "";
 		while(itty.hasNext()) {
 			String word = itty.next();
 			//Remove any blank words in the ArrayList
@@ -113,7 +115,7 @@ public class JavaAnalyzer extends Analyzer {
 	private void searchForType(String[] arr, String type) {
         for (int i = 0; i < arr.length - 2; i++) {
             if (arr[i].equals(type) && !arr[i+2].equals("(")) {
-                if(arr[i+1].equals("[")) {
+                if(arr[i+1].equals("[") && !arr[i+3].equals(".")) {
                     variablesList.add(arr[i+3]);
                 }
                 else {
@@ -128,9 +130,35 @@ public class JavaAnalyzer extends Analyzer {
      * @param s The line of code to extract variables from
      */
     public void extractVariables(String s)
-    { 	
-        //Create an array of all words separated by a space
-        String words[] = s.split(" ");
+    {
+		//Create an array of all words separated by a space
+		String words[] = s.split(" ");
+		//Transform the array into an ArrayList
+		ArrayList<String> list = new ArrayList<>(Arrays.asList(words));
+		//start iterator
+		Iterator<String> itty = list.iterator();
+		//set a switch to keep track of when we are in a string.
+		boolean stringSwitch = false;
+		//the following loop removes Strings. In order to detect variables strings must not be present
+		while(itty.hasNext())
+		{
+			String word = itty.next();
+
+			//if we run into the beginning of a string we turn on the switch and remove the quote character, this happens again at the end of the String
+			if(word.equals("\""))
+			{
+				stringSwitch = !stringSwitch;
+				itty.remove();
+			}
+			//while inside of a string we remove it
+			else if(stringSwitch && !word.equals("\""))
+			{
+				itty.remove();
+			}
+
+		}
+		//put words back into an array
+		words = list.toArray(new String[list.size()]);
         //extract String and primitive variables
         searchForType(words, "String");
         searchForType(words, "boolean");
@@ -144,36 +172,14 @@ public class JavaAnalyzer extends Analyzer {
         //extract all other variables
         for (int i = 2; i < words.length; i++) {
             if((!words[i-1].equals(")"))&&(words[i].equals("=") || words[i].equals(";")) && Character.isUpperCase(words[i-2].charAt(0))){
-                variablesList.add(words[i-1]);
+                if(words[i-1].equals(">")) {
+					variablesList.add(words[i-2]);
+				}
+				else {
+					variablesList.add(words[i - 1]);
+				}
             }
         }
-        //Transform the array into an ArrayList
-        ArrayList<String> list = new ArrayList<>(Arrays.asList(words));
-        //start iterator
-        Iterator<String> itty = list.iterator();
-        //set a switch to keep track of when we are in a string.
-        boolean stringSwitch = false;
-	String literal = "";
-        //the following loop removes Strings. It is unfortunate but in order to detect variables strings must not be present
-        while(itty.hasNext())
-        {
-            String word = itty.next();
-
-            //if we run into the beginning of a string we turn on the switch and remove the quote character, this happens again at the end of the String
-            if(word.equals("\""))
-            {
-		stringSwitch = !stringSwitch;
-                itty.remove();
-            }
-            //while inside of a string we remove it
-            else if(stringSwitch && !word.equals("\""))
-            {
-                itty.remove();
-            }
-
-        }
-        //put words back into an array
-        words = list.toArray(new String[list.size()]);
     }
 
 	@Override
@@ -190,7 +196,6 @@ public class JavaAnalyzer extends Analyzer {
 
 			//Runs until end of file
 			while ((line = br.readLine()) != null) {
-
 				/* First, remove any comments from the line */
 
 				//If the previous line began or continued a multi-line comment
@@ -232,6 +237,16 @@ public class JavaAnalyzer extends Analyzer {
 				extractLiterals(line.toCharArray());
 				line = flattenCode(line);
 				extractVariables(line);
+				//temporary fix
+				Iterator<String> it = variablesList.iterator();
+				Matcher m;
+				while(it.hasNext()) {
+					String element = it.next();
+					m = NON_ALPHA_NUMERIC.matcher(element);
+					if(m.matches()) {
+						it.remove();
+					}
+				}
 
 			}
             }
@@ -241,18 +256,12 @@ public class JavaAnalyzer extends Analyzer {
 			catch(IOException io){	//from BufferedReader
 				SIT.notifyUser("Error reading the contents of " + filename + "." );
 			}
-            System.out.println(variablesList);
-	    System.out.print("Literals: ");
-	    System.out.println(literalsList);
+			System.out.println(variablesList);
+	    //System.out.print("Literals: ");
+	    //System.out.println(literalsList);
 	}
 
-
-
 	@Override
-    /**
-     * Analyzes a java source code file for vulnerabilities,
-     * @param filename The name of the file to be analyzed
-     */
 	protected void analyze(String filename) {
 		parse(filename);
 	}
