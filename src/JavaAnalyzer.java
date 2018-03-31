@@ -57,20 +57,25 @@ public class JavaAnalyzer extends Analyzer {
 	* Reads an array of characters, extracts String literals represented inside, and stores them.
 	* @param arr an array of characters
     */
-	private void extractLiterals(char[] arr) {
+	private void extractLiterals(char[] arr) 
+	{
 	    boolean inString = false;
 	    String literal = "";
-	    for(int i=0; i<arr.length; i++) {
-	        if(arr[i] == '\"') {
-		    inString = !inString;
-		    if(literal.length() != 0) {
-			literalsList.add(literal);
-			literal = "";
-		    }
-		}
-		else if(inString) {
-		    literal += arr[i];
-		}
+	    for(int i=0; i<arr.length; i++) 
+	    {
+	        if(arr[i] == '\"') 
+	        {
+			    inString = !inString;
+			    if(literal.length() != 0) 
+			    {
+					literalsList.add(literal);
+					literal = "";
+			    }
+	        }
+	        else if(inString) 
+	        {
+	        	literal += arr[i];
+	        }
 	    }
 	}
 
@@ -274,8 +279,13 @@ public class JavaAnalyzer extends Analyzer {
      * Method that analyzes a file for possible vulnerability to SQL injections 
      * @param fileName the name of the file to be analyzed
      */
-	public void analyze(String fileName) {
+	public void analyze(String filename) {
+		parse(filename);
 		
+	}
+	
+	private void sqlVuln(String fileName)
+	{
 		String DBkeywords[] = {"SELECT", "UNION", "WHERE", "FROM", "HAVING", "JOIN", "ORDER BY"}; //a list of key words used in SQL
 		String keyInMethods[] = {".NEXT",".READ", ".GET"}; //a list of methods used to obtain input from the user, list can be extended later
 		String contents = "";
