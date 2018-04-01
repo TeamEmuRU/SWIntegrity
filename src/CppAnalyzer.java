@@ -28,6 +28,8 @@ public class CppAnalyzer extends Analyzer
 	//literals of the file
 	private List<String> literals;
 	private String fileContents;
+	//this map keeps track of which significant symbol(non comments) reside on which lines
+	private Map<Integer,Integer> symbolToLine;
 
 	
 	
@@ -41,21 +43,31 @@ public class CppAnalyzer extends Analyzer
 		variablesList = new LinkedList<Variable>();
 		keywords = new HashSet<>();
 		literals=new LinkedList<>();
+		symbolToLine=new HashMap<>();
 		//Create keyword set
 		createKeywordSet();
+	}
+	private void clearAll() {
+		variablesList = new LinkedList<Variable>();
+		literals=new LinkedList<>();
+		symbolToLine=new HashMap<>();
+		fileContents="";
 	}
 	
 	@Override
 	public void parse(String filename) 
 	{
-	
-		String file = openFile(filename);			
+		//clear all gathered data
+		clearAll();
+		String file = openFile(filename);
+		
 		file = flattenCode(file);
+		this.fileContents=file;
 		//TODO: remove print statement
 		System.out.print(file);
 		extractVariables(file);
 		extractLiterals(file);
-		this.fileContents=file;
+		
 		//TODO remove print statement
 		System.out.println(variablesList);
 	}
@@ -151,47 +163,83 @@ public class CppAnalyzer extends Analyzer
 		
 		/* First, remove any comments from the file */	
 		//removes single-line and multi-line comments in the format /* --- */
-		s = s.replaceAll("/\\*((?:.*\\r?\\n?)*)\\*/", "");
+		//s = s.replaceAll("/\\*((?:.*\\r?\\n?)*)\\*/", "");
 		//removes single-line comments in the format "//"
-		s = s.replaceAll("//.*\n", "");
+		//s = s.replaceAll("//.*\n", "");
 		
-		/* Next, add spaces around special characters to make the next steps of processing easier */
-		String finalString = s.trim().replace("\n", "").replace("\t","").replaceAll("\r", "");
 		//Separate all special characters		
-		finalString = finalString.replace("=", " = ");
-		finalString = finalString.replace("(", " ( ");
-		finalString = finalString.replace(")", " ) ");
-		finalString = finalString.replace(";", " ; ");
-		finalString = finalString.replace("{", " { ");
-		finalString = finalString.replace("}", " } ");
-		finalString = finalString.replace("[", " [ ");
-		finalString = finalString.replace("]", " ] ");
-		finalString = finalString.replace(":", " : ");
-		finalString = finalString.replace("+", " + ");
-		finalString = finalString.replace("\"", " \" ");
-		finalString = finalString.replace(",", " , ");
-		finalString = finalString.replace("-", " - ");
-		finalString = finalString.replace("/", " / ");
-		finalString = finalString.replace("%", " % ");
-		finalString = finalString.replace("*", " * ");
+		s = s.replace("=", " = ");
+		s = s.replace("(", " ( ");
+		s = s.replace(")", " ) ");
+		s = s.replace(";", " ; ");
+		s = s.replace("{", " { ");
+		s = s.replace("}", " } ");
+		s = s.replace("[", " [ ");
+		s = s.replace("]", " ] ");
+		s = s.replace(":", " : ");
+		s = s.replace("+", " + ");
+		s = s.replace("\"", " \" ");
+		s = s.replace(",", " , ");
+		s = s.replace("-", " - ");
+		s = s.replace("/", " / ");
+		s = s.replace("%", " % ");
+		s = s.replace("*", " * ");	
+		s = s.replace("\n", " \n ");
+		s = s.replace("\t", " \t ");	
+		s = s.replace("\r", "");	
 		
-		
-		//Create an array of all words separated by a space
-		String words[] = finalString.split(" ");
-		//Transform the array into an ArrayList
-		ArrayList<String> list = new ArrayList<>(Arrays.asList(words));
-		Iterator<String> itty = list.iterator();
-		String result = "";
-		while(itty.hasNext()) 
-		{
-			String word = itty.next();
-			//Remove any blank words in the ArrayList
-			if(!word.equals(""))
-			{
-				result += (word + " ");
+		//split strings		
+		String[] temp=s.split(" ");
+		ArrayList<String> words=new ArrayList<>(temp.length);
+		//remove spaces
+		for(String word:temp) {
+			if(!word.equals("")) {
+				words.add(word);
 			}
 		}
-		return result.trim();
+		//set in comment variable, significant symbol number and line number
+		boolean inComment=false;
+		int symbolID=0;
+		int lineID=1;
+		//set variable for final result
+		String finalString="";
+		//search through string
+		for(int index=0;index<words.size();index++) {
+			//if comment start switch to ignore
+			if(words.get(index).equals("/")&&words.get(index+1).equals("*")) {
+				inComment=true;
+			}
+			//if end of comment turn swithc off
+			else if(words.get(index).equals("*")&&words.get(index+1).equals("/")) {
+				inComment=false;
+				index++;
+			}
+			//if line comment jump to end of line
+			else if(words.get(index).equals("/")&&words.get(index+1).equals("/")) {
+				while(!words.get(index).equals("\n")) {
+					index++;
+				}
+				lineID++;
+			}
+			//if end of line increment line number
+			else if(words.get(index).equals("\n")) {
+				lineID++;
+			}
+			//if tab ignore
+			else if(words.get(index).equals("\t"));
+			//if we arent in comment add that string to the final and incremtn symbol ID
+			else if(!inComment) {
+				if(!words.get(index).equals(""))	{
+					finalString+=words.get(index)+" ";
+					symbolToLine.put(symbolID, lineID);
+					symbolID++;
+				}
+			}
+				
+		}
+		
+
+		return finalString.trim();
 	}
 	/**
 	 * Identifies whether a given String can be used as a variable or class name without conflicting with reserved C++ keywords.
@@ -215,7 +263,6 @@ public class CppAnalyzer extends Analyzer
 	 */
 	public void extractVariables(String s) 
 	{
-		s = flattenCode(s);
 		s = s.replace("\\\"", "");
 		//Create an array of all words separated by a space
 		String words[] = s.split(" ");
@@ -263,7 +310,7 @@ public class CppAnalyzer extends Analyzer
 				if( (!words[i+2].contains("(")) && isValidName(words[i]) )
 				{
 					//if it is, we declare the variable name:type
-					variablesList.add(new Variable(words[i+1], words[i], scopes.toString(), i));
+					variablesList.add(new Variable(words[i+1], words[i], scopes.toString(), symbolToLine.get(i)));
 				}
 			}
 			//add a new scope if the keywords is found
@@ -359,42 +406,34 @@ public class CppAnalyzer extends Analyzer
 	@Override
 	protected void analyze(String filename) {
 		parse(filename);
+		sqlCppAnalyze();
 	}
 
-	private void sqlCppAnalyze(String fileName) {
+	private void sqlCppAnalyze() {
 		
 		String DBkeywords[] = {"SELECT", "UNION", "WHERE", "FROM", "HAVING", "JOIN", "ORDER BY"}; //A List of key words used in SQL
 		//a list of the most common c++ libraries to use for databases
 		String DBlibraries[] = {"MYSQL","SQL","SQLAPI", "SQLITE3","SOCI", "OTL", "LMDB++", "DTL", "LMDB", "MONGOXX"};
-		String contents = "";
-		String currentLine = "";
-		boolean badSQL = false; // a boolean to see if this vulnerability exists
+		HashSet<Integer> lineNumbers=new HashSet<>();
 		
-		try{
-			BufferedReader br = new BufferedReader(new FileReader(fileName));
 		
-			while((currentLine = br.readLine()) != null){
-				contents += currentLine;
-			}
 			
 			//change everything to uppercase to deal with case sensitivity
-			contents = contents.toUpperCase();
-			
+			String contents = fileContents.toUpperCase();
+			String[] temp=contents.split(" ");
 			//check to see if a database library was used for c++,
 			//if you find one, there is a possibility for SQL injection
 			//if you don't, then there's a strong indicator that there won't be any SQL injections
 			for(String lib : DBlibraries) {	
 				if(contents.contains(lib)){
-					
 					for(String word : DBkeywords){//iterates through the key word list to see if they
 								      //appear in the string of the program code.
-					
+						
 						//search for keywords that might indicate an SQL statement	
-						if(contents.contains(word)){
-							
+						for(int index=0;index<temp.length;index++){
 							//if keywords were found, check to see if the program calls for user input
-							if(contents.contains("CIN >>")){
-								badSQL = true;
+							if(temp[index].contains(word)&&contents.contains(" COUT ")){
+								lineNumbers.add(symbolToLine.get(index));
 							}
 								
 							
@@ -402,13 +441,9 @@ public class CppAnalyzer extends Analyzer
 					}
 				} 
 			}
-		}
-		catch (IOException e){
-			System.out.println("FileNotFoundException in "
-					+ "c++ SQL analyze");
-		}
+		
 		//Display whether possible sql injections were detected
-		System.out.println("At risk for possible SQL injections: "+badSQL);
+		System.out.println("At risk for possible SQL injections: "+lineNumbers);
 	}
 
 	private class Variable{
@@ -416,7 +451,7 @@ public class CppAnalyzer extends Analyzer
 		String type;
 		String scope;
 		//Line on which this variable is created 
-		int symbolNumber;
+		int lineNumber;
 		//line on which the assignment is followed by the reference
 		Map<Integer,String> assignments;
 		
@@ -425,7 +460,7 @@ public class CppAnalyzer extends Analyzer
 			this.name = name;
 			this.type = type;
 			this.scope = scope;
-			this.symbolNumber = line;
+			this.lineNumber = line;
 			assignments=new HashMap<>();
 		}
 		public String getName() {
@@ -447,10 +482,10 @@ public class CppAnalyzer extends Analyzer
 			this.scope = scope;
 		}
 		public int getLine() {
-			return symbolNumber;
+			return lineNumber;
 		}
 		public void setLine(int line) {
-			this.symbolNumber = line;
+			this.lineNumber = line;
 		}
 		public Map<Integer, String> getAssignments() {
 			return assignments;
@@ -461,7 +496,7 @@ public class CppAnalyzer extends Analyzer
 		
 		@Override
 		public String toString() {
-			return "Variable [name=" + name + ", type=" + type + ", scope=" + scope + ", symbolNumber=" + symbolNumber
+			return "Variable [name=" + name + ", type=" + type + ", scope=" + scope + ", symbolNumber=" + lineNumber
 					+ ", assignments=" + assignments +  "]";
 		}
 		@Override

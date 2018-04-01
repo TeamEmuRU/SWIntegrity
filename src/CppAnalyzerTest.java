@@ -12,7 +12,7 @@ class CppAnalyzerTest {
 	@Test
 	void test() {
 		CppAnalyzer c=new CppAnalyzer();
-		c.parse("C:\\Users\\Tyler\\Desktop\\Test\\SWIntegrity\\Test Files\\hello.cpp");
+		c.analyze("C:\\Users\\tyler\\eclipse-workspace\\SWIntegrity\\TestFiles\\hello.cpp");
 		
 	}
 
