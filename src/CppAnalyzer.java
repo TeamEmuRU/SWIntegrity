@@ -24,6 +24,7 @@ public class CppAnalyzer extends Analyzer
 	private Set<String> keywords;
 	//literals of the file
 	private List<String> literals;
+	private String fileContents;
 
 	
 	
@@ -51,6 +52,7 @@ public class CppAnalyzer extends Analyzer
 		System.out.print(file);
 		extractVariables(file);
 		extractLiterals(file);
+		this.fileContents=file;
 		//TODO remove print statement
 		System.out.println(variablesList);
 	}
@@ -329,13 +331,18 @@ public class CppAnalyzer extends Analyzer
 			}
 		}//end for
 	}
-	private boolean literalContains(String search) {
+	public boolean literalContains(String search) {
 		for(String literal:literals) {
 			if(literal.contains(search)) {
 				return true;
 			}
 		}
 		return false;
+	}
+	public boolean fileContains(String search) {
+		
+			return fileContents.contains(search);
+		
 	}
 
 	
