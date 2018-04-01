@@ -7,6 +7,9 @@
  */
 
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -331,9 +334,7 @@ public class CppAnalyzer extends Analyzer
 			}
 		}//end for
 	}
-<<<<<<< HEAD
-	public boolean literalContains(String search) {
-=======
+
 	
 	/**
          * Given a search string, returns whether or not that string was found within a literal
@@ -341,7 +342,6 @@ public class CppAnalyzer extends Analyzer
 	 * @return true if the search string was found within a literal
          */
 	private boolean literalContains(String search) {
->>>>>>> branch 'master' of https://github.com/TeamEmuRU/SWIntegrity.git
 		for(String literal:literals) {
 			if(literal.contains(search)) {
 				return true;
