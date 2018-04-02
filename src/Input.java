@@ -8,6 +8,7 @@
 
 
 import java.io.File;
+import java.io.IOException;
 import java.util.*;
 
 
@@ -63,6 +64,7 @@ public class Input {
 					case "-c":
 						addCppFilesInDirectory(System.getProperty("user.dir"));
 						break;
+					//TODO: Add ability to specify single file types recursively
 					case "-r":
 						addFiles(getAllFilesInDirectoryAndSubDirectories(System.getProperty("user.dir")));
 						break;
@@ -91,6 +93,7 @@ public class Input {
 				//This starts after the tags are processed
 				for (int i = nonTagsStart; i < args.length; i++) 
 				{
+					
 					//If the previous run of the loop detected that this argument was a tag,
 					//Move right to the next argument
 					if(hasTag)
@@ -108,8 +111,22 @@ public class Input {
 					if(nameFragment)	
 					{
 						File temp = new File(args[i]);
-						//If temp is not a file or directory on its own
-						if(!temp.isFile() && !temp.isDirectory())
+						//If temp is a file or directory on its own, then there 
+						if(temp.isFile() || temp.isDirectory())
+						{
+							try
+							{
+								hasTag = detectTag(temp.getAbsolutePath(), args[i + 1]);
+								SIT.notifyUser("Error: Invalid path: " + f.getAbsolutePath());
+							}
+							catch(ArrayIndexOutOfBoundsException ab)
+							{
+								hasTag = detectTag(temp.getAbsolutePath(), " ");
+								SIT.notifyUser("Error: Invalid path: " + f.getAbsolutePath());
+							}
+						}
+						//if temp was not a file/dir on its own, concatenate the current argument to f
+						else
 						{
 							//nameFragment remains true
 							f = new File(f.getAbsolutePath() + " " + args[i]);
@@ -131,11 +148,14 @@ public class Input {
 							continue;
 						} 
 					}
+					else
+					{
+						//Process only the current argument
+						f = new File(args[i]);
+					}
 					
-					//Process only the current argument
-					f = new File(args[i]);
-						
 					//If f is a file or directory, then add it to the input and set the nameFragment flag to false
+					//TODO: This if statement always returns false on the first loop
 					if (f.isFile() || f.isDirectory()) 
 					{
 						try
