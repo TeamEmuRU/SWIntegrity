@@ -569,6 +569,7 @@ public class Input {
 		//analyze each file
 		for(String filename : javaFiles) {
 			analyzer.analyze(filename);
+			filename = filename.replaceAll("/../", "/").replaceAll("/./", "/");
 			SIT.notifyUser(filename + " has been analyzed.");
 		}
 		System.out.println("all java files read");
@@ -587,6 +588,7 @@ public class Input {
 		//analyze each file
 		for(String filename : adaFiles) {
 			analyzer.analyze(filename);
+			filename = filename.replaceAll("/../", "/").replaceAll("/./", "/");
 			SIT.notifyUser(filename+" has been analyzed.");
 			//TODO analyze
 		}
@@ -605,6 +607,7 @@ public class Input {
 		//analyze each file
 		for(String filename : cppFiles) {
 			analyzer.analyze(filename);
+			filename = filename.replaceAll("/../", "/").replaceAll("/./", "/");
 			SIT.notifyUser(filename+" has been analyzed.");
 			//TODO analyze
 		}
