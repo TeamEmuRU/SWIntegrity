@@ -261,17 +261,16 @@ public class JavaAnalyzer extends Analyzer {
 			catch(IOException io){	//from BufferedReader
 				SIT.notifyUser("Error reading the contents of " + filename + "." );
 			}
+			System.out.println("Variables:");
 			System.out.println(variablesList);
-	    //System.out.print("Literals: ");
-	    //System.out.println(literalsList);
+			System.out.println("Literals:");
+	    	System.out.println(literalsList);
 	}
 
 	@Override
 	protected void analyze(String filename) {
 		parse(filename);
 	}
-	
-	
 	
 	//This is the java SQL injection vulnerability; hard-coded into the program until the database is implemented
     /**
@@ -305,10 +304,10 @@ public class JavaAnalyzer extends Analyzer {
 					// %00 is a null byte used by attackers in many different
 					// types of vulnerabilities.
 					if(contents.contains(word)){
-						
+
 //						if(contents.contains("1=1") || contents.contains("%00") || contents.contains("'")){
-//							badSQL = true;									    
-//						}	
+//							badSQL = true;
+//						}
 						
 						//if keywords were found, check to see if the program collects user input
 						for(String inputWord : keyInMethods){
@@ -329,6 +328,4 @@ public class JavaAnalyzer extends Analyzer {
 		//Display whether possible sql injections were detected
 		System.out.println("At risk of SQL injection: "+badSQL);
 	}
-
-
 }
