@@ -406,10 +406,10 @@ public class CppAnalyzer extends Analyzer
 	@Override
 	protected void analyze(String filename) {
 		parse(filename);
-		sqlCppAnalyze();
+		sqlCppAnalyze(filename);
 	}
 
-	private void sqlCppAnalyze() {
+	public void sqlCppAnalyze(String filename) {
 		
 		String DBkeywords[] = {"SELECT", "UNION", "WHERE", "FROM", "HAVING", "JOIN", "ORDER BY"}; //A List of key words used in SQL
 		//a list of the most common c++ libraries to use for databases
@@ -443,7 +443,11 @@ public class CppAnalyzer extends Analyzer
 			}
 		
 		//Display whether possible sql injections were detected
-		System.out.println("At risk for possible SQL injections: "+lineNumbers);
+		if(lineNumbers.isEmpty()) {
+			System.out.println("At risk for possible SQL injections: None detected");
+		}else {
+			System.out.println("At risk for possible SQL injections: "+lineNumbers);
+		}
 	}
 
 	private class Variable{
