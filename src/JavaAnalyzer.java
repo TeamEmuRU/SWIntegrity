@@ -277,7 +277,7 @@ public class JavaAnalyzer extends Analyzer {
      * Method that analyzes a file for possible vulnerability to SQL injections 
      * @param fileName the name of the file to be analyzed
      */
-	private void sqlVuln(String fileName)
+	public void sqlVuln(String fileName)
 	{
 		String DBkeywords[] = {"SELECT", "UNION", "WHERE", "FROM", "HAVING", "JOIN", "ORDER BY"}; //a list of key words used in SQL
 		String keyInMethods[] = {".NEXT",".READ", ".GET"}; //a list of methods used to obtain input from the user, list can be extended later
@@ -304,14 +304,13 @@ public class JavaAnalyzer extends Analyzer {
 					// %00 is a null byte used by attackers in many different
 					// types of vulnerabilities.
 					if(contents.contains(word)){
-
-//						if(contents.contains("1=1") || contents.contains("%00") || contents.contains("'")){
-//							badSQL = true;
-//						}
 						
 						//if keywords were found, check to see if the program collects user input
 						for(String inputWord : keyInMethods){
-							if(contents.contains(inputWord)){
+							
+							//If it does collect user input, check to see if it uses prepared statements
+							//prepared statements are safe. If no prepared statement, not safe.
+							if(contents.contains(inputWord)&& !contents.contains("PREPAREDSTATEMENT")){
 								badSQL = true;
 							}
 							

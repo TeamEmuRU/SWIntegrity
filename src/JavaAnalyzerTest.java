@@ -1,3 +1,5 @@
+import org.junit.jupiter.api.Test;
+
 //import org.junit.Before;
 //import org.junit.Test;
 
@@ -24,11 +26,21 @@ public class JavaAnalyzerTest {
         ja = new JavaAnalyzer();
     }
 
+//    /**
+//     * Tests that variables and literals are extracted correctly.
+//     */
+//    //@Test
+//    public void testVariablesAndLiterals() {
+//        ja.analyze("C:\\Users\\Joe\\Documents\\SWIntegrity\\src\\SIT.java");
+//    }
+//    
     /**
-     * Tests that variables and literals are extracted correctly.
+     * Tests the sql detection method
      */
-    //@Test
-    public void testVariablesAndLiterals() {
-        ja.analyze("C:\\Users\\Joe\\Documents\\SWIntegrity\\src\\SIT.java");
-    }
+    @Test
+	void test() {
+    	ja = new JavaAnalyzer();
+		ja.sqlVuln("/Users/KristelleLucero/Documents/Software Engineering 2018/SWIntegrity/Test Files/sqlExample.java");
+		ja.sqlVuln("/Users/KristelleLucero/Documents/Software Engineering 2018/SWIntegrity/Test Files/sqlExample2.java");
+	}
 }
