@@ -567,14 +567,24 @@ public class Input {
 		analyzer = new JavaAnalyzer();
 		
 		//analyze each file
-		for(String filename : javaFiles) {
-			analyzer.analyze(filename);
-			filename = filename.replaceAll("/../", "/").replaceAll("/./", "/");
-			SIT.notifyUser(filename + " has been analyzed.");
+		File f = null;		
+		try {
+		    for(String filename : javaFiles) {
+			    analyzer.analyze(filename);
+			    f = new File(filename);
+			    SIT.notifyUser(f.getCanonicalPath()+" has been analyzed.");
+		    }
 		}
-		System.out.println("all java files read");
+		
+		catch (SecurityException | IOException ex) {
+		    SIT.notifyUser("Could not get file path.");
+		}
+		catch (NullPointerException npe) {
+		    SIT.notifyUser("File path was null.");
+		}
+		finally {System.out.println("all java files read");}
 	}
-	
+
 	/**
 	 * Analyzes Ada files for vulnerabilities by invoking an Analyzer object
 	 */
@@ -586,13 +596,23 @@ public class Input {
 		analyzer = new AdaAnalyzer();
 		
 		//analyze each file
-		for(String filename : adaFiles) {
-			analyzer.analyze(filename);
-			filename = filename.replaceAll("/../", "/").replaceAll("/./", "/");
-			SIT.notifyUser(filename+" has been analyzed.");
-			//TODO analyze
+		File f = null;
+		try {
+		    for(String filename : adaFiles) {
+			    analyzer.analyze(filename);
+			    f = new File(filename);
+			    SIT.notifyUser(f.getCanonicalPath()+" has been analyzed.");
+			    //TODO analyze
+		    }
 		}
-		SIT.notifyUser("all ada files read");
+		
+		catch (SecurityException | IOException ex) {
+		    SIT.notifyUser("Could not get file path.");
+		}
+		catch (NullPointerException npe) {
+		    SIT.notifyUser("File path was null.");
+		}
+		finally {SIT.notifyUser("all ada files read");}
 	}
 	/**
 	 * Analyzes C++ files for vulnerabilities by invoking an Analyzer object
@@ -605,13 +625,22 @@ public class Input {
 		analyzer= new CppAnalyzer();
 		
 		//analyze each file
-		for(String filename : cppFiles) {
-			analyzer.analyze(filename);
-			filename = filename.replaceAll("/../", "/").replaceAll("/./", "/");
-			SIT.notifyUser(filename+" has been analyzed.");
-			//TODO analyze
+		File f = null;
+		try {   
+		    for(String filename : cppFiles) {
+			    analyzer.analyze(filename);
+			    f = new File(filename);
+			    SIT.notifyUser(f.getCanonicalPath()+" has been analyzed.");
+			    //TODO analyze
+		    }
 		}
-		SIT.notifyUser("all c++ files read");
+		catch (SecurityException | IOException ex) {
+		    SIT.notifyUser("Could not get file path.");
+		}
+		catch (NullPointerException npe) {
+		    SIT.notifyUser("File path was null.");
+		}
+		finally {SIT.notifyUser("all c++ files read");}
 	}
 	
 
