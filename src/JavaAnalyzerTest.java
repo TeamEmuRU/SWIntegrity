@@ -1,7 +1,5 @@
-import static org.junit.Assert.*;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+//import org.junit.Before;
+//import org.junit.Test;
 
 /**
  * The test class for JavaAnalyzer
@@ -21,23 +19,16 @@ public class JavaAnalyzerTest {
      * Sets up the test fixture.
      * Called before every test case method.
      */
-    @Before
+    //@BeforeEach
     public void setUp() {
         ja = new JavaAnalyzer();
     }
 
     /**
-     * Tears down the test fixture.
-     * Called after every test case method.
+     * Tests that variables and literals are extracted correctly.
      */
-    @After
-    public void tearDown(){}
-
-    /**
-     * Tests that variables are extracted correctly, and that
-     */
-    @Test
-    public void testExtractVariables() {
-        ja.analyze("/root/SWIntegrity/src/SIT.java");
+    //@Test
+    public void testVariablesAndLiterals() {
+        ja.analyze("C:\\Users\\Joe\\Documents\\SWIntegrity\\src\\SIT.java");
     }
 }
