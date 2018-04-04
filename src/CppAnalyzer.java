@@ -78,7 +78,7 @@ public class CppAnalyzer extends Analyzer
 	 */
 	private void createKeywordSet() 
 	{
-		String[] words= {"alignas","alignof","and","and_eq","asm","atomic_cancel","atomic_commit","atomic_noexcept","auto","bitand","bitor","break","case","catch","class","compl","concept","const","constexpr","const_cast","continue","co_await","co_return","co_yield","decltype","default","delete","do","double","dynamic_cast","else","enum","explicit","export","extern","false","for","friend","goto","if","import","inline(1)","module","mutable","namespace","new","noexcept","not","not_eqv","nullptr","operator","or","or_eq","private","protected","public","register","reinterpret_cast","requires","return","sizeof","static","static_assert","static_cast","struct","switch","synchronized","template","this","thread_local","throw","true","try","typedef","typeid","typename","union","virtual","void","volatile","while","xor","xor_eq","if","elif","else","endif","defined","ifdef","ifndef","define","undef","include","line","error","pragma","override","final","transaction_safe","transaction_safe_dynamic"};
+		String[] words= {"alignas","alignof","and","and_eq","asm","atomic_cancel","atomic_commit","atomic_noexcept","auto","bitand","bitor","break","case","catch","class","compl","concept","const","constexpr","const_cast","continue","co_await","co_return","co_yield","decltype","default","delete","do","double","dynamic_cast","else","enum","explicit","export","extern","false","for","friend","goto","if","import","inline(1)","module","mutable","namespace","new","noexcept","not","not_eqv","nullptr","operator","or","or_eq","private","protected","public","register","reinterpret_cast","requires","return","sizeof","static","static_assert","static_cast","struct","switch","synchronized","template","this","thread_local","throw","true","try","typedef","typeid","typename","union","virtual","volatile","while","xor","xor_eq","if","elif","else","endif","defined","ifdef","ifndef","define","undef","include","line","error","pragma","override","final","transaction_safe","transaction_safe_dynamic"};
 		for(String word:words) {
 			keywords.add(word);
 		}
@@ -311,8 +311,15 @@ public class CppAnalyzer extends Analyzer
 			//add a new scope if the keywords is found
 			if(words[i].equals("class")||(!keywords.contains(words[i]) && !keywords.contains(words[i+1])&&words[i+2].equals("("))) 
 			{
-				scopes.push(words[i+1]+"-"+scopeID);
-				scopeID++;
+				int temp=i+1;
+				while(!words[temp].equals(";")) {
+					if(words[temp].equals("{")) {
+						scopes.push(words[i+1]+"-"+scopeID);
+						scopeID++;
+						break;
+					}
+					temp++;
+				}
 					
 			}
 			else if(words[i].equals("if")||words[i].equals("else")||words[i].equals("for")||words[i].equals("while")||words[i].equals("try")||words[i].equals("catch")) 
