@@ -78,29 +78,21 @@ public class CppAnalyzer extends Analyzer
 	 */
 	private void createKeywordSet() 
 	{
-		keywords.add("public");
-		keywords.add("private");
-		keywords.add("protected");
-		keywords.add("static");
-		keywords.add("final");
-		keywords.add("void");
-		keywords.add("if");
-		keywords.add("elif");
-		keywords.add("else");
-		keywords.add("extends");
-		keywords.add("import");
-		keywords.add("abstract");
-		keywords.add("new");
-		keywords.add("null");
-		keywords.add("try");
-		keywords.add("catch");
-		keywords.add("class");
-		keywords.add("return");
+		String[] words= {"alignas","alignof","and","and_eq","asm","atomic_cancel","atomic_commit","atomic_noexcept","auto","bitand","bitor","break","case","catch","class","compl","concept","const","constexpr","const_cast","continue","co_await","co_return","co_yield","decltype","default","delete","do","double","dynamic_cast","else","enum","explicit","export","extern","false","for","friend","goto","if","import","inline(1)","module","mutable","namespace","new","noexcept","not","not_eqv","nullptr","operator","or","or_eq","private","protected","public","register","reinterpret_cast","requires","return","sizeof","static","static_assert","static_cast","struct","switch","synchronized","template","this","thread_local","throw","true","try","typedef","typeid","typename","union","virtual","void","volatile","while","xor","xor_eq","if","elif","else","endif","defined","ifdef","ifndef","define","undef","include","line","error","pragma","override","final","transaction_safe","transaction_safe_dynamic"};
+		for(String word:words) {
+			keywords.add(word);
+		}
+		
+		
 		keywords.add(";");
 		keywords.add("(");
 		keywords.add(")");
 		keywords.add("{");
 		keywords.add("}");
+		keywords.add("[");
+		keywords.add("]");
+		keywords.add("||");
+		keywords.add("&&");
 		keywords.add("=");
 		keywords.add("+");
 		keywords.add("%");
@@ -112,6 +104,9 @@ public class CppAnalyzer extends Analyzer
 		keywords.add("cin");
 		keywords.add("#include");
 		keywords.add(":");
+		keywords.add(",");
+		keywords.add(":");
+		keywords.add("*");
 		
 		//TODO add the rest
 		//Can use http://en.cppreference.com/w/cpp/keyword as a reference
