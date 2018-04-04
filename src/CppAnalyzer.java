@@ -108,6 +108,8 @@ public class CppAnalyzer extends Analyzer
 		keywords.add(":");
 		keywords.add("*");
 		keywords.add("'");
+		keywords.add("\'");
+		keywords.add("!");
 		
 		//TODO add the rest
 		//Can use http://en.cppreference.com/w/cpp/keyword as a reference
@@ -176,6 +178,7 @@ public class CppAnalyzer extends Analyzer
 		s = s.replace("+", " + ");
 		s = s.replace("\"", " \" ");
 		s = s.replace("'", " ' ");
+		s = s.replace("\'", " \' ");
 		s = s.replace(",", " , ");
 		s = s.replace("-", " - ");
 		s = s.replace("/", " / ");
