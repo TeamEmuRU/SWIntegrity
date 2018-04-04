@@ -7,6 +7,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
+/**
+ * The ada analyzer class is a class specialized to pull important information from an ada file and check the file against known vulnerabilities.
+ * @author jamie tyler walder
+ *
+ */
 
 public class AdaAnalyzer extends Analyzer{
 	Map<String,Variable> variables;
@@ -49,6 +54,14 @@ public class AdaAnalyzer extends Analyzer{
 		this.keyWords.addAll(Arrays.asList(keyWords));
 		
 	}
+	private void clearAll() {
+		this.variables = new HashMap<>();
+		this.literals = new LinkedList<>();
+		this.symbolToLine = new HashMap<>();
+		this.externalVariables=new HashMap<>();
+		this.externalFunctionCalls=new LinkedList<>();
+		
+	}
 	@Override
 	/**
 	 * parses file for important information like variables and literals
@@ -56,6 +69,7 @@ public class AdaAnalyzer extends Analyzer{
 	 */
 	public void parse(String filename) {
 		// TODO Auto-generated method stub
+		clearAll();
 		String fileContents=openFile(filename);
 		fileContents=flattenCodeAndMap(fileContents);
 		extractVariables(fileContents);
@@ -66,6 +80,14 @@ public class AdaAnalyzer extends Analyzer{
 	 * @return if word is a proper variable name
 	 */
 	public boolean isVarName(String s) {
+		for(String symbol:specialSymbols) {
+			if(s.contains(symbol)||s.contains(" ")) {
+				return false;
+			}
+		}
+		if(Character.isDigit(s.charAt(0))||s.contains("__")) {
+			return false;
+		}
 		return !keyWords.contains(s)&&!specialSymbols.contains(s);
 	}
 	/**
@@ -249,7 +271,7 @@ public class AdaAnalyzer extends Analyzer{
 		}
 		
 		
-		return result;
+		return result.trim();
 	}
 
 	@Override
@@ -257,6 +279,31 @@ public class AdaAnalyzer extends Analyzer{
 		// TODO Auto-generated method stub
 		parse(filename);
 	}
+	
+	
+	public Map<String, Variable> getVariables() {
+		return variables;
+	}
+	public Map<String, Variable> getExternalVariables() {
+		return externalVariables;
+	}
+	public List<String> getExternalFunctionCalls() {
+		return externalFunctionCalls;
+	}
+	public List<String> getLiterals() {
+		return literals;
+	}
+	public Map<Integer, Integer> getSymbolToLine() {
+		return symbolToLine;
+	}
+	public Set<String> getSpecialSymbols() {
+		return specialSymbols;
+	}
+	public Set<String> getKeyWords() {
+		return keyWords;
+	}
+
+
 	private class Variable{
 		String name;
 		String type;
