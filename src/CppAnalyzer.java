@@ -343,7 +343,7 @@ public class CppAnalyzer extends Analyzer
 				//flag if the variable was found in scope
 				boolean found = false;
 				//if it is get the variable
-				while(!found) 
+				while(!found&&!scopes.isEmpty()) 
 				{
 					for(Variable v:variablesList) 
 					{
