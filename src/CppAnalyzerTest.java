@@ -9,20 +9,18 @@ class CppAnalyzerTest {
 	void setUp() throws Exception {
 	}
 
-//	@Test
-//	void test() {
-//		CppAnalyzer c=new CppAnalyzer();
-//		c.analyze("/Users/KristelleLucero/Documents/Software Engineering 2018/SWIntegrity/Test Files/sqlExample.cpp");
-//		c.analyze("/Users/KristelleLucero/Documents/Software Engineering 2018/SWIntegrity/Test Files/sqlExample2.cpp");
-//	}
+	@Test
+	void test() {
+		CppAnalyzer c=new CppAnalyzer();
+		c.analyze("../TestFiles/hello.cpp");
+
+	}
 
 	@Test
 	void TestSqlCppAnalyze() {
 		CppAnalyzer c=new CppAnalyzer();
-		c.analyze("/Users/KristelleLucero/Documents/Software Engineering 2018/SWIntegrity/Test Files/sqlExample.cpp");
-		c.sqlCppAnalyze("/Users/KristelleLucero/Documents/Software Engineering 2018/SWIntegrity/Test Files/sqlExample.cpp");
-		c.analyze("/Users/KristelleLucero/Documents/Software Engineering 2018/SWIntegrity/Test Files/sqlExample.cpp");
-		c.sqlCppAnalyze("/Users/KristelleLucero/Documents/Software Engineering 2018/SWIntegrity/Test Files/sqlExample2.cpp");
+		c.analyze("../TestFiles/sqlExample.cpp");
+		c.sqlCppAnalyze("../TestFiles/sqlExample.cpp");
 	}
 	
 
