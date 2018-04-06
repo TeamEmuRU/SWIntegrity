@@ -438,9 +438,9 @@ public class CppAnalyzer extends Analyzer
 						//search for keywords that might indicate an SQL statement	
 						for(int index=0;index<temp.length;index++){
 							//if keywords were found, check to see if the program calls for user input
-							if(temp[index].contains(word) && contents.contains(" COUT ")){
+							
 								lineNumbers.add(symbolToLine.get(index));
-							}
+							
 								
 							
 						} 													     
