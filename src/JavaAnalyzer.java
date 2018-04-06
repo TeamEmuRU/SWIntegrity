@@ -261,9 +261,10 @@ public class JavaAnalyzer extends Analyzer {
 			catch(IOException io){	//from BufferedReader
 				SIT.notifyUser("Error reading the contents of " + filename + "." );
 			}
+			System.out.println("Variables:");
 			System.out.println(variablesList);
-	    //System.out.print("Literals: ");
-	    //System.out.println(literalsList);
+			System.out.println("Literals:");
+	    	System.out.println(literalsList);
 	}
 
 	@Override
@@ -271,14 +272,12 @@ public class JavaAnalyzer extends Analyzer {
 		parse(filename);
 	}
 	
-	
-	
 	//This is the java SQL injection vulnerability; hard-coded into the program until the database is implemented
     /**
      * Method that analyzes a file for possible vulnerability to SQL injections 
      * @param fileName the name of the file to be analyzed
      */
-	private void sqlVuln(String fileName)
+	public void sqlVuln(String fileName)
 	{
 		String DBkeywords[] = {"SELECT", "UNION", "WHERE", "FROM", "HAVING", "JOIN", "ORDER BY"}; //a list of key words used in SQL
 		String keyInMethods[] = {".NEXT",".READ", ".GET"}; //a list of methods used to obtain input from the user, list can be extended later
@@ -306,13 +305,12 @@ public class JavaAnalyzer extends Analyzer {
 					// types of vulnerabilities.
 					if(contents.contains(word)){
 						
-//						if(contents.contains("1=1") || contents.contains("%00") || contents.contains("'")){
-//							badSQL = true;									    
-//						}	
-						
 						//if keywords were found, check to see if the program collects user input
 						for(String inputWord : keyInMethods){
-							if(contents.contains(inputWord)){
+							
+							//If it does collect user input, check to see if it uses prepared statements
+							//prepared statements are safe. If no prepared statement, not safe.
+							if(contents.contains(inputWord)&& !contents.contains("PREPAREDSTATEMENT")){
 								badSQL = true;
 							}
 							
@@ -329,6 +327,4 @@ public class JavaAnalyzer extends Analyzer {
 		//Display whether possible sql injections were detected
 		System.out.println("At risk of SQL injection: "+badSQL);
 	}
-
-
 }

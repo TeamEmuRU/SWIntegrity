@@ -4,7 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 class CppAnalyzerTest {
-
+	
 	@BeforeEach
 	void setUp() throws Exception {
 	}
@@ -12,8 +12,16 @@ class CppAnalyzerTest {
 	@Test
 	void test() {
 		CppAnalyzer c=new CppAnalyzer();
-		c.parse("C:\\Users\\Tyler\\Desktop\\Test\\SWIntegrity\\Test Files\\hello.cpp");
-		
+		c.analyze("../TestFiles/hello.cpp");
+
 	}
+
+	@Test
+	void TestSqlCppAnalyze() {
+		CppAnalyzer c=new CppAnalyzer();
+		c.analyze("../TestFiles/sqlExample.cpp");
+		c.sqlCppAnalyze("../TestFiles/sqlExample.cpp");
+	}
+	
 
 }

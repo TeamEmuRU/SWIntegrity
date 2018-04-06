@@ -26,7 +26,6 @@ public class SIT {
 	 */
 	public static void main(String[] args) {
 		Input input = new Input();
-
 		input.processInput(args);
 	}
 
