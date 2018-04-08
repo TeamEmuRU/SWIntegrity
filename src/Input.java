@@ -77,7 +77,15 @@ public class Input {
 					SIT.displayHelp();
 					break;
 				default:
-					SIT.notifyUser("Error: unrecognized command");
+					if(args[0].startsWith("-"))
+					{
+						SIT.notifyUser("Error: unrecognized command: '" + args[0] + "'. Type -help for a list of valid commands.");
+					}
+					else
+					{
+						SIT.notifyUser("Error: A language must be specified. Type -help for a list of valid commands.");
+					}
+					
 					System.exit(0);
 			}//end switch
 		}
@@ -430,7 +438,7 @@ public class Input {
 	 * @param dir the path of the directory you wish to call the method on 
 	 * @return all files within that directory and it's subdirectories
 	 */
-	private List<String> getAllFilesInDirectoryAndSubDirectories(String dir) {
+	public List<String> getAllFilesInDirectoryAndSubDirectories(String dir) {
 		//gather all files in this directory
 		List<String> allFiles=getAllFilesInDirectory(dir);
 		//gather all directories within this directory
