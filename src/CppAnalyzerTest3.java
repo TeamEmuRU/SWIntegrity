@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Test;
 
 class CppAnalyzerTest3 {
 	CppAnalyzer cpp=new CppAnalyzer();
-	@Test
+	/*@Test
 	void testParse() {
 		
 		cpp.parse("TestFiles/hello.java");
@@ -17,7 +17,7 @@ class CppAnalyzerTest3 {
 		cpp.analyze("TestFiles/hello.java");
 		assertTrue(cpp.getFileContents().equals("import java.util. * ; public class hello { public static void main ( String [ ] args ) { System.out.println ( \" Hello Word \" ) ; } }"));
 		assertTrue(cpp.getVariablesList().size()==4);
-	}
+	}*/
 
 	@Test
 	void testCppAnalyzer() {

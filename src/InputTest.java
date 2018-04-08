@@ -5,13 +5,14 @@ import org.junit.jupiter.api.Test;
 class InputTest {
 
 	@Test
-	void specifyFileTypeFromCurrentDirectory() 
+	void specifyOneCommand() 
 	{
 		Input i = new Input();
-		String[] s = ("Test Files\\hello.txt -j").split(" ");
+		String[] s = ("-a").split("");
 		i.processInput(s);
 	}
 	
+	/*
 	@Test
 	void specifyFileTypeFromRelativePath() 
 	{
@@ -55,5 +56,6 @@ class InputTest {
 		String[] s = ("Test Files -all Test Files\\New Folder -all").split(" ");	
 		i.processInput(s); 
 	}
+	*/
 	
 }
