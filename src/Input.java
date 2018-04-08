@@ -18,6 +18,7 @@ public class Input {
 	private List<String> adaFiles; 	//a collection of Ada files
 	private List<String> javaFiles;	//a collection of java files
 	private List<String> cppFiles;	//a collection of c++ files
+	private boolean uJava, uAda, uCPP;	//records the types of files the user wants to analyze
 	
 	/**
 	 * Default Constructor
@@ -27,6 +28,9 @@ public class Input {
 		adaFiles = new LinkedList<>();
 		javaFiles = new LinkedList<>();
 		cppFiles = new LinkedList<>();
+		uJava = false;
+		uAda = false;
+		uCPP = false;
 	}
 	
 	
@@ -39,37 +43,64 @@ public class Input {
 	
 	public void processInput(String[] args)
 	{
-		if (args.length == 0) {
-			//If no arguments specified, process all files with known extensions
-			//in the current directory
+		//If no arguments specified, process all files with known extensions
+		//in the current directory
+		if (args.length == 0) 
+		{
 			addFiles(getAllFilesInDirectory(System.getProperty("user.dir")));
 			this.analyze();
 		}
-		//If arguments are specified
-		else 
+		//If one argument is specified, and it is a language tag,
+		//process all files of that type in the current folder
+		else if(args.length == 1)
 		{
-			//iterate through tag arguments and handle them accordingly
+			switch (args[0]) 
+			{
+				//If the tag is not recognized, the program exits with a warning
+				case "-j":
+					addJavaFilesInDirectory(System.getProperty("user.dir"));
+					break;
+				case "-a":
+					addAdaFilesInDirectory(System.getProperty("user.dir"));
+					break;
+				case "-c":
+					addCppFilesInDirectory(System.getProperty("user.dir"));
+					break;
+				case "-r":
+					addFiles(getAllFilesInDirectoryAndSubDirectories(System.getProperty("user.dir")));
+					break;
+				case "-all":
+					addFiles(getAllFilesInDirectory(System.getProperty("user.dir")));
+					break;
+				case "-help":
+				case "?":
+					SIT.displayHelp();
+					break;
+				default:
+					SIT.notifyUser("Error: unrecognized command");
+					System.exit(0);
+			}//end switch
+		}
+		//If more than one argument is specified
+		else
+		{
+			//iterate through tag arguments and record which languages
+			//the user wants to analyze for
 			boolean tagZone = true;
 			int nonTagsStart = 0;
 			for (int i = 0; i < args.length && tagZone; i++) 
 			{
-				switch (args[i]) {
+				switch (args[i]) 
+				{
 					//By default, searches the current directory
 					case "-j":
-						addJavaFilesInDirectory(System.getProperty("user.dir"));
+						uJava = true;
 						break;
 					case "-a":
-						addAdaFilesInDirectory(System.getProperty("user.dir"));
+						uAda = true;
 						break;
 					case "-c":
-						addCppFilesInDirectory(System.getProperty("user.dir"));
-						break;
-					//TODO: Add ability to specify single file types recursively
-					case "-r":
-						addFiles(getAllFilesInDirectoryAndSubDirectories(System.getProperty("user.dir")));
-						break;
-					case "-all":
-						addFiles(getAllFilesInDirectory(System.getProperty("user.dir")));
+						uCPP = true;
 						break;
 					case "-help":
 					case "?":
@@ -111,19 +142,12 @@ public class Input {
 					if(nameFragment)	
 					{
 						File temp = new File(args[i]);
-						//If temp is a file or directory on its own, then there 
+						//If temp is a file or directory on its own, then f is not an existing path
+						//so display an error and terminate the program
 						if(temp.isFile() || temp.isDirectory())
 						{
-							try
-							{
-								hasTag = detectTag(temp.getAbsolutePath(), args[i + 1]);
 								SIT.notifyUser("Error: Invalid path: " + f.getAbsolutePath());
-							}
-							catch(ArrayIndexOutOfBoundsException ab)
-							{
-								hasTag = detectTag(temp.getAbsolutePath(), " ");
-								SIT.notifyUser("Error: Invalid path: " + f.getAbsolutePath());
-							}
+								System.exit(0);
 						}
 						//if temp was not a file/dir on its own, concatenate the current argument to f
 						else
@@ -137,11 +161,11 @@ public class Input {
 						{
 							try
 							{
-								hasTag = detectTag(f.getAbsolutePath(), args[i + 1]);
+								hasTag = verifyUserInputFileType(f.getAbsolutePath(), args[i + 1]);
 							}
 							catch(ArrayIndexOutOfBoundsException ar)
 							{
-								hasTag = detectTag(f.getAbsolutePath(), " ");
+								hasTag = verifyUserInputFileType(f.getAbsolutePath(), " ");
 							}
 							
 							nameFragment = false;
@@ -160,11 +184,11 @@ public class Input {
 					{
 						try
 						{
-							hasTag = detectTag(f.getAbsolutePath(), args[i + 1]);
+							hasTag = verifyUserInputFileType(f.getAbsolutePath(), args[i + 1]);
 						}
 						catch(ArrayIndexOutOfBoundsException ar)
 						{
-							hasTag = detectTag(f.getAbsolutePath(), " ");
+							hasTag = verifyUserInputFileType(f.getAbsolutePath(), " ");
 						}
 						
 						nameFragment = false;
@@ -175,91 +199,122 @@ public class Input {
 					}//end if
 				}//end for
 			}
-		}
+		}//end if
 			this.analyze();
 	}
 	
 	/**
-	 * If the tag matches a known filetype tag, then the file is added to the appropriate list as if it were that type
+	 * If the file extensions match the type of files the user wishes to analyze, then those files are added to the appropriate file list
+	 * If a file extension does not match the type of files the user wishes to analyze, then an error is displayed and the program is terminated
 	 * @param filename The name of the file currently being processed
 	 * @param argument The argument following the current filename
-	 * @return True if argument is a tag
+	 * @return True if argument is tag -r or -all
 	 */
-	private boolean detectTag(String filename, String argument)
+	private boolean verifyUserInputFileType(String filename, String argument)
 	{	
 		File f = new File(filename);
 	
 		switch (argument) {
-		//Default is if the next argument is not a tag for this file
-		case "-j":
-		{
-			if(f.isFile())
-				javaFiles.add(filename);
-			else if(f.isDirectory())
-				addJavaFilesInDirectory(filename);
-			else
-				SIT.notifyUser("Invalid file or directory name");
-			return true;
-		}
-		case "-a":
-		{
-			if(f.isFile())
-				adaFiles.add(filename);
-			else if(f.isDirectory())
-				addAdaFilesInDirectory(filename);
-			else
-				SIT.notifyUser("Invalid file or directory name");
-			return true;
-		}
-		case "-c":
-		{
-			if(f.isFile())
-				cppFiles.add(filename);
-			else if(f.isDirectory())
-				addCppFilesInDirectory(filename);
-			else
-				SIT.notifyUser("Invalid file or directory name");
-			return true;
-		}
+		//Default is if the next argument is not a recursive tag for this file
+		//Tags may only follow Directory names
 		case "-r":
 		{
 			if(f.isFile())
-				SIT.notifyUser("Invalid argument for " + filename);
+			{
+				SIT.notifyUser("Invalid command following " + filename);
+				System.exit(0);
+			}
 			else if (f.isDirectory())
+			{
 				addFiles(getAllFilesInDirectoryAndSubDirectories(filename));
+			}
 			else
-				SIT.notifyUser("Invalid file or directory name");
+			{
+				SIT.notifyUser("Invalid file or directory name: " + filename);
+				System.exit(0);
+			}
 			return true;
 		}
 		case "-all":
 		{
 			if(f.isFile())
-				SIT.notifyUser("Invalid argument for " + filename);
+			{
+				SIT.notifyUser("Invalid command following " + filename);
+			}
 			else if (f.isDirectory())
-				addFiles(getAllFilesInDirectory(filename));
+			{
+				if(uJava)
+				{
+					addJavaFilesInDirectory(filename);
+				}
+				if(uAda)
+				{
+					addAdaFilesInDirectory(filename);
+				}
+				if(uCPP)
+				{
+					addCppFilesInDirectory(filename);
+				}
+			}
 			else
-				SIT.notifyUser("Invalid file or directory name");
+			{
+				SIT.notifyUser("Invalid file or directory name: " + filename);
+				System.exit(0);
+			}
 			return true;
 		}
 		default:
 			if(argument.startsWith("-"))
 			{
-				SIT.notifyUser("The program has encountered an invalid argument\n");
-				return true;
+				SIT.notifyUser("The program has encountered an invalid argument following filepath " + filename + "\n");
+				System.exit(0);
 			}
 			else
 			{
 				if(f.isFile())
-					addFile(filename);
+				{
+					if(isJavaFile(filename) && uJava)
+					{
+						javaFiles.add(filename);
+					}
+					else if(isAdaFile(filename) && uAda)
+					{
+						adaFiles.add(filename);
+					}
+					else if(isCppFile(filename) && uCPP)
+					{
+						cppFiles.add(filename);
+					}
+					else
+					{
+						SIT.notifyUser("Error: file " + filename + " does not match a user-specified language.");
+						System.exit(0);
+					}
+				}	
 				else if(f.isDirectory())
-					addFiles(getAllFilesInDirectory(filename));
+				{
+					if(uJava)
+					{
+						addJavaFilesInDirectory(filename);
+					}
+					if(uAda)
+					{
+						addAdaFilesInDirectory(filename);
+					}
+					if(uCPP)
+					{
+						addCppFilesInDirectory(filename);
+					}
+				}
 				else
-					SIT.notifyUser("Invalid file or directory name");
-				return false;
-			}
+				{
+					SIT.notifyUser("Invalid file or directory name: " + filename);
+					System.exit(0);
+				}//end if	
+			}//end if
+			return false;
 		}//end switch
-	}
-	
+	}//end verifyUserInputFileType
 	
 	
 	
@@ -273,24 +328,11 @@ public class Input {
 	 * Calls the sortByType function
 	 * @param filenames A list of files to add
 	 */
-	public void addFiles(List<String> filenames)
+	private void addFiles(List<String> filenames)
 	{
 		//sort files depending on their extension
 		//and add files to the appropriate linked list
 		sortByType(filenames);
-	}
-	
-	/**
-	 * Add a single file to the input class
-	 * Calls the sortByType function
-	 * @param filename A single file to add
-	 */
-	private void addFile(String filename)
-	{
-		List<String> fileList = new LinkedList<>();
-		fileList.add(filename);
-		
-		sortByType(fileList);
 	}
 	
 	/**
@@ -332,7 +374,7 @@ public class Input {
 	 * @return a reader that contains the files
 	 */
 	//TODO: Make this function private to the Input class. Replace its usage in main
-	public List<String> getAllFilesInDirectory(String dir) {
+	private List<String> getAllFilesInDirectory(String dir) {
 		//gather information on folder
 		File folder = new File(dir);
 		
@@ -388,28 +430,29 @@ public class Input {
 	 * @param dir the path of the directory you wish to call the method on 
 	 * @return all files within that directory and it's subdirectories
 	 */
-	public List<String> getAllFilesInDirectoryAndSubDirectories(String dir) {
+	private List<String> getAllFilesInDirectoryAndSubDirectories(String dir) {
 		//gather all files in this directory
 		List<String> allFiles=getAllFilesInDirectory(dir);
 		//gather all directories within this directory
 		List<String> allDirectories=getAllDirectoriesInDirectory(dir);
 		//for each subdirectory, gather all files within that directory and it's subdirectories and then add them to the list of 
 		//files from the directory that came before it 
-		for(String subDir:allDirectories) {
+		for(String subDir : allDirectories) {
 			//the recursive call will continue until it hits the bottom of the directory tree, at which case get all Directories in directory will return zero 
 			//and this for loop wont run 
 			allFiles.addAll(getAllFilesInDirectoryAndSubDirectories(subDir));
 		}
 		return allFiles;
-		
 	}
+	
+	
 	
 	/**
 	 * Search through directory and collect all Java files
 	 * @param dir The directory to pull files from
 	 */
 	//TODO: Make this function private to the Input class. Replace its usage in main
-	public void addJavaFilesInDirectory(String dir) 
+	private void addJavaFilesInDirectory(String dir) 
 	{
 		List<String> filenames = getAllFilesInDirectory(dir);
 		for(String name:filenames) 
@@ -426,7 +469,7 @@ public class Input {
 	 * @param dir The directory to pull files from
 	 */
 	//TODO: Make this function private to the Input class. Replace its usage in main
-	public void addAdaFilesInDirectory(String dir) 
+	private void addAdaFilesInDirectory(String dir) 
 	{
 		List<String> filenames = getAllFilesInDirectory(dir);
 		for(String name:filenames) 
@@ -443,7 +486,7 @@ public class Input {
 	 * @param dir The directory to pull files from
 	 */
 	//TODO: Make this function private to the Input class. Replace its usage in main
-	public void addCppFilesInDirectory(String dir) {
+	private void addCppFilesInDirectory(String dir) {
 		List<String> filenames =  getAllFilesInDirectory(dir);
 		for(String name:filenames) {
 			if(isCppFile(name)) {
@@ -460,7 +503,7 @@ public class Input {
 	 */
 	//TODO: Decide if we need this function --> extension validation is done in other methods
 	//We could use isFile() rather than having another method call.
-	public boolean validFile(String name) {
+	private boolean validFile(String name) {
 		
 		boolean valid = false;
 	
@@ -485,7 +528,7 @@ public class Input {
 	 * @param filename Name of file to validate
 	 * @return true if the file is a Java file
 	 */
-	public boolean isJavaFile(String filename) {
+	private boolean isJavaFile(String filename) {
 		//split the file basses on a .
 		String[] temp = filename.split("\\.");
 		//if there is an extension(the splits leads to more than one)
@@ -501,7 +544,7 @@ public class Input {
 	 * @param filename Name of file to validate
 	 * @return true if the file is an Ada file
 	 */
-	public boolean isAdaFile(String filename) {
+	private boolean isAdaFile(String filename) {
 		
 		//split the file bases on a .
 		String[] temp=filename.split("\\.");
@@ -520,7 +563,7 @@ public class Input {
 	 * @return true if the file is a C++ file
 	 */
 	//TODO: Accept header files in this method or in a separate method
-	public boolean isCppFile(String filename) {
+	private boolean isCppFile(String filename) {
 		
 		//split the file basses on a .
 		String[] temp=filename.split("\\.");
