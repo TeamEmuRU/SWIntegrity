@@ -83,7 +83,7 @@ public class Input {
 					}
 					else
 					{
-						SIT.notifyUser("Error: A language must be specified. Type -help for a list of valid commands.");
+						SIT.notifyUser("Error: At least one language must be specified. Type -help for a list of valid commands.");
 					}
 					
 					System.exit(0);
@@ -92,6 +92,11 @@ public class Input {
 		//If more than one argument is specified
 		else
 		{
+			if( !(args[0].trim().startsWith("-")))
+			{
+				SIT.notifyUser("Error: At least one language must be specified. Type -help for a list of valid commands.");
+			}
+			
 			//iterate through tag arguments and record which languages
 			//the user wants to analyze for
 			boolean tagZone = true;
@@ -108,6 +113,11 @@ public class Input {
 						uAda = true;
 						break;
 					case "-c":
+						uCPP = true;
+						break;
+					case "-all":
+						uJava = true;
+						uAda = true;
 						uCPP = true;
 						break;
 					case "-help":
@@ -165,6 +175,7 @@ public class Input {
 						}
 						//If the newly-concatenated f is a file or directory,
 						//add it to the input and set the nameFragment flag to false
+						//If f is not a file or directory, and there are no more args to concatenate to f, then the path is invalid
 						if(f.isFile() || f.isDirectory()) 
 						{
 							try
@@ -178,7 +189,12 @@ public class Input {
 							
 							nameFragment = false;
 							continue;
-						} 
+						}
+						else if(i == args.length - 1)
+						{
+							SIT.notifyUser("Error: Invalid path: " + f.getAbsolutePath());
+							System.exit(0);
+						}
 					}
 					else
 					{
@@ -234,7 +250,22 @@ public class Input {
 			}
 			else if (f.isDirectory())
 			{
-				addFiles(getAllFilesInDirectoryAndSubDirectories(filename));
+				List<String> files = (getAllFilesInDirectoryAndSubDirectories(filename));
+				for(String file : files)
+				{
+					if(uJava && isJavaFile(file))
+					{
+						this.javaFiles.add(file);
+					}
+					else if(uAda && isAdaFile(file))
+					{
+						this.adaFiles.add(file);
+					}
+					else if(uCPP && isCppFile(file))
+					{
+						this.cppFiles.add(file);
+					}
+				}//end for
 			}
 			else
 			{
@@ -432,6 +463,7 @@ public class Input {
 		}
 		return fileNames;
 	}
+	
 	/**
 	 * This method is used to recursively call a directory and get all files within that Directory as well as all files inside directories within those 
 	 * directories
@@ -452,8 +484,6 @@ public class Input {
 		}
 		return allFiles;
 	}
-	
-	
 	
 	/**
 	 * Search through directory and collect all Java files
