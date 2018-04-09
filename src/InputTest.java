@@ -4,58 +4,64 @@ import org.junit.jupiter.api.Test;
 
 class InputTest {
 
-	@Test
-	void specifyOneCommand() 
+	/*@Test
+	void specifyOneLanguage() 
 	{
+		System.out.println("\t\tTest specifyOneLanguage");
 		Input i = new Input();
-		String[] s = ("-a").split("");
-		i.processInput(s);
-	}
-	
-	/*
-	@Test
-	void specifyFileTypeFromRelativePath() 
-	{
-		Input i = new Input();
-		String[] s = (".\\Test Files\\hello.txt -j").split(" ");
+		String[] s = ("-a TestFiles").split(" ");
 		i.processInput(s);
 	}
 	
 	@Test
-	void analyzeDirectoryForSingleFileType()
+	void specifyMultipleLanguages() 
 	{
+		System.out.println("\t\tTest specifyMultipleLanguages");
 		Input i = new Input();
-		String[] s = ("Test Files -a").split(" ");	
+		String[] s = ("-j -c TestFiles").split(" ");
 		i.processInput(s);
 	}
 	
+	
 	@Test
-	void analyzeDirectoryForMultipleFileTypes()
+	void specifyNoLanguages()
 	{
-		//Only analyzes Ada and Java files in the folder
-		//Skips C++ files
+		System.out.println("\t\tTest specifyNoLanguages");
 		Input i = new Input();
-		String[] s = ("Test Files -a Test Files -j").split(" ");	
+		String[] s = ("TestFiles").split(" ");	
 		i.processInput(s); 
 	}
+	
 	
 	@Test
 	void analyzeGrandchildDirectory()
 	{
+		System.out.println("\t\tTest analyzeGrandchildDirectory");
 		//User can traverse directories below the current dir's children
 		//Directories can also contain spaces
 		Input i = new Input();
-		String[] s = ("Test Files\\New Folder").split(" ");	
+		String[] s = ("-j TestFiles\\New Folder").split(" ");	
 		i.processInput(s); 
 	}
+	
 	
 	@Test
 	void analyzeMultipleDirectories()
 	{
+		System.out.println("\t\tTest analyzeMultipleDirectories");
 		Input i = new Input();
-		String[] s = ("Test Files -all Test Files\\New Folder -all").split(" ");	
+		String[] s = ("-a TestFiles TestFiles\\New Folder").split(" ");	
 		i.processInput(s); 
 	}
-	*/
+	
+	@Test
+	void analyzeInvalidDirectory()
+	{
+		System.out.println("\t\tTest analyzeInvalidDirectory");
+		Input i = new Input();
+		String[] s = ("-a Test Files").split(" ");	
+		i.processInput(s); 
+	}*/
+	
 	
 }
