@@ -32,8 +32,7 @@ public class CppAnalyzer extends Analyzer
 	private Map<Integer,Integer> symbolToLine;
 	private List<Pointer> pointersList;
 
-	//TODO make sure to include comma declarations
-	//TODO make sure to take in consideration hardcoeded lists.
+
 	
 	/**
 	 * Default constructor
