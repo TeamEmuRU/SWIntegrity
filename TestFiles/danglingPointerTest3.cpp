@@ -4,14 +4,12 @@
 #include <stdio.h>
 int main()
 {
-    int * ptr = (int *)malloc(sizeof(int));
+    int * ptr = new int[10];
  
     // After below free call, ptr becomes a 
     // dangling pointer
     delete ptr ; 
      
     // No more a dangling pointer
-    //ptr = NULL ;
+    ptr = NULL;
 }
-//# nclude < stdlib . h > # include < stdio . h > int main( ) { int * ptr = (int * ) malloc ( sizeof ( int ) ); int * ptr = ( int * ) malloc ( sizeof ( int ) ) ;
-    

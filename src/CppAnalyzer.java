@@ -54,6 +54,7 @@ public class CppAnalyzer extends Analyzer
 		literals=new LinkedList<>();
 		symbolToLine=new HashMap<>();
 		fileContents="";
+		pointersList=new LinkedList<>();
 	}
 	
 	@Override
@@ -112,6 +113,8 @@ public class CppAnalyzer extends Analyzer
 		keywords.add("'");
 		keywords.add("\'");
 		keywords.add("!");
+		keywords.add("<");
+		keywords.add(">");
 		
 		//TODO add the rest
 		//Can use http://en.cppreference.com/w/cpp/keyword as a reference
@@ -188,7 +191,9 @@ public class CppAnalyzer extends Analyzer
 		s = s.replace("*", " * ");	
 		s = s.replace("\n", " \n ");
 		s = s.replace("\t", " \t ");	
-		s = s.replace("\r", "");	
+		s = s.replace("\r", "");
+		s = s.replace("<", " < ");
+		s = s.replace(">", " > ");
 		
 		//split strings		
 		String[] temp=s.split(" ");
@@ -335,7 +340,7 @@ public class CppAnalyzer extends Analyzer
 				scopeID++;
 			}
 			//exit scope if character is found
-			else if(words[i].equals("}")) 
+			else if(!scopes.isEmpty()&&words[i].equals("}")) 
 			{
 				scopes.pop();
 			}
@@ -365,11 +370,11 @@ public class CppAnalyzer extends Analyzer
 							//capture assignment until ; is reached
 							while(!words[place].equals(";")) 
 							{
-								assignment+=words[place];
+								assignment+=words[place]+" ";
 								place++;
 							}
 							//add word to assignments
-							v.getAssignments().put(i, assignment);
+							v.getAssignments().put(i, assignment.trim());
 							//we found the variable, so set flag to true
 							found = true;
 						}
@@ -404,11 +409,11 @@ public class CppAnalyzer extends Analyzer
 							//capture assignment until ; is reached
 							while(!words[place].equals(";")) 
 							{
-								assignment+=words[place];
+								assignment+=words[place]+" ";
 								place++;
 							}
 							//add word to assignments
-							v.getAssignments().put(i, assignment);
+							v.getAssignments().put(i, assignment.trim());
 							//we found the variable, so set flag to true
 							found = true;
 						}
@@ -428,7 +433,7 @@ public class CppAnalyzer extends Analyzer
 				
 			}
 			
-			else if(isValidName(words[i])&&words[i+1].equals("*")&&isValidName(words[i+2])) 
+			else if(isValidName(words[i])&&words[i+1].equals("*")&&isValidName(words[i+2])&&!scopes.isEmpty()) 
 			{
 				int pos;
 				pos = i;
@@ -443,7 +448,7 @@ public class CppAnalyzer extends Analyzer
 				}
 			}
 			
-			else if(words[i].equals("delete")&&isValidName(words[i+1])))
+			else if(words[i].equals("delete")&&isValidName(words[i+1]))
 			{
 				
 				
@@ -547,7 +552,7 @@ public class CppAnalyzer extends Analyzer
 		}
 	}
 	
-	public void danglingPointerAnalyzer(String file)
+	public void danglingPointerAnalyzer()
 	{
 		String[] words = fileContents.split(" ");
 		List<Integer> danglingPointerList = new LinkedList<>();
@@ -555,24 +560,27 @@ public class CppAnalyzer extends Analyzer
 		{
 			for(Integer deletion: p.getDeletions())
 			{
-				int i = deletion;
+				int i = deletion+1;
 				boolean isDP = false;
-				while(!words[i].equals(p.getName())||!words[i+1].equals("="))
+				while(i<words.length)
 				{
-					if(words[i+2].equals("="))
+					if (words[i].equals("}"))
 					{
 						isDP = true;
 						break;
 					}
-					else if (words[i].equals("}"))
-					{
-						isDP = true;
+					if(words[i].equals(p.getName())&&words[i+1].equals("=")&&!words[i+2].equals("=")) {
 						break;
 					}
+					else if (words[i].equals(p.getName())) {
+						isDP=true;
+						break;
+					}
+					i++;
 				}
 				if(isDP)
 				{
-					danglingPointerList.add(deletion);
+					danglingPointerList.add(symbolToLine.get(deletion));
 				}
 			}
 			for(Map.Entry<Integer, String> entry:p.getAssignments().entrySet()) 
@@ -717,4 +725,4 @@ public class CppAnalyzer extends Analyzer
 	
 }
 
-}
+

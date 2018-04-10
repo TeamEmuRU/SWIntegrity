@@ -12,15 +12,22 @@ class CppAnalyzerTest {
 	@Test
 	void test() {
 		CppAnalyzer c=new CppAnalyzer();
-		c.analyze("../TestFiles/hello.cpp");
+		//c.analyze("TestFiles/hello.cpp");
 
 	}
 
 	@Test
 	void TestSqlCppAnalyze() {
 		CppAnalyzer c=new CppAnalyzer();
-		c.analyze("../TestFiles/sqlExample.cpp");
-		c.sqlCppAnalyze("../TestFiles/sqlExample.cpp");
+		//c.analyze("TestFiles/sqlExample.cpp");
+		//c.sqlCppAnalyze("TestFiles/sqlExample.cpp");
+		c.parse("TestFiles/danglingPointerTest.cpp");
+		c.danglingPointerAnalyzer();
+		c.parse("TestFiles/danglingPointerTest1.cpp");
+		c.danglingPointerAnalyzer();
+		c.parse("TestFiles/danglingPointerTest3.cpp");
+		c.danglingPointerAnalyzer();
+		
 	}
 	
 
