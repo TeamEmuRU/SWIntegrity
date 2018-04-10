@@ -443,7 +443,7 @@ public class CppAnalyzer extends Analyzer
 				}
 			}
 			
-			else if(words[i].equals("delete")&&isValidName(words[i+1])))
+			else if(words[i].equals("delete")&&isValidName(words[i+1]))
 			{
 				
 				
@@ -717,4 +717,4 @@ public class CppAnalyzer extends Analyzer
 	
 }
 
-}
+
