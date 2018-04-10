@@ -4,6 +4,7 @@ Jamie 'Tyler' Walder- Development Team<br/>
 Kristelle Lucero - Product Owner<br/>
 Abby Beizer - Development Team<br/>
 Ed Klein - Scrum Master<br/>
+Sean || sdthe - Development Team<br/>
 INSTALATION<br/>
 install java<br/>
 C:\>set CLASSPATH=bin_directory<br/>
