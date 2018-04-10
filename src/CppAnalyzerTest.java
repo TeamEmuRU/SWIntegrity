@@ -27,6 +27,7 @@ class CppAnalyzerTest {
 		c.danglingPointerAnalyzer();
 		c.parse("TestFiles/danglingPointerTest3.cpp");
 		c.danglingPointerAnalyzer();
+		c.parse("TestFiles/sqlExample2.cpp");
 		
 	}
 	

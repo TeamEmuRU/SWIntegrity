@@ -32,7 +32,8 @@ public class CppAnalyzer extends Analyzer
 	private Map<Integer,Integer> symbolToLine;
 	private List<Pointer> pointersList;
 
-	
+	//TODO make sure to include comma declarations
+	//TODO make sure to take in consideration hardcoeded lists.
 	
 	/**
 	 * Default constructor
@@ -309,6 +310,7 @@ public class CppAnalyzer extends Analyzer
 		//search each word for matching pattern
 		for(int i = 0; (i < words.length - 2); i++) 
 		{
+			
 			//if the first two words are not keywords, this may signify a variable declaration
 			if( !keywords.contains(words[i]) && !keywords.contains(words[i+1]) ) 
 			{
@@ -319,6 +321,31 @@ public class CppAnalyzer extends Analyzer
 					//if it is, we declare the variable name:type
 					variablesList.add(new Variable(words[i+1], words[i], scopes.toString(), symbolToLine.get(i)));
 				}
+				//look for mulivaraible declaration on the same line
+				int place=i+1;
+				while(!words[place].equals(";")) {
+					if(words[place].equals(",")&&isValidName(words[place+1])){
+						variablesList.add(new Variable(words[place+1], words[i], scopes.toString(), symbolToLine.get(place+1)));
+					}
+					place++;
+				}
+			}
+			//this takes care of varaibles that have instantiaed that take in generic types
+			if(!keywords.contains(words[i]) && words[i+1].equals("<")) {
+				int place=i+1;
+				String type="";
+				while(!words[place].equals(";")) {
+					type+=words[place];
+					if(words[place].equals(">")) {
+						variablesList.add(new Variable(words[place+1], words[i]+type, scopes.toString(), symbolToLine.get(place)));
+						break;
+					}
+					place++;
+				}
+			}
+			//if we are statically declaring a list push a fake scope for consistancy
+			if(words[i].equals("=")&&words[i+1].equals("{")) {
+				scopes.push("");
 			}
 			//add a new scope if the keywords is found
 			if(words[i].equals("class")||(!keywords.contains(words[i]) && !keywords.contains(words[i+1])&&words[i+2].equals("("))) 

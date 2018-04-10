@@ -9,6 +9,9 @@ int main()
     // After below free call, ptr becomes a 
     // dangling pointer
     delete ptr; 
+    static const std::list<std::string> myList = {"a", "b", "c"};
+    int i=2;
+    int x,y=0,z;
      
     // No more a dangling pointer
     //ptr = NULL;
