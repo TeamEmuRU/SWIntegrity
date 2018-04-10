@@ -30,6 +30,7 @@ public class CppAnalyzer extends Analyzer
 	private String fileContents;
 	//this map keeps track of which significant symbol(non comments) reside on which lines
 	private Map<Integer,Integer> symbolToLine;
+	private List<Pointer> pointersList;
 
 	
 	
@@ -44,6 +45,7 @@ public class CppAnalyzer extends Analyzer
 		keywords = new HashSet<>();
 		literals=new LinkedList<>();
 		symbolToLine=new HashMap<>();
+		pointersList=new LinkedList<>();
 		//Create keyword set
 		createKeywordSet();
 	}
@@ -345,7 +347,6 @@ public class CppAnalyzer extends Analyzer
 			//check to see if this is an assignment
 			else if(words[i].equals("=")&&!words[i+1].equals("=")) 
 			{
-				//create stack to keep track of temporary scopes
 				Stack<String> temp = new Stack<>();
 				//flag if the variable was found in scope
 				boolean found = false;
@@ -385,6 +386,96 @@ public class CppAnalyzer extends Analyzer
 				{
 					scopes.push(temp.pop());
 				}
+				temp = new Stack<>();
+				//flag if the variable was found in scope
+				found = false;
+				//if it is get the variable
+				while(!found&&!scopes.isEmpty()) 
+				{
+					for(Pointer v:pointersList) 
+					{
+						//if the variable name and scope match add the assignment
+						if(v.getName().equals(words[i-1])&&v.getScope().equals(scopes.toString())) 
+						{
+							//start a place to capture everything after the initialization
+							int place=i+1;
+							//start string to capture assignment
+							String assignment = "";
+							//capture assignment until ; is reached
+							while(!words[place].equals(";")) 
+							{
+								assignment+=words[place];
+								place++;
+							}
+							//add word to assignments
+							v.getAssignments().put(i, assignment);
+							//we found the variable, so set flag to true
+							found = true;
+						}
+						//if we didn't find it, back out a scope and try again
+					}
+					if(!found&&!scopes.isEmpty()) 
+					{
+						temp.push(scopes.pop());
+					}
+				}//end while
+				
+				//repopulate the scope appropriately
+				while(!temp.isEmpty()) 
+				{
+					scopes.push(temp.pop());
+				}
+				
+			}
+			
+			else if(isValidName(words[i])&&words[i+1].equals("*")&&isValidName(words[i+2])) 
+			{
+				int pos;
+				pos = i;
+				while(!words[pos].equals("="))
+				{
+					if(words[pos].equals("{")||words[pos].equals(";"))
+					{
+						pointersList.add(new Pointer(words[i+2],words[i],scopes.toString(),symbolToLine.get(i)));
+						break;
+					}
+					pos--;
+				}
+			}
+			
+			else if(words[i].equals("delete")&&isValidName(words[i+1])))
+			{
+				
+				
+				//create stack to keep track of temporary scopes
+				Stack<String> temp = new Stack<>();
+				//flag if the variable was found in scope
+				boolean found = false;
+				//if it is get the variable
+				while(!found&&!scopes.isEmpty()) 
+				{
+					for(Pointer v:pointersList) 
+					{
+						//if the variable name and scope match add the assignment
+						if(v.getName().equals(words[i+1])&&v.getScope().equals(scopes.toString())) 
+						{
+							v.addToDeletion(i+1);
+							found = true;
+						}
+						//if we didn't find it, back out a scope and try again
+					}
+					if(!found&&!scopes.isEmpty()) 
+					{
+						temp.push(scopes.pop());
+					}
+				}//end while
+				
+				//repopulate the scope appropriately
+				while(!temp.isEmpty()) 
+				{
+					scopes.push(temp.pop());
+				}
+				
 			}
 		}//end for
 	}
@@ -454,6 +545,53 @@ public class CppAnalyzer extends Analyzer
 		}else {
 			System.out.println("At risk for possible SQL injections: "+lineNumbers);
 		}
+	}
+	
+	public void danglingPointerAnalyzer(String file)
+	{
+		String[] words = fileContents.split(" ");
+		List<Integer> danglingPointerList = new LinkedList<>();
+		for(Pointer p: pointersList)
+		{
+			for(Integer deletion: p.getDeletions())
+			{
+				int i = deletion;
+				boolean isDP = false;
+				while(!words[i].equals(p.getName())||!words[i+1].equals("="))
+				{
+					if(words[i+2].equals("="))
+					{
+						isDP = true;
+						break;
+					}
+					else if (words[i].equals("}"))
+					{
+						isDP = true;
+						break;
+					}
+				}
+				if(isDP)
+				{
+					danglingPointerList.add(deletion);
+				}
+			}
+			for(Map.Entry<Integer, String> entry:p.getAssignments().entrySet()) 
+			{
+				if(!entry.getValue().equals("")) {
+					String[] assignment=entry.getValue().split(" ");
+					String first=assignment[0];
+					String last=assignment[assignment.length-1];
+					if(first.equals("new")||first.equals("&"));
+					else if(last.equals(")")) {
+						danglingPointerList.add(symbolToLine.get(entry.getKey()));
+					}
+						
+				}
+				
+			}
+			
+		}
+		System.out.println(danglingPointerList);
 	}
 
 	private class Variable{
@@ -551,5 +689,32 @@ public class CppAnalyzer extends Analyzer
 		
 		
 	}
+	private class Pointer extends Variable
+	{
+		List<Integer> deletions;
+
+		public Pointer(String name, String type, String scope, int line)
+		{
+			super(name, type, scope, line);
+			deletions = new LinkedList<Integer>();
+		}
+		public List<Integer> getDeletions() {
+			return deletions;
+		}
+
+		public void setDeletions(List<Integer> deletions) {
+			this.deletions = deletions;
+		}
+		
+		public void addToDeletion(int symbolNumber)
+		{
+			deletions.add(symbolNumber);
+		}
+		
+	}
+	
+	
+	
+}
 
 }
