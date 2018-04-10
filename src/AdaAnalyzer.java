@@ -16,6 +16,7 @@ import java.util.Stack;
 public class AdaAnalyzer extends Analyzer{
 	Map<String,Variable> variables;
 	Map<String,Variable> externalVariables;
+	Map<String,Pointer> pointers;
 	List<String> externalFunctionCalls;
 	List<String> literals;
 	//mapping from symbol to line lookup
@@ -23,6 +24,7 @@ public class AdaAnalyzer extends Analyzer{
 	//symbols that are recognized as part of words
 	Set<String> specialSymbols;
 	Set<String> keyWords;
+	Set<String> accessTypes;
 	
 	
 	
@@ -52,6 +54,7 @@ public class AdaAnalyzer extends Analyzer{
 		this.keyWords=new HashSet<>();
 		this.specialSymbols.addAll(Arrays.asList(specialSymbols));
 		this.keyWords.addAll(Arrays.asList(keyWords));
+		this.accessTypes=new HashSet<String>();
 		
 	}
 	private void clearAll() {
@@ -60,6 +63,7 @@ public class AdaAnalyzer extends Analyzer{
 		this.symbolToLine = new HashMap<>();
 		this.externalVariables=new HashMap<>();
 		this.externalFunctionCalls=new LinkedList<>();
+		this.accessTypes=new HashSet<String>();
 		
 	}
 	@Override
@@ -124,7 +128,24 @@ public class AdaAnalyzer extends Analyzer{
 			if(!inLiteral) {
 				//check to see if literal is a variable initialization
 			if(i+2<words.length&&isVarName(words[i])&&words[i+1].equals(":")&&isVarName(words[i+2])) {
-				variables.put(words[i]+scopes.toString(),new Variable(words[i],words[i+2],scopes.toString(),symbolToLine.get(i)));
+				if(!this.accessTypes.contains(words[i+2])) {
+					variables.put(words[i]+scopes.toString(),new Variable(words[i],words[i+2],scopes.toString(),symbolToLine.get(i)));
+				}
+				else {
+					pointers.put(words[i]+scopes.toString(),new Pointer(words[i],words[i+2],scopes.toString(),symbolToLine.get(i)));
+				}
+				int temp=i-1;
+				while(!words[temp].equals("is")&&!words[temp].equals(";")) {
+					if(words[temp].equals(",")&&isVarName(words[temp-1])) {
+						if(!this.accessTypes.contains(words[i+2])) {
+							variables.put(words[i]+scopes.toString(),new Variable(words[i],words[i+2],scopes.toString(),symbolToLine.get(i)));
+						}
+						else {
+							pointers.put(words[i]+scopes.toString(),new Pointer(words[i],words[i+2],scopes.toString(),symbolToLine.get(i)));
+						}
+					}
+					temp--;
+				}
 			}
 			//check for the end of a scope and pop if so
 			if(words[i].equals("end")||words[i].equals("else")||words[i].equals("elsif")) {
@@ -210,6 +231,17 @@ public class AdaAnalyzer extends Analyzer{
 			else {
 				//other wise since we're in a literal we add the word to the string
 				literal+=words[i];
+			}
+			//check to see if an access type is declared
+			if(i+4<words.length&&words[i].equalsIgnoreCase("type")&&isVarName(words[i+1])&&words[i+2].equalsIgnoreCase("is")&&words[i+3].equalsIgnoreCase("Access")) {
+				this.accessTypes.add(words[i+1]);
+			}
+			if(words[i].equalsIgnoreCase("free_vector")&&words[i+1].equals("(")&&isVarName(words[i+2])&&words[i+3].equals("")) {
+				for(Map.Entry<String, Pointer> e:pointers.entrySet()) {
+					if(e.getValue().getName().equalsIgnoreCase(words[i+2])) {
+						e.getValue().addDeletion(i);
+					}
+				}
 			}
 		}
 		System.out.println(variables);
@@ -390,6 +422,23 @@ public class AdaAnalyzer extends Analyzer{
 		
 		
 		
+		
+		
+		
+	}
+	private class Pointer extends Variable{
+		List<Integer> deletions;
+		public Pointer(String name, String type, String scope, int line) {
+			super(name, type, scope, line);
+			deletions=new LinkedList<>();
+			
+		}
+		public List<Integer> getDeletions() {
+			return deletions;
+		}
+		public void addDeletion(int symbol) {
+			deletions.add(symbol);
+		}
 		
 		
 	}
