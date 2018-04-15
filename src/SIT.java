@@ -78,17 +78,25 @@ public class SIT {
 		notifyUser("");
 		notifyUser("This Software Integrity Tester (SIT) analyzes Java, Ada, and C++ source code");
 		notifyUser("for security weaknesses and vulnerabilities.\n");
-		notifyUser("Usage: SIT <options> <directory name or filenames>");
-		notifyUser("where possible options include:");
+		notifyUser("Usage: SIT <language tags> <directories and filenames>\n");
+		notifyUser("Language Tags:");
+		notifyUser("\tLanguage tags specify the file types accepted by the current run of the SIT.");
+		notifyUser("\tDesignating files which do not conform to the specified tags will generate an error.");
+		notifyUser("\tAt least one language tag from the following is required and must precede any file paths:");
+		notifyUser("\t-j\tJava");
+		notifyUser("\t-a\tAda");
+		notifyUser("\t-c\tC++");
+		notifyUser("\tMultiple language tags may be specified, separated by spaces.");
+		notifyUser("\t(ex. \"SIT -j -a <files>\" will allow both Java and Ada files to be analyzed)");
 		notifyUser("");
-		notifyUser("(No options or directory/files specified)");
-		notifyUser("	Analyze all supported source code files in the current directory");
+		notifyUser("Directories and Files:");
+		notifyUser("\tIf no directory or file paths are specified, the files in the current directory will be analyzed.");
+		notifyUser("\tDesignating a directory analyzes all files in that directory which conform to the specified language tags.");
+		notifyUser("\tAny number of directory and file paths may be specified.");
 		notifyUser("");
-		notifyUser("-j  Analyze all Java source code files in the specified directory");
-		notifyUser("-a  Analyze all Ada source code files in the specified directory");
-		notifyUser("-c  Analyze all C++ source code and header files in the specified directory");
-		notifyUser("-r  Analyze all specified source code files in the specified directory, and");
-		notifyUser("    all of its subdirectories");
+		notifyUser("Additional Commands:");
+		notifyUser("\t-r\tWhen this command follows the path of a directory, the SIT will analyze all files in that directory");
+		notifyUser("\t\tand all of its subdirectories which conform to the specified language tags.");
 		notifyUser("");
 	}
 }
