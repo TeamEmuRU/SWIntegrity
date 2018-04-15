@@ -247,13 +247,6 @@ public class AdaAnalyzer extends Analyzer{
 			if(i+4<words.length&&words[i].equalsIgnoreCase("type")&&isVarName(words[i+1])&&words[i+2].equalsIgnoreCase("is")&&words[i+3].equalsIgnoreCase("Access")) {
 				this.accessTypes.add(words[i+1]);
 			}
-			if(words[i].equalsIgnoreCase("free_vector")&&words[i+1].equals("(")&&isVarName(words[i+2])&&words[i+3].equals("")) {
-				for(Map.Entry<String, Pointer> e:pointers.entrySet()) {
-					if(e.getValue().getName().equalsIgnoreCase(words[i+2])) {
-						e.getValue().addDeletion(i);
-					}
-				}
-			}
 		}
 		System.out.println(variables);
 		System.out.println(literals);
