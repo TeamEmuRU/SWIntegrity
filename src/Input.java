@@ -41,6 +41,13 @@ public class Input {
 	//						 //
 	///////////////////////////
 	
+	/**
+	 * This is the main behavior of the SIT's user interface.
+	 * Accepts user input and collects specified SIT language tags, exits the program if an invalid command is supplied. 
+	 * Then validates directory and file paths, storing them in a list based on language, or exits the program if a path is invalid.
+	 *
+	 * @param args User input
+	 */
 	public void processInput(String[] args)
 	{
 		//If no arguments specified, process all files with known extensions
@@ -228,8 +235,10 @@ public class Input {
 	}
 	
 	/**
-	 * If the file extensions match the type of files the user wishes to analyze, then those files are added to the appropriate file list
-	 * If a file extension does not match the type of files the user wishes to analyze, then an error is displayed and the program is terminated
+	 * If the file extensions match the SIT language tags supplied by the user, then those files are added to the appropriate file list.
+	 * If a file extension does not match the type of files the user wishes to analyze, then an error is displayed and the program is terminated.
+	 * If a directory is followed by the -r SIT command, then all files conforming to the specified SIT language tags are added to the appropriate list
+	 * from within that directory and all of its sub-directories
 	 * @param filename The name of the file currently being processed
 	 * @param argument The argument following the current filename
 	 * @return True if argument is tag -r or -all
@@ -686,7 +695,6 @@ public class Input {
 			    //TODO analyze
 		    }
 		}
-		
 		catch (SecurityException | IOException ex) {
 		    SIT.notifyUser("Could not get file path.");
 		}
@@ -695,6 +703,8 @@ public class Input {
 		}
 		finally {SIT.notifyUser("all ada files read");}
 	}
+	
+	
 	/**
 	 * Analyzes C++ files for vulnerabilities by invoking an Analyzer object
 	 */

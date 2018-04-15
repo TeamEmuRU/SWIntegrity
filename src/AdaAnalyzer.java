@@ -8,8 +8,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 /**
- * The ada analyzer class is a class specialized to pull important information from an ada file and check the file against known vulnerabilities.
- * @author jamie tyler walder
+ * The AdaAnalyzer parses Ada files for variable names and scopes, and runs the file against known vulnerabilities.
+ * @author Jamie Tyler Walder
  *
  */
 
@@ -29,7 +29,7 @@ public class AdaAnalyzer extends Analyzer{
 	
 	
 	/**
-	 * constructor for ada analyzer class, it creates the lists necessary for collection of data
+	 * Constructor which creates lists necessary for collection of data.
 	 */
 	public AdaAnalyzer() {
 		super();
@@ -57,6 +57,10 @@ public class AdaAnalyzer extends Analyzer{
 		this.accessTypes=new HashSet<String>();
 		
 	}
+	
+	/**
+	 * Clears all existing data from each list used by AdaAnalyzer's parsing functions
+	 */
 	private void clearAll() {
 		this.variables = new HashMap<>();
 		this.literals = new LinkedList<>();
@@ -66,11 +70,16 @@ public class AdaAnalyzer extends Analyzer{
 		this.accessTypes=new HashSet<String>();
 		
 	}
-	@Override
+	
+	
+	
+
 	/**
-	 * parses file for important information like variables and literals
-	 * 
+	 * Override Analyzer.parse
+	 * Opens a file and parses it for variable names
+	 * @param filename The path of the file to parse
 	 */
+	@Override
 	public void parse(String filename) {
 		// TODO Auto-generated method stub
 		clearAll();
@@ -78,10 +87,11 @@ public class AdaAnalyzer extends Analyzer{
 		fileContents=flattenCodeAndMap(fileContents);
 		extractVariables(fileContents);
 	}
+	
 	/**
-	 * checks if words is keyword or symbol 
-	 * @param s word to check
-	 * @return if word is a proper variable name
+	 * Checks whether a word is an Ada reserved keyword or symbol 
+	 * @param s Word to check
+	 * @return false if the word is a valid variable name
 	 */
 	public boolean isVarName(String s) {
 		for(String symbol:specialSymbols) {
@@ -94,9 +104,10 @@ public class AdaAnalyzer extends Analyzer{
 		}
 		return !keyWords.contains(s)&&!specialSymbols.contains(s);
 	}
+	
 	/**
-	 * pulls variables and literals from file
-	 * @param file file to be analyzed, must be flattened to work
+	 * Extracts variables and literals from a file
+	 * @param file The path of the file to be parsed, must be flattened to work
 	 */
 	public void extractVariables(String file) {
 		//split the file by spaces for easy manipulation
@@ -249,10 +260,11 @@ public class AdaAnalyzer extends Analyzer{
 		System.out.println(externalVariables);
 		System.out.println(externalFunctionCalls);
 	}
+	
 	/**
-	 * flattens code and records symbol's lines
-	 * @param file file to flatten
-	 * @return a string with no new lines with a space seperating every symbol
+	 * Flattens code and records symbol's lines
+	 * @param file The path of the file to flatten
+	 * @return a string with no new lines, and with a space separating every symbol
 	 */
 	public String flattenCodeAndMap(String file) {
 		//add spaces in between special symbols and other words
@@ -306,6 +318,11 @@ public class AdaAnalyzer extends Analyzer{
 		return result.trim();
 	}
 
+	/**
+	 * Parses a file, then runs known vulnerability algorithms against the file and
+	 * reports any detected vulnerabilities to a Reporter class.
+	 * @param filename The path of the file to analyze
+	 */
 	@Override
 	protected void analyze(String filename) {
 		// TODO Auto-generated method stub
@@ -418,14 +435,9 @@ public class AdaAnalyzer extends Analyzer{
 				return false;
 			return true;
 		}
-		
-		
-		
-		
-		
-		
-		
 	}
+	
+	
 	private class Pointer extends Variable{
 		List<Integer> deletions;
 		public Pointer(String name, String type, String scope, int line) {
