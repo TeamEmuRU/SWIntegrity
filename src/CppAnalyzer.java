@@ -539,11 +539,17 @@ public class CppAnalyzer extends Analyzer
 		sqlCppAnalyze();
 	}
 
+
 	public void sqlCppAnalyze() {
 		Vulnerability c=new CppSQLInjectionVulnerability();
 		c.run(this);
-		
 	}
+
+	/**
+     	* Method that analyzes a file for possible vulnerability to SQL injections
+     	* @param filename the name of the file to be analyzed
+     	*/
+
 	
 	public void danglingPointerAnalyzer()
 	{
