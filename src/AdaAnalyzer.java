@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
 /**
  * The AdaAnalyzer parses Ada files for variable names and scopes, and runs the file against known vulnerabilities.
  * @author Jamie Tyler Walder
@@ -88,7 +90,6 @@ public class AdaAnalyzer extends Analyzer{
 		rawCode = fileContents;
 		fileContents=flattenCodeAndMap(fileContents);
 		extractVariables(fileContents);
-		System.out.println(variables);
 	}
 	
 	/**
@@ -324,6 +325,7 @@ public class AdaAnalyzer extends Analyzer{
 	protected void analyze(String filename) {
 		// TODO Auto-generated method stub
 		parse(filename);
+		danglingAccessType();
 	}
 	
 	
@@ -348,49 +350,61 @@ public class AdaAnalyzer extends Analyzer{
 	public Set<String> getKeyWords() {
 		return keyWords;
 	}
-	 public void danglingAccessType() {
+	public void danglingAccessType() {
 		//case 1: access type variables that have not been freed still point to another access type variable that was freed
-		Pattern deallocatorMethod = Pattern.compile("procedure [.{1,}] is new Ada.Unchecked_Deallocation");
+		Pattern deallocatorMethod = Pattern.compile("procedure \\S{1,} is new Ada.Unchecked_Deallocation");
 		ArrayList<String> methodList = new ArrayList<>();
 		HashSet<String> dangerousVariables = new HashSet<>();
-		String currentLine;
 		HashSet<Variable> danglers = new HashSet<>();
-		Matcher matcher = deallocatorMethod.matcher(currentLine);
+		Matcher matcher = deallocatorMethod.matcher(rawCode);
 		while(matcher.find()){
-			methodList.add(matcher.group().substring(10, currentLine.indexOf("is new")-1));
-			System.out.println(matcher.group());
+			methodList.add(matcher.group().substring(10, rawCode.indexOf("is new", matcher.start())-1));
 		}
 		for(String m : methodList) {
-			Pattern methodCall = Pattern.compile(m + "(\\S{1,}");
+			Pattern methodCall = Pattern.compile(m + "(\\S{1,})");
 			Matcher mat = methodCall.matcher(rawCode);
 			while(mat.find()){
-				dangerousVariables.add(s.substring(m.length() + 1, s.lastIndexOf(")")));
-				System.out.println(mat.group());
+				String found = mat.group();
+				dangerousVariables.add(found.substring(m.length() + 1, found.lastIndexOf(")")));
 			}
 		}
 		for(String v : dangerousVariables){
-			for(Variable va : variables){
-				if(rawCode.contains(va.getName() + ":=" + v && !dangerousVariables.contains(va.getName())){
+			for(Variable va : variables.values()){
+				Pattern assign = Pattern.compile(va.getName() + "\\s*:\\s*=\\s*" + v);
+				Matcher mm = assign.matcher(rawCode);
+				if(mm.find() && !dangerousVariables.contains(va.getName())){ //if var := myFunction is called, and myFunction returns an access type, this won't catch it
 					danglers.add(va);
 				}
 			}
 		}
 		//case 2: access type variable is assigned to a local variable that has become out of scope, and the access type variable is not reassigned to something else
-		int accessScope;
-		int localVariableScope;
+		int accessScope = 0;
+		int localVariableScope = 0;
+		String maybeVariable = "";
 		Pattern numeric = Pattern.compile("[0-9]{1,}");
 		Matcher mt;
-		for(String type : accesses){
-			for(Variable v : vars){
-				if(v.getType().equalsIgnoreCase(type)){ //the variable is an access type
-					mt = numeric.matcher(v.getScope());
-					mt.find();
-					accessScope = Integer.parseInt(mt.group());
-					for(String q : v.getAssignments().values()){
-						if(aa.getVariables().get(q) != null){
-							mt = numeric.matcher(aa.getVariables().get(q).getScope());
-							mt.find();
-							localVariableScope = Integer.parseInt(mt.group());
+		for(Variable v : variables.values()){
+			if (accessTypes.contains(v.getType())) { //the variable is an access type
+				mt = numeric.matcher(v.getScope());
+				while (mt.find()) {
+					if (mt.hitEnd()) {
+						accessScope = Integer.parseInt(mt.group());
+					}
+				}
+				Pattern assignment = Pattern.compile(v.getName() + "\\s*:\\s*=\\s*");
+				Pattern value = Pattern.compile("\\S{1,};");
+				Matcher mtch = assignment.matcher(rawCode);
+				Matcher cap = value.matcher(rawCode);
+				while(mtch.find()){
+					if(cap.find(mtch.end())){
+						maybeVariable = cap.group().substring(0, cap.group().length()-1);
+						if(variables.keySet().contains(maybeVariable)){
+							mt = numeric.matcher(variables.get(maybeVariable).getScope());
+							while(mt.find()){
+								if(mt.hitEnd()){
+									localVariableScope = Integer.parseInt(mt.group());
+								}
+							}
 							if(localVariableScope > accessScope){
 								danglers.add(v);
 							}
@@ -399,8 +413,16 @@ public class AdaAnalyzer extends Analyzer{
 				}
 			}
 		}
+		if(danglers.isEmpty()){
+			System.out.println("No danger of dangling access types found.");
+		}
+		else{
+			System.out.println("Danger of dangling access types:");
+			for(Variable vari : danglers){
+				System.out.println(vari.getName());
+			}
+		}
 	}
-
 	private class Variable{
 		String name;
 		String type;
