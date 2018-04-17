@@ -254,6 +254,7 @@ public class JavaAnalyzer extends Analyzer {
 				}
 
 			}
+			br.close();
             }
 			catch(FileNotFoundException fnf){	//from FileReader
 				SIT.notifyUser("Error: File " + filename + " could not be parsed.");
@@ -265,6 +266,7 @@ public class JavaAnalyzer extends Analyzer {
 			//System.out.println(variablesList);
 			//System.out.println("Literals:");
 	    	//System.out.println(literalsList);
+		
 	}
 
 	@Override
