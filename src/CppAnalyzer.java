@@ -537,6 +537,10 @@ public class CppAnalyzer extends Analyzer
 		parse(filename);
 	}
 
+	/**
+     	* Method that analyzes a file for possible vulnerability to SQL injections
+     	* @param filename the name of the file to be analyzed
+     	*/
 	public void sqlCppAnalyze(String filename) {
 		
 		String DBkeywords[] = {"SELECT", "UNION", "WHERE", "FROM", "HAVING", "JOIN", "ORDER BY"}; //A List of key words used in SQL
