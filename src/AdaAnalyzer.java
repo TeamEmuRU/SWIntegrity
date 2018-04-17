@@ -25,6 +25,7 @@ public class AdaAnalyzer extends Analyzer{
 	Set<String> specialSymbols;
 	Set<String> keyWords;
 	Set<String> accessTypes;
+	String rawCode;
 	
 	
 	
@@ -84,8 +85,10 @@ public class AdaAnalyzer extends Analyzer{
 		// TODO Auto-generated method stub
 		clearAll();
 		String fileContents=openFile(filename);
+		rawCode = fileContents;
 		fileContents=flattenCodeAndMap(fileContents);
 		extractVariables(fileContents);
+		System.out.println(variables);
 	}
 	
 	/**
@@ -158,20 +161,23 @@ public class AdaAnalyzer extends Analyzer{
 					temp--;
 				}
 			}
-			//check for the end of a scope and pop if so
-			if(words[i].equals("end")||words[i].equals("else")||words[i].equals("elsif")) {
-				scopes.pop();
+			try {
+				//check for the end of a scope and pop if so
+				if (words[i].equals("end") || words[i].equals("else") || words[i].equals("elsif")) {
+					scopes.pop();
+				}
+				//check to see if the word is the begining of an anonimous scope and add scope to stack
+				if ((words[i].equals("if") || words[i].equals("else") || words[i].equals("elif") || words[i].equals("loop") || words[i].equals("case")) && !words[i + 1].equals(";")) {
+					scopes.push(words[i] + "-" + scopeID);
+					scopeID++;
+				}
+				//check to see if the word is the begining of a named scope and that scope to the stack
+				if (words[i].equals("function") || words[i].equals("procedure") || words[i].equals("body")) {
+					scopes.push(words[i + 1] + "-" + scopeID);
+					scopeID++;
+				}
 			}
-			//check to see if the word is the begining of an anonimous scope and add scope to stack
-			if((words[i].equals("if")||words[i].equals("else")||words[i].equals("elif")||words[i].equals("loop")||words[i].equals("case"))&&!words[i+1].equals(";")) {
-				scopes.push(words[i]+"-"+scopeID);
-				scopeID++;
-			}
-			//check to see if the word is the begining of a named scope and that scope to the stack
-			if(words[i].equals("function")||words[i].equals("procedure")||words[i].equals("body")){
-				scopes.push(words[i+1]+"-"+scopeID);
-				scopeID++;
-			}
+			catch(Exception e){}
 			//look for external varialbes
 			if(words[i].equals(".")&&isVarName(words[i+1])&&isVarName(words[i-1])&&!words[i+2].equals("(")&&!scopes.isEmpty()) {
 				externalVariables.put(words[i-1]+words[i]+words[i+1],new Variable(words[i-1]+words[i]+words[i+1], null, null, symbolToLine.get(i)));
@@ -201,7 +207,7 @@ public class AdaAnalyzer extends Analyzer{
 								assignment+=words[index]+" ";
 								index++;
 							}
-							//add assignment to list and record it'sline
+							//add assignment to list and record it's line
 							var.getAssignments().put(symbolToLine.get(i), assignment);
 							//signify that we found it
 							found=true;
@@ -306,8 +312,6 @@ public class AdaAnalyzer extends Analyzer{
 				symbolID++;
 			}
 		}
-		
-		
 		return result.trim();
 	}
 
@@ -344,7 +348,58 @@ public class AdaAnalyzer extends Analyzer{
 	public Set<String> getKeyWords() {
 		return keyWords;
 	}
-
+	 public void danglingAccessType() {
+		//case 1: access type variables that have not been freed still point to another access type variable that was freed
+		Pattern deallocatorMethod = Pattern.compile("procedure [.{1,}] is new Ada.Unchecked_Deallocation");
+		ArrayList<String> methodList = new ArrayList<>();
+		HashSet<String> dangerousVariables = new HashSet<>();
+		String currentLine;
+		HashSet<Variable> danglers = new HashSet<>();
+		Matcher matcher = deallocatorMethod.matcher(currentLine);
+		while(matcher.find()){
+			methodList.add(matcher.group().substring(10, currentLine.indexOf("is new")-1));
+			System.out.println(matcher.group());
+		}
+		for(String m : methodList) {
+			Pattern methodCall = Pattern.compile(m + "(\\S{1,}");
+			Matcher mat = methodCall.matcher(rawCode);
+			while(mat.find()){
+				dangerousVariables.add(s.substring(m.length() + 1, s.lastIndexOf(")")));
+				System.out.println(mat.group());
+			}
+		}
+		for(String v : dangerousVariables){
+			for(Variable va : variables){
+				if(rawCode.contains(va.getName() + ":=" + v && !dangerousVariables.contains(va.getName())){
+					danglers.add(va);
+				}
+			}
+		}
+		//case 2: access type variable is assigned to a local variable that has become out of scope, and the access type variable is not reassigned to something else
+		int accessScope;
+		int localVariableScope;
+		Pattern numeric = Pattern.compile("[0-9]{1,}");
+		Matcher mt;
+		for(String type : accesses){
+			for(Variable v : vars){
+				if(v.getType().equalsIgnoreCase(type)){ //the variable is an access type
+					mt = numeric.matcher(v.getScope());
+					mt.find();
+					accessScope = Integer.parseInt(mt.group());
+					for(String q : v.getAssignments().values()){
+						if(aa.getVariables().get(q) != null){
+							mt = numeric.matcher(aa.getVariables().get(q).getScope());
+							mt.find();
+							localVariableScope = Integer.parseInt(mt.group());
+							if(localVariableScope > accessScope){
+								danglers.add(v);
+							}
+						}
+					}
+				}
+			}
+		}
+	}
 
 	private class Variable{
 		String name;
