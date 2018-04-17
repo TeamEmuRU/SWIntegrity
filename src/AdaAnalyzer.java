@@ -248,10 +248,10 @@ public class AdaAnalyzer extends Analyzer{
 				this.accessTypes.add(words[i+1]);
 			}
 		}
-		System.out.println(variables);
-		System.out.println(literals);
-		System.out.println(externalVariables);
-		System.out.println(externalFunctionCalls);
+		//System.out.println(variables);
+		//System.out.println(literals);
+		//System.out.println(externalVariables);
+		//System.out.println(externalFunctionCalls);
 	}
 	
 	/**

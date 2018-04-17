@@ -261,10 +261,10 @@ public class JavaAnalyzer extends Analyzer {
 			catch(IOException io){	//from BufferedReader
 				SIT.notifyUser("Error reading the contents of " + filename + "." );
 			}
-			System.out.println("Variables:");
-			System.out.println(variablesList);
-			System.out.println("Literals:");
-	    	System.out.println(literalsList);
+			//System.out.println("Variables:");
+			//System.out.println(variablesList);
+			//System.out.println("Literals:");
+	    	//System.out.println(literalsList);
 	}
 
 	@Override

@@ -67,12 +67,12 @@ public class CppAnalyzer extends Analyzer
 		file = flattenCode(file);
 		this.fileContents=file;
 		//TODO: remove print statement
-		System.out.print(file);
+		//System.out.print(file);
 		extractVariables(file);
 		extractLiterals(file);
 		
 		//TODO remove print statement
-		System.out.println(variablesList);
+		//System.out.println(variablesList);
 	}
 	
 	/**
