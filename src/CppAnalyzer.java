@@ -463,7 +463,7 @@ public class CppAnalyzer extends Analyzer
 			{
 				int pos;
 				pos = i;
-				while(!words[pos].equals("="))
+				while(pos>0&&!words[pos].equals("="))
 				{
 					if(words[pos].equals("{")||words[pos].equals(";"))
 					{
@@ -535,100 +535,42 @@ public class CppAnalyzer extends Analyzer
 	@Override
 	protected void analyze(String filename) {
 		parse(filename);
+		danglingPointerAnalyzer();
+		sqlCppAnalyze();
 	}
 
-	public void sqlCppAnalyze(String filename) {
+	public void sqlCppAnalyze() {
+		Vulnerability c=new CppSQLInjectionVulnerability();
+		c.run(this);
 		
-		String DBkeywords[] = {"SELECT", "UNION", "WHERE", "FROM", "HAVING", "JOIN", "ORDER BY"}; //A List of key words used in SQL
-		//a list of the most common c++ libraries to use for databases
-		String DBlibraries[] = {"MYSQL","SQL","SQLAPI", "SQLITE3","SOCI", "OTL", "LMDB++", "DTL", "LMDB", "MONGOXX"};
-		HashSet<Integer> lineNumbers=new HashSet<>();
-		
-		
-			
-			//change everything to uppercase to deal with case sensitivity
-			String contents = fileContents.toUpperCase();
-			String[] temp=contents.split(" ");
-			//check to see if a database library was used for c++,
-			//if you find one, there is a possibility for SQL injection
-			//if you don't, then there's a strong indicator that there won't be any SQL injections
-			for(String lib : DBlibraries) {	
-				if(contents.contains(lib)){
-					for(String word : DBkeywords){//iterates through the key word list to see if they
-								      //appear in the string of the program code.
-						
-						//search for keywords that might indicate an SQL statement	
-						for(int index=0;index<temp.length;index++){
-							//if keywords were found, check to see if the program calls for user input
-							if(temp[index].contains(word)){
-								lineNumbers.add(symbolToLine.get(index));
-							}
-								
-							
-						} 													     
-					}
-				} 
-			}
-		
-		//Display whether possible sql injections were detected
-		if(lineNumbers.isEmpty()) {
-			System.out.println("At risk for possible SQL injections: None detected");
-		}else {
-			System.out.println("At risk for possible SQL injections: "+lineNumbers);
-		}
 	}
 	
 	public void danglingPointerAnalyzer()
 	{
-		String[] words = fileContents.split(" ");
-		List<Integer> danglingPointerList = new LinkedList<>();
-		for(Pointer p: pointersList)
-		{
-			for(Integer deletion: p.getDeletions())
-			{
-				int i = deletion+1;
-				boolean isDP = false;
-				while(i<words.length)
-				{
-					if (words[i].equals("}"))
-					{
-						isDP = true;
-						break;
-					}
-					if(words[i].equals(p.getName())&&words[i+1].equals("=")&&!words[i+2].equals("=")) {
-						break;
-					}
-					else if (words[i].equals(p.getName())) {
-						isDP=true;
-						break;
-					}
-					i++;
-				}
-				if(isDP)
-				{
-					danglingPointerList.add(symbolToLine.get(deletion));
-				}
-			}
-			for(Map.Entry<Integer, String> entry:p.getAssignments().entrySet()) 
-			{
-				if(!entry.getValue().equals("")) {
-					String[] assignment=entry.getValue().split(" ");
-					String first=assignment[0];
-					String last=assignment[assignment.length-1];
-					if(first.equals("new")||first.equals("&"));
-					else if(last.equals(")")) {
-						danglingPointerList.add(symbolToLine.get(entry.getKey()));
-					}
-						
-				}
-				
-			}
-			
-		}
-		System.out.println(danglingPointerList);
+		Vulnerability c=new CppDanglingPointerVulnerability();
+		c.run(this);
+	}
+	
+	public List<Variable> getVariablesList() {
+		return variablesList;
+	}
+	public Set<String> getKeywords() {
+		return keywords;
+	}
+	public List<String> getLiterals() {
+		return literals;
+	}
+	public String getFileContents() {
+		return fileContents;
+	}
+	public Map<Integer, Integer> getSymbolToLine() {
+		return symbolToLine;
+	}
+	public List<Pointer> getPointersList() {
+		return pointersList;
 	}
 
-	private class Variable{
+	public class Variable{
 		String name;
 		String type;
 		String scope;
@@ -723,7 +665,7 @@ public class CppAnalyzer extends Analyzer
 		
 		
 	}
-	private class Pointer extends Variable
+	public class Pointer extends Variable
 	{
 		List<Integer> deletions;
 

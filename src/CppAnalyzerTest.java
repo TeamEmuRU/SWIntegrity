@@ -19,15 +19,16 @@ class CppAnalyzerTest {
 	@Test
 	void TestSqlCppAnalyze() {
 		CppAnalyzer c=new CppAnalyzer();
-		//c.analyze("TestFiles/sqlExample.cpp");
-		//c.sqlCppAnalyze("TestFiles/sqlExample.cpp");
-		c.parse("TestFiles/danglingPointerTest.cpp");
-		c.danglingPointerAnalyzer();
-		c.parse("TestFiles/danglingPointerTest1.cpp");
-		c.danglingPointerAnalyzer();
-		c.parse("TestFiles/danglingPointerTest3.cpp");
-		c.danglingPointerAnalyzer();
-		c.parse("TestFiles/sqlExample2.cpp");
+		c.analyze("TestFiles/danglingPointerTest.cpp");
+	
+		c.analyze("TestFiles/danglingPointerTest1.cpp");
+	
+		c.analyze("TestFiles/danglingPointerTest3.cpp");
+		
+		c.analyze("TestFiles/sqlExample2.cpp");
+	
+		c.analyze("TestFiles/sqlExample.cpp");
+		
 		
 	}
 	
