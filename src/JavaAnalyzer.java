@@ -431,6 +431,7 @@ public class JavaAnalyzer extends Analyzer {
 		private JavaAnalyzer getOuterType() {
 			return JavaAnalyzer.this;
 		}
+	}
 
 		//This is the java SQL injection vulnerability; hard-coded into the program until the database is implemented
 
@@ -494,4 +495,3 @@ public class JavaAnalyzer extends Analyzer {
 			}
 		}
 	}
-}
