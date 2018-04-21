@@ -229,6 +229,22 @@ public class Input {
 						nameFragment = true;
 					}//end if
 				}//end for
+				
+				//If the user declared a language tag but did not supply any files for this tag,
+				//then the tag will pull all of that language from the current directory
+				if(uJava && javaFiles.size() == 0)
+				{
+					addJavaFilesInDirectory(System.getProperty("user.dir"));
+				}
+				if(uAda && adaFiles.size() == 0)
+				{
+					addAdaFilesInDirectory(System.getProperty("user.dir"));
+				}
+				if(uCPP && cppFiles.size() == 0)
+				{
+					addCppFilesInDirectory(System.getProperty("user.dir"));
+				}
+				
 			}
 		}//end if
 			this.analyze();
