@@ -220,6 +220,33 @@ public class AdaAnalyzer extends Analyzer{
 					}
 					
 				}
+				while(!found&&!scopes.isEmpty()) {
+					//check each variable
+						Variable var=pointers.get(words[i-1]+scopes.toString());
+						if(var!=null) {
+							//check each variable to see if this words is that variable
+							if(var.getName().equals(words[i-1])&&var.getScope().equals(scopes.toString())) {
+								//start loop to collect assignment
+								int index=i+2;
+								//set assigment to capture assignment
+								String assignment="";
+								//loop and collect until end of statement 
+								while(!words[index].equals(";")) {
+									assignment+=words[index]+" ";
+									index++;
+								}
+								//add assignment to list and record it's line
+								var.getAssignments().put(symbolToLine.get(i), assignment);
+								//signify that we found it
+								found=true;
+							}
+						}
+						//back up a scope if we couldnt find the variable
+						if(!found&&!scopes.isEmpty()) {
+							tempScope.push(scopes.pop());
+						}
+						
+					}
 				//revert the scopes if need be
 				while(!tempScope.isEmpty()) {
 					scopes.push(tempScope.pop());

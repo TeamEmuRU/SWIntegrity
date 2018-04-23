@@ -9,7 +9,7 @@ class AdaAnalyzerTest {
 	@BeforeEach
 	void setUp() throws Exception {
 		ana=new AdaAnalyzer();
-		file=ana.openFile("Test Files\\hello.adb");
+		file=ana.openFile("TestFiles\\hello.adb");
 		file=ana.flattenCodeAndMap(file);
 		ana.extractVariables(file);
 		testExtractVariables();
@@ -17,7 +17,7 @@ class AdaAnalyzerTest {
 
 	@Test
 	void testParse() {
-		ana.parse("Test Files\\hello.adb");
+		ana.parse("TestFiles\\hello.adb");
 		assertTrue(ana.getVariables().size()==1);
 		assertTrue(ana.getExternalVariables().size()==0);
 		assertTrue(ana.getLiterals().size()==1);
