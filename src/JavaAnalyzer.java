@@ -27,6 +27,7 @@ public class JavaAnalyzer extends Analyzer {
 	private HashMap<String, ArrayList<Integer>> symbolToLine;
 	private Pattern NON_ALPHA_NUMERIC;
 	private int lineNumber = 1;
+	private String fileContents;
 
 
 	/**
@@ -307,6 +308,7 @@ public class JavaAnalyzer extends Analyzer {
 		} catch (IOException io) {    //from BufferedReader
 			SIT.notifyUser("Error reading the contents of " + filename + ".");
 		}
+		fileContents=fileBuilder.toString();
 		extractVariables(fileBuilder.toString());
 		//temporary fix
 		Iterator<Variable> it = variablesList.iterator();
@@ -318,10 +320,6 @@ public class JavaAnalyzer extends Analyzer {
 				it.remove();
 			}
 		}
-		//System.out.println("Variables:");
-		System.out.println(variablesList);
-		//System.out.println("Literals:");
-		//System.out.println(literalsList);
 	}
 
 	@Override
@@ -329,6 +327,28 @@ public class JavaAnalyzer extends Analyzer {
 		parse(filename);
 		System.out.println(symbolToLine);
 	}
+	
+
+	public Set<String> getTypeList() {
+		return typeList;
+	}
+
+	public HashMap<String, ArrayList<Integer>> getSymbolToLine() {
+		return symbolToLine;
+	}
+
+	public Pattern getNON_ALPHA_NUMERIC() {
+		return NON_ALPHA_NUMERIC;
+	}
+
+	public String getFileContents() {
+		return fileContents;
+	}
+
+	public int getLineNumber() {
+		return lineNumber;
+	}
+
 
 	public class Variable {
 		String name;
@@ -441,57 +461,6 @@ public class JavaAnalyzer extends Analyzer {
 		 * @param fileName the name of the file to be analyzed
 		 */
 		public void sqlVuln(String fileName) {
-			String DBkeywords[] = {"SELECT", "UNION", "WHERE", "FROM", "HAVING", "JOIN", "ORDER BY"}; //a list of key words used in SQL
-			String keyInMethods[] = {".NEXT", ".READ", ".GET"}; //a list of methods used to obtain input from the user, list can be extended later
-			String contents = "";
-			String currentLine = "";
-			ArrayList<Integer> locations = new ArrayList<>();
-			boolean badSQL = false; // a boolean to see if this vulnerability exists
-
-			try {
-				BufferedReader br = new BufferedReader(new FileReader(fileName));
-
-				while ((currentLine = br.readLine()) != null) {
-					contents += currentLine;
-				}
-				//checks the two java library api imports see if being used
-				//if no then skips all analysis to return false no vulnerabilities
-				if (contents.contains("java.sql") || contents.contains("jdbc")) {
-					contents = contents.toUpperCase();
-
-					for (String word : DBkeywords) {//iterates through the key word list to see if they
-						//appear in the string of the program code.
-
-						//if said keyword appears, checks for specific
-						// statements that hackers use for SQL Injection.
-						// %00 is a null byte used by attackers in many different
-						// types of vulnerabilities.
-						if (contents.contains(word)) {
-
-							//if keywords were found, check to see if the program collects user input
-							for (String inputWord : keyInMethods) {
-
-								//If it does collect user input, check to see if it uses prepared statements
-								//prepared statements are safe. If no prepared statement, not safe.
-								if (contents.contains(inputWord) && !contents.contains("PREPAREDSTATEMENT")) {
-									badSQL = true;
-									locations.addAll(symbolToLine.get(inputWord));
-								}
-
-							}
-						}
-					}
-				}
-			} catch (IOException e) {
-				System.out.println("FileNotFoundException in "
-						+ "Java SQL analyze");
-			}
-
-			//Display whether possible sql injections were detected
-			System.out.println("At risk of SQL injection: " + badSQL);
-			if(badSQL){
-				System.out.print("Risks located on lines ");
-				System.out.println(locations);
-			}
+			
 		}
 	}
