@@ -15,7 +15,8 @@ public abstract class Analyzer {
 	
 	private BufferedReader br;
 	protected static String jarPath = "file://./vulnerabilities/vulnerabilities.jar";
-	protected static String configPath = "vulnerabilities\\config.csv";
+	
+	protected static String configPath=Analyzer.class.getResource("vulnerabilities/config.csv").getPath();
 	
 	/**
 	 * Open a file with a given file name and return its contents
@@ -23,6 +24,7 @@ public abstract class Analyzer {
 	 * @return The contents of the file
 	 */
 	public String openFile(String fileName) {
+		
 		try {
 			//use buffered reader to open the file
 			br = new BufferedReader(new FileReader(fileName));
@@ -34,8 +36,11 @@ public abstract class Analyzer {
 			while ((sCurrentLine = br.readLine()) != null) {
 				file += sCurrentLine + "\n";
 			}
+			
 			return file;
+			
 		}
+		
 		catch(FileNotFoundException e) {
 			//Thrown by BufferedReader
 			//if there was an error opening a file, notify the user

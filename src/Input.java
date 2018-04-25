@@ -50,6 +50,7 @@ public class Input {
 	 */
 	public void processInput(String[] args)
 	{
+		SIT.notifyUser("Verifing Files...");
 		//If no arguments specified, process all files with known extensions
 		//in the current directory
 		if (args.length == 0) 
@@ -596,6 +597,7 @@ public class Input {
 		String[] temp = filename.split("\\.");
 		//if there is an extension(the splits leads to more than one)
 		//Use the last split to evaluate the extension (covers absolute paths)
+		
 		if(temp.length>1) {
 			int split = temp.length - 1;
 			return temp[split].equals("java");
@@ -653,12 +655,19 @@ public class Input {
 	 * Analyzes sorted lists of files for vulnerabilities
 	 */
 	public void analyze() {
+		LinkedList<String> fileNames=new LinkedList<>();
+		fileNames.addAll(javaFiles);
+		fileNames.addAll(cppFiles);
+		fileNames.addAll(adaFiles);
+		Report.filesAnalyzed(fileNames);
+		SIT.notifyUser("Files Collected.");
 		if(javaFiles.size()>0)
 			analyzeJava();
 		if(adaFiles.size()>0)
 			analyzeAda();
 		if(cppFiles.size()>0)
 			analyzeCpp();
+		Report.writeReport();
 		//TODO special case for other
 	}
 	
@@ -676,8 +685,10 @@ public class Input {
 		File f = null;		
 		try {
 		    for(String filename : javaFiles) {
+		    	f = new File(filename);
+		    	SIT.notifyUser("Analyzing "+f.getCanonicalPath()+"...");
 			    analyzer.analyze(filename);
-			    f = new File(filename);
+			    
 			    SIT.notifyUser(f.getCanonicalPath()+" has been analyzed.");
 		    }
 		}
@@ -705,8 +716,10 @@ public class Input {
 		File f = null;
 		try {
 		    for(String filename : adaFiles) {
+		    	f = new File(filename);
+		    	SIT.notifyUser("Analyzing "+f.getCanonicalPath()+"...");
 			    analyzer.analyze(filename);
-			    f = new File(filename);
+			    
 			    SIT.notifyUser(f.getCanonicalPath()+" has been analyzed.");
 			    //TODO analyze
 		    }
@@ -735,8 +748,10 @@ public class Input {
 		File f = null;
 		try {   
 		    for(String filename : cppFiles) {
+		    	f = new File(filename);
+		    	SIT.notifyUser("Analyzing "+f.getCanonicalPath()+"...");
 			    analyzer.analyze(filename);
-			    f = new File(filename);
+			    
 			    SIT.notifyUser(f.getCanonicalPath()+" has been analyzed.");
 			    //TODO analyze
 		    }

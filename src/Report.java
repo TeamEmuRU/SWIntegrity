@@ -1,7 +1,9 @@
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -33,7 +35,8 @@ public class Report {
 	
 	public static void writeReport() 
 	{
-		String fileName = "report.txt";
+		new File("Reports").mkdirs();
+		String fileName = "Reports\\"+new Date().getTime()+"report.txt";
 		DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
 		LocalDateTime now = LocalDateTime.now();
 		try

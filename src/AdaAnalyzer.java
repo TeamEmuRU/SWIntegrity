@@ -123,6 +123,7 @@ public class AdaAnalyzer extends Analyzer{
 	 * @param file The path of the file to be parsed, must be flattened to work
 	 */
 	public void extractVariables(String file) {
+		SIT.notifyUser("Extracting Variables");
 		//split the file by spaces for easy manipulation
 		String[] words=file.split(" ");
 		//set a scope id to define scopes
@@ -291,10 +292,7 @@ public class AdaAnalyzer extends Analyzer{
 				this.accessTypes.add(words[i+1]);
 			}
 		}
-		//System.out.println(variables);
-		//System.out.println(literals);
-		//System.out.println(externalVariables);
-		//System.out.println(externalFunctionCalls);
+		
 	}
 	
 	/**
@@ -389,18 +387,22 @@ public class AdaAnalyzer extends Analyzer{
 	protected void analyze(String filename) {
 		//Parse the file for its variables
 		parse(filename);
-		
+		SIT.notifyUser("Looking For Vulnerabilities");
 		//Accost the CSV file and shake it down for its tasty vulnerabilities
 		try {
 			BufferedReader br = new BufferedReader(new FileReader(configPath));
 			String config = br.readLine();	//ignore the CSV header
 			
-			while(!(config = br.readLine()).equals(",,,,,"))	//If the current line of the CVS is not null
+			while((config = br.readLine())!=null&&!config.equals(",,,,,"))	//If the current line of the CVS is not null
 			{
 				String[] fields = config.split(",");	//Split at the comma because CSV
 				if(fields[2].equals("ADA"))				//The "language" field must match ADA
 				{
-					callVulnerability(fields[5]);		//Field  is the name of the vulnerability's class
+					SIT.notifyUser("Looking For "+fields[1]+"...");
+					List<Integer> lines=callVulnerability(fields[5]);		//Field  is the name of the vulnerability's class
+					if(lines.size()>0) {
+						Report.addVuln(filename, "Ada", fields[1], lines, fields[3], fields[4]);
+					}
 				}
 			}
 			

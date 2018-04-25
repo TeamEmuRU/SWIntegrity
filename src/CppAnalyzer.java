@@ -72,13 +72,11 @@ public class CppAnalyzer extends Analyzer
 		
 		file = flattenCode(file);
 		this.fileContents=file;
-		//TODO: remove print statement
-		//System.out.print(file);
+		
 		extractVariables(file);
 		extractLiterals(file);
 		
-		//TODO remove print statement
-		//System.out.println(variablesList);
+	
 	}
 	
 	/**
@@ -276,6 +274,7 @@ public class CppAnalyzer extends Analyzer
 	 */
 	public void extractVariables(String s) 
 	{
+		SIT.notifyUser("Extracting Variables");
 		s = s.replace("\\\"", "");
 		//Create an array of all words separated by a space
 		String words[] = s.split(" ");
@@ -574,18 +573,22 @@ public class CppAnalyzer extends Analyzer
 	protected void analyze(String filename) {
 		//Parse the file for its variables
 		parse(filename);
-		
+		SIT.notifyUser("Looking For Vulnerabilities");
 		//Accost the CSV file and shake it down for its tasty vulnerabilities
 		try {
 			BufferedReader br = new BufferedReader(new FileReader(configPath));
 			String config = br.readLine();	//ignore the CSV header
 			
-			while(!(config = br.readLine()).equals(",,,,,"))	//If the current line of the CVS is not null
+			while((config = br.readLine())!=null&&!config.equals(",,,,,"))	//If the current line of the CVS is not null
 			{
 				String[] fields = config.split(",");	//Split at the comma because CSV
 				if(fields[2].equals("C++"))				//The "language" field must match ADA
 				{
-					callVulnerability(fields[5]);		//Field  is the name of the vulnerability's class
+					SIT.notifyUser("Looking For "+fields[1]+"...");
+					List<Integer> lines=callVulnerability(fields[5]);		//Field  is the name of the vulnerability's class
+					if(lines.size()>0) {
+						Report.addVuln(filename, "C++", fields[1], lines, fields[3], fields[4]);
+					}		
 				}
 			}
 			
@@ -620,7 +623,7 @@ public class CppAnalyzer extends Analyzer
 		
 	}
 	
-	public List<Variable> getVariablesList() {
+	public List<Variable> getVariables() {
 		return variablesList;
 	}
 	public Set<String> getKeywords() {

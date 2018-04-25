@@ -3,18 +3,5 @@ CWE-89,Improper Neutralization of Special Elements used in an SQL Command,C++,Hi
 CWE-89,Improper Neutralization of Special Elements used in an SQL Command,JAVA,High,Use a whitelist to validate commands before they are processed. Sanitize input before processing it.,JavaSQLInjectionVulnerability
 CWE-825,Expired Pointer Dereference,C++,High,Ensure that pointers are initialized after declaration before they are dereferenced. Ensure that pointers are not dereferenced after previously valid memory locations become invalid.,CppDanglingPointerVulnerability
 CWE-825,Expired Pointer Dereference,ADA,High, Ensure that pointers are initialized after declaration before they are dereferenced. Ensure that pointers are not dereferenced after previously valid memory locations become invalid.,AdaDanglingPointerVulnerability
-CWE-22,Improper Limitation of a Pathname to a Restricted Directory,ADA,High,,AdaDanglingPointerVulnerability
-CWE-78,Improper Neutralization of Special Elements used in an OS Command,JAVA,High,,
-,,,,,
-,,,,,
-,,,,,
-,,,,,
-,,,,,
-,,,,,
-,,,,,
-,,,,,
-,,,,,
-,,,,,
-,,,,,
-,,,,,
-,,,,,
+CWE-22,Improper Limitation of a Pathname to a Restricted Directory,ADA,High,Use a whitelist to validate commands before they are processed. Sanitize input before processing it.,AdaDanglingPointerVulnerability
+CWE-78,Improper Neutralization of Special Elements used in an OS Command,JAVA,High,Use a whitelist to validate commands before they are processed. Sanitize input before processing it.,JavaSQLInjectionVulnerability
