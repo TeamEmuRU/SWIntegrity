@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 /**
+ * This class created the Report text file that has all relevant information about the files that were analyzed
  * 
  * @author Sean Lawton & Jamie Tyler Walder
  */
@@ -18,6 +19,7 @@ public class Report {
 	
 	private static final Report instance = new Report();
 	static List<Info> information = new LinkedList<Info>();
+	static List<String> files = new LinkedList<String>();
 	
 	private Report()
 	{
@@ -42,36 +44,64 @@ public class Report {
 			outputStream.println("SIT Version 1.0.0");
 			outputStream.println("Date: " + dtf.format(now));
 			outputStream.println(" ");
-			outputStream.println("Files Analyzed:" + numberOfFiles());
-			Iterator<String> itty = fileNames().iterator();
+			outputStream.println("Files Analyzed: " + numberOfFiles());
+			Iterator<String> itty = files.iterator();
 			while(itty.hasNext())
 			{
 				outputStream.println("	" + itty.next());
 			}
 			outputStream.println(" ");
 			outputStream.println("Warnings:");
-			Iterator<Info> iter = information.iterator();
+			Iterator<String> iter = fileNames().iterator();
 			while(iter.hasNext())
 			{
-				Info temp = iter.next();
-				outputStream.println("	" + temp.getFile());
-				outputStream.println("	" + temp.getLang() + temp.getVuln() + "[" + temp.getRisk() + "]: Lines " + temp.getLines());
-				outputStream.println("	Solution:" + temp.getSolution());
+				String temp = iter.next();
+				outputStream.println("	" + temp);
+				Iterator<Info> it = information.iterator();
+				while(it.hasNext())
+				{
+					Info temp2 = it.next();
+					if(temp2.getFile().equals(temp))
+					{
+						outputStream.println("	" + temp2.getLang() + " " + temp2.getVuln() + "[" + temp2.getRisk() + "]: Lines " + temp2.getLines());
+						outputStream.println("	Solution: " + temp2.getSolution());
+						outputStream.println(" ");
+					}
+				}
+			}
+			outputStream.println("Summary:");
+			for(String file: files)
+			{
+				outputStream.println("	" + file);
+				if(riskPerFile(file)==1)
+				{
+					outputStream.println("		" + riskPerFile(file) + " Warning");
+				}
+				else
+				{
+					outputStream.println("		" + riskPerFile(file) + " Warnings");
+				}
 				outputStream.println(" ");
 			}
-			outputStream.println(" ");
-			outputStream.println("Summary:");
-			outputStream.println("	Files Analyzed:" + numberOfFiles());
+			outputStream.println("Total Summary:");
+			outputStream.println("	Files Analyzed: " + numberOfFiles());
 			for(Entry<String, Integer> e:vulNumbers().entrySet()) {
-				outputStream.println("	Number of " + e.getKey() + " Occurances: " + e.getValue())
+				outputStream.println("	Number of " + e.getKey() + " Occurrences: " + e.getValue());
 			}
+			HashMap<String,Integer> risk = riskNumbers();
+			outputStream.println("	High Risk Warnings: " + risk.get("High") + "	Medium Risk Warnings: " + risk.get("Medium") + "	Low Risk Warnings: " + risk.get("Low"));
 			outputStream.close();
-			System.out.println("Done");
+			System.out.println("Done.");
 		}
 		catch (FileNotFoundException e)
 		{
 			e.printStackTrace();
 		}
+	}
+	
+	public static void filesAnalyzed(List<String> fileNames)
+	{
+		files = fileNames;
 	}
 	
 	public void clear()
@@ -120,12 +150,45 @@ public class Report {
 		return vulns;
 	}
 	
+	public static HashMap<String,Integer> riskNumbers()
+	{
+		HashMap<String,Integer> risks = new HashMap<String,Integer>();
+		Iterator<Info> itty = information.iterator();
+		while(itty.hasNext())
+		{
+			Info temp = itty.next();
+			if(risks.containsKey(temp.getVuln()))
+			{
+				risks.put(temp.getRisk(), risks.get(temp.getRisk()+1));
+			}
+			else
+			{
+				risks.put(temp.getRisk(), 1);
+			}
+		}
+		return risks;
+	}
+	
+	public static int riskPerFile(String file)
+	{
+		int i = 0;
+		for(Info inf: information)
+		{
+			if(inf.getFile().equals(file))
+			{
+				i++;
+			}
+		}
+		return i;
+	}
+	
 	public static void addVuln(String file, String lang, String vuln, List<Integer> lines, String risk, String solution) 
 	{
 		information.add(new Info(file, lang, vuln, lines, risk, solution));
 	}
 }
-	class Info 
+
+class Info 
 	{
 		String file;
 		String lang;
