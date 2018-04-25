@@ -91,7 +91,6 @@ public class Report {
 			HashMap<String,Integer> risk = riskNumbers();
 			outputStream.println("	High Risk Warnings: " + risk.get("High") + "	Medium Risk Warnings: " + risk.get("Medium") + "	Low Risk Warnings: " + risk.get("Low"));
 			outputStream.close();
-			System.out.println("Done.");
 		}
 		catch (FileNotFoundException e)
 		{
