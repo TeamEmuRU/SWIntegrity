@@ -201,7 +201,7 @@ public class JavaAnalyzer extends Analyzer {
 				type = words[i];
 				if(words[i+2].equals("=")){
 					int place = i+3;
-					while(!(words[place].equals(";")) && !(words[place] == null)) {
+					while(place<words.length&&place>-1&&!(words[place].equals(";")) && !(words[place] == null)) {
 						assignment += words[place] + " ";
 						place++;
 					}
