@@ -9,7 +9,14 @@ import java.util.Set;
 import java.util.Stack;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.lang.reflect.*;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLClassLoader;
 
 /**
  * The AdaAnalyzer parses Ada files for variable names and scopes, and runs the file against known vulnerabilities.
@@ -344,7 +351,35 @@ public class AdaAnalyzer extends Analyzer{
 		}
 		return result.trim();
 	}
-
+	
+	/**
+	 * This method loads a jar file containing all known SIT vulnerabilities
+	 * The appropriate vulnerability is located within the jar, and its run function is called
+	 * in order to analyze this file for that vulnerability.
+	 * @param className The name of the vulnerability to locate within the jar file
+	 * @return A list containing the line numbers in which the vulnerability was found
+	 * @throws ClassNotFoundException
+	 * @throws MalformedURLException
+	 * @throws NoSuchMethodException
+	 * @throws IllegalAccessException
+	 * @throws IllegalArgumentException
+	 * @throws InvocationTargetException
+	 * @throws InstantiationException
+	 */
+	private List<Integer> callVulnerability(String className) throws ClassNotFoundException, MalformedURLException, NoSuchMethodException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, InstantiationException
+	{
+		//Create a new URL class using the jarPath variable stored in Analyzer
+		URL temp = new URL(jarPath);
+		URL[] jar = {temp};
+		
+		//Load the jar file and find the correct vulnerability within this jar
+		URLClassLoader jarLoader = new URLClassLoader(jar);
+		Class c = jarLoader.loadClass(className);
+		//Find the run method for the vulnerability
+		Method m = c.getDeclaredMethod("run", Analyzer.class);
+		return (List<Integer>) (m.invoke(c.newInstance(), this));
+	}
+	
 	/**
 	 * Parses a file, then runs known vulnerability algorithms against the file and
 	 * reports any detected vulnerabilities to a Reporter class.
@@ -352,13 +387,23 @@ public class AdaAnalyzer extends Analyzer{
 	 */
 	@Override
 	protected void analyze(String filename) {
-		// TODO Auto-generated method stub
+		//Parse the file for its variables
 		parse(filename);
+		
+		//Accost the CSV file and shake it down for its tasty vulnerabilities
 		try {
+			BufferedReader br = new BufferedReader(new FileReader(configPath));
+			String config = br.readLine();	//ignore the CSV header
 			
-			Class c=Class.forName("AdaDanglingPointerVulnerability");
-			Method m=c.getMethod("run", Analyzer.class);
-			m.invoke(c.newInstance(),this);
+			while(!(config = br.readLine()).equals(",,,,,"))	//If the current line of the CVS is not null
+			{
+				String[] fields = config.split(",");	//Split at the comma because CSV
+				if(fields[2].equals("ADA"))				//The "language" field must match ADA
+				{
+					callVulnerability(fields[5]);		//Field  is the name of the vulnerability's class
+				}
+			}
+			
 			
 		} catch (ClassNotFoundException e) {
 			// TODO Auto-generated catch block
@@ -382,7 +427,13 @@ public class AdaAnalyzer extends Analyzer{
 		} catch (InstantiationException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		}catch (FileNotFoundException e){
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
+		
 	}
 	
 	
@@ -407,10 +458,7 @@ public class AdaAnalyzer extends Analyzer{
 	public Set<String> getKeyWords() {
 		return keyWords;
 	}
-	public void danglingAccessType() {
-		Vulnerability v=new AdaDanglingPointerVulnerability();
-		v.run(this);
-	}
+
 	class Variable{
 		String name;
 		String type;
