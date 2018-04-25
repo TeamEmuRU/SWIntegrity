@@ -9,6 +9,8 @@ import java.util.Set;
 import java.util.Stack;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
+import java.lang.reflect.*;
+
 /**
  * The AdaAnalyzer parses Ada files for variable names and scopes, and runs the file against known vulnerabilities.
  * @author Jamie Tyler Walder
@@ -352,7 +354,35 @@ public class AdaAnalyzer extends Analyzer{
 	protected void analyze(String filename) {
 		// TODO Auto-generated method stub
 		parse(filename);
-		danglingAccessType();
+		try {
+			
+			Class c=Class.forName("AdaDanglingPointerVulnerability");
+			Method m=c.getMethod("run", Analyzer.class);
+			m.invoke(c.newInstance(),this);
+			
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			
+		} catch (NoSuchMethodException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (SecurityException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalArgumentException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InvocationTargetException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InstantiationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	
