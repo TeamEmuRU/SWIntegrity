@@ -120,7 +120,7 @@ public class Report {
 	/**
 	 * clears the information list of all Info classes
 	 */
-	public void clear()
+	public void clear() 
 	{
 		information.clear();
 	}
