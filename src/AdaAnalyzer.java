@@ -20,6 +20,7 @@ import java.net.URLClassLoader;
 
 /**
  * The AdaAnalyzer parses Ada files for variable names and scopes, and runs the file against known vulnerabilities.
+ * @author Abby Beizer
  * @author Jamie Tyler Walder
  *
  */
@@ -38,8 +39,7 @@ public class AdaAnalyzer extends Analyzer{
 	Set<String> accessTypes;
 	String rawCode;
 	
-	
-	
+
 	/**
 	 * Constructor which creates lists necessary for collection of data.
 	 */
@@ -67,7 +67,6 @@ public class AdaAnalyzer extends Analyzer{
 		this.specialSymbols.addAll(Arrays.asList(specialSymbols));
 		this.keyWords.addAll(Arrays.asList(keyWords));
 		this.accessTypes=new HashSet<String>();
-		
 	}
 	
 	/**
@@ -82,9 +81,6 @@ public class AdaAnalyzer extends Analyzer{
 		this.accessTypes=new HashSet<String>();
 		
 	}
-	
-	
-	
 
 	/**
 	 * Override Analyzer.parse
@@ -228,7 +224,6 @@ public class AdaAnalyzer extends Analyzer{
 					if(!found&&!scopes.isEmpty()) {
 						tempScope.push(scopes.pop());
 					}
-					
 				}
 				while(!found&&!scopes.isEmpty()) {
 					//check each variable
@@ -255,7 +250,6 @@ public class AdaAnalyzer extends Analyzer{
 						if(!found&&!scopes.isEmpty()) {
 							tempScope.push(scopes.pop());
 						}
-						
 					}
 				//revert the scopes if need be
 				while(!tempScope.isEmpty()) {
@@ -280,7 +274,6 @@ public class AdaAnalyzer extends Analyzer{
 					found=true;
 					}
 				}
-				
 			}
 			}
 			else {
@@ -292,7 +285,6 @@ public class AdaAnalyzer extends Analyzer{
 				this.accessTypes.add(words[i+1]);
 			}
 		}
-		
 	}
 	
 	/**
@@ -404,13 +396,10 @@ public class AdaAnalyzer extends Analyzer{
 						Report.addVuln(filename, "Ada", fields[1], lines, fields[3], fields[4]);
 					}
 				}
-			}
-			
-			
+			}	
 		} catch (ClassNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			
 		} catch (NoSuchMethodException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -435,7 +424,6 @@ public class AdaAnalyzer extends Analyzer{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
 	}
 	
 	
@@ -461,6 +449,11 @@ public class AdaAnalyzer extends Analyzer{
 		return keyWords;
 	}
 
+	/**
+	 * This internal class represents a Variable in the parsed source code
+	 * @author Jamie Tyler Walder
+	 *
+	 */
 	class Variable{
 		String name;
 		String type;
@@ -509,11 +502,16 @@ public class AdaAnalyzer extends Analyzer{
 			this.assignments = assignments;
 		}
 		
+		/**
+		 * Returns a String containing the name, type, scope, symbolNumber, and assignments of the Variable
+		 */
 		@Override
 		public String toString() {
 			return "Variable [name=" + name + ", type=" + type + ", scope=" + scope + ", symbolNumber=" + symbolNumber
 					+ ", assignments=" + assignments +  "]";
 		}
+		
+		
 		@Override
 		public int hashCode() {
 			final int prime = 31;
@@ -522,6 +520,8 @@ public class AdaAnalyzer extends Analyzer{
 			result = prime * result + ((scope == null) ? 0 : scope.hashCode());
 			return result;
 		}
+		
+		
 		@Override
 		public boolean equals(Object obj) {
 			if (this == obj)
@@ -545,7 +545,11 @@ public class AdaAnalyzer extends Analyzer{
 		}
 	}
 	
-	
+	/**
+	 * This internal class represents pointer variables and their scopes
+	 * @author Jamie Tyler Walder
+	 *
+	 */
 	private class Pointer extends Variable{
 		List<Integer> deletions;
 		public Pointer(String name, String type, String scope, int line) {
