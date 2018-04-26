@@ -1,0 +1,50 @@
+Software Intgrity Tester Vulnerability Report
+ 
+SIT Version 1.0.0
+Date: 2018/04/26 17:54:07
+ 
+Files Analyzed: 3
+	C:\Users\Tyler\Desktop\Test\SWIntegrity\TestFiles\danglingPointerTest.cpp
+	C:\Users\Tyler\Desktop\Test\SWIntegrity\TestFiles\danglingPointerTest1.cpp
+	C:\Users\Tyler\Desktop\Test\SWIntegrity\TestFiles\danglingPointerTest3.cpp
+	C:\Users\Tyler\Desktop\Test\SWIntegrity\TestFiles\hello.cpp
+	C:\Users\Tyler\Desktop\Test\SWIntegrity\TestFiles\sqlExample.cpp
+	C:\Users\Tyler\Desktop\Test\SWIntegrity\TestFiles\sqlExample2.cpp
+ 
+Warnings:
+	C:\Users\Tyler\Desktop\Test\SWIntegrity\TestFiles\danglingPointerTest.cpp
+	C++ Expired Pointer Dereference[High]: Lines [11]
+	Solution: Ensure that pointers are initialized after declaration before they are dereferenced. Ensure that pointers are not dereferenced after previously valid memory locations become invalid.
+ 
+	C:\Users\Tyler\Desktop\Test\SWIntegrity\TestFiles\sqlExample2.cpp
+	C++ Improper Neutralization of Special Elements used in an SQL Command[High]: Lines [133, 137, 141, 127]
+	Solution: Use a whitelist to validate commands before they are processed. Sanitize input before processing it.
+ 
+	C:\Users\Tyler\Desktop\Test\SWIntegrity\TestFiles\danglingPointerTest1.cpp
+	C++ Expired Pointer Dereference[High]: Lines [18]
+	Solution: Ensure that pointers are initialized after declaration before they are dereferenced. Ensure that pointers are not dereferenced after previously valid memory locations become invalid.
+ 
+Summary:
+	C:\Users\Tyler\Desktop\Test\SWIntegrity\TestFiles\danglingPointerTest.cpp
+		1 Warning
+ 
+	C:\Users\Tyler\Desktop\Test\SWIntegrity\TestFiles\danglingPointerTest1.cpp
+		1 Warning
+ 
+	C:\Users\Tyler\Desktop\Test\SWIntegrity\TestFiles\danglingPointerTest3.cpp
+		0 Warnings
+ 
+	C:\Users\Tyler\Desktop\Test\SWIntegrity\TestFiles\hello.cpp
+		0 Warnings
+ 
+	C:\Users\Tyler\Desktop\Test\SWIntegrity\TestFiles\sqlExample.cpp
+		0 Warnings
+ 
+	C:\Users\Tyler\Desktop\Test\SWIntegrity\TestFiles\sqlExample2.cpp
+		1 Warning
+ 
+Total Summary:
+	Files Analyzed: 3
+	Number of C++ Improper Neutralization of Special Elements used in an SQL Command Occurrences: 1
+	Number of C++ Expired Pointer Dereference Occurrences: 1
+	High Risk Warnings: 1	Medium Risk Warnings: null	Low Risk Warnings: null

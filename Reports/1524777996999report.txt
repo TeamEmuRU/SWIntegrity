@@ -1,0 +1,16 @@
+Software Intgrity Tester Vulnerability Report
+ 
+SIT Version 1.0.0
+Date: 2018/04/26 17:26:37
+ 
+Files Analyzed: 0
+	C:\Users\Tyler\Desktop\Test\SWIntegrity\hello.java
+ 
+Warnings:
+Summary:
+	C:\Users\Tyler\Desktop\Test\SWIntegrity\hello.java
+		0 Warnings
+ 
+Total Summary:
+	Files Analyzed: 0
+	High Risk Warnings: null	Medium Risk Warnings: null	Low Risk Warnings: null
