@@ -6,7 +6,6 @@
  * @author Jamie Tyler Walder
  */
 
-
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -38,10 +37,8 @@ public class CppAnalyzer extends Analyzer
 	private Map<Integer,Integer> symbolToLine;
 	private List<Pointer> pointersList;
 
-
-	
 	/**
-	 * Default constructor
+	 * Constructor which creates lists necessary for collection of data.
 	 */
 	public CppAnalyzer()
 	{
@@ -55,6 +52,10 @@ public class CppAnalyzer extends Analyzer
 		//Create keyword set
 		createKeywordSet();
 	}
+	
+	/**
+	 * Clears all existing data from each list used by AdaAnalyzer's parsing functions
+	 */
 	private void clearAll() {
 		variablesList = new LinkedList<Variable>();
 		literals=new LinkedList<>();
@@ -63,6 +64,11 @@ public class CppAnalyzer extends Analyzer
 		pointersList=new LinkedList<>();
 	}
 	
+	/**
+	 * Override Analyzer.parse
+	 * Opens a file and parses it for variable names
+	 * @param filename The path of the file to parse
+	 */
 	@Override
 	public void parse(String filename) 
 	{
@@ -89,8 +95,7 @@ public class CppAnalyzer extends Analyzer
 		for(String word:words) {
 			keywords.add(word);
 		}
-		
-		
+
 		keywords.add(";");
 		keywords.add("(");
 		keywords.add(")");
@@ -123,6 +128,7 @@ public class CppAnalyzer extends Analyzer
 		//TODO add the rest
 		//Can use http://en.cppreference.com/w/cpp/keyword as a reference
 	}
+	
 	/**
 	 * Scans files and pulls out all literals 
 	 * @param file file contents to be scanned
@@ -245,13 +251,11 @@ public class CppAnalyzer extends Analyzer
 					symbolToLine.put(symbolID, lineID);
 					symbolID++;
 				}
-			}
-				
+			}	
 		}
-		
-
 		return finalString.trim();
 	}
+	
 	/**
 	 * Identifies whether a given String can be used as a variable or class name without conflicting with reserved C++ keywords.
 	 * @param name The String to validate
@@ -362,8 +366,7 @@ public class CppAnalyzer extends Analyzer
 						break;
 					}
 					temp++;
-				}
-					
+				}	
 			}
 			else if(words[i].equals("if")||words[i].equals("else")||words[i].equals("for")||words[i].equals("while")||words[i].equals("try")||words[i].equals("catch")) 
 			{
@@ -461,9 +464,7 @@ public class CppAnalyzer extends Analyzer
 				{
 					scopes.push(temp.pop());
 				}
-				
 			}
-			
 			else if(isValidName(words[i])&&words[i+1].equals("*")&&isValidName(words[i+2])&&!scopes.isEmpty()) 
 			{
 				int pos;
@@ -478,7 +479,6 @@ public class CppAnalyzer extends Analyzer
 					pos--;
 				}
 			}
-			
 			else if(words[i].equals("delete")&&isValidName(words[i+1]))
 			{
 				
@@ -511,17 +511,16 @@ public class CppAnalyzer extends Analyzer
 				{
 					scopes.push(temp.pop());
 				}
-				
 			}
 		}//end for
 	}
 
 	
 	/**
-         * Given a search string, returns whether or not that string was found within a literal
-         * @param search the string to look for
+     * Given a search string, returns whether or not that string was found within a literal
+     * @param search the string to look for
 	 * @return true if the search string was found within a literal
-         */
+     */
 	private boolean literalContains(String search) {
 		for(String literal:literals) {
 			if(literal.contains(search)) {
@@ -530,10 +529,15 @@ public class CppAnalyzer extends Analyzer
 		}
 		return false;
 	}
+	
+	/**
+	 * Searches the file for a phrase and returns whether the file contains that phrase
+	 * @param search A String to search the file for
+	 * @return true if the file contains the search String
+	 */
 	public boolean fileContains(String search) {
 		
-			return fileContents.contains(search);
-		
+			return fileContents.contains(search);	
 	}
 
 	/**
@@ -591,11 +595,9 @@ public class CppAnalyzer extends Analyzer
 					}		
 				}
 			}
-			
 		} catch (ClassNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			
 		} catch (NoSuchMethodException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -620,7 +622,6 @@ public class CppAnalyzer extends Analyzer
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
 	}
 	
 	public List<Variable> getVariables() {
@@ -642,6 +643,11 @@ public class CppAnalyzer extends Analyzer
 		return pointersList;
 	}
 
+	/**
+	 * This internal class represents a Variable in the parsed source code
+	 * @author Jamie Tyler Walder
+	 *
+	 */
 	public class Variable{
 		String name;
 		String type;
@@ -690,11 +696,16 @@ public class CppAnalyzer extends Analyzer
 			this.assignments = assignments;
 		}
 		
+		/**
+		 * Returns a String containing the name, type, scope, symbolNumber, and assignments of the Variable
+		 */
 		@Override
 		public String toString() {
 			return "Variable [name=" + name + ", type=" + type + ", scope=" + scope + ", symbolNumber=" + lineNumber
 					+ ", assignments=" + assignments +  "]";
 		}
+		
+		
 		@Override
 		public int hashCode() {
 			final int prime = 31;
@@ -704,6 +715,8 @@ public class CppAnalyzer extends Analyzer
 			result = prime * result + ((scope == null) ? 0 : scope.hashCode());
 			return result;
 		}
+		
+		
 		@Override
 		public boolean equals(Object obj) 
 		{
@@ -730,13 +743,14 @@ public class CppAnalyzer extends Analyzer
 		}
 		private CppAnalyzer getOuterType() {
 			return CppAnalyzer.this;
-		}
-		
-		
-		
-		
-		
+		}	
 	}
+	
+	/**
+	 * This internal class represents pointer variables and their scopes
+	 * @author Jamie Tyler Walder
+	 *
+	 */
 	public class Pointer extends Variable
 	{
 		List<Integer> deletions;

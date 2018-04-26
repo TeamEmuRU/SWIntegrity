@@ -196,66 +196,68 @@ public class JavaAnalyzer extends Analyzer {
 				scope--;
 			}
 			else{
-			if((typeList.contains(words[i]) || words[i].matches(className)) && words[i+1].matches(variableName) &&  (words[i+2].equals(";") || words[i+2].equals("="))){
-				name = words[i+1];
-				type = words[i];
-				if(words[i+2].equals("=")){
-					int place = i+3;
-					while(place<words.length&&place>-1&&!(words[place].equals(";")) && !(words[place] == null)) {
-						assignment += words[place] + " ";
+				if((typeList.contains(words[i]) || words[i].matches(className)) && words[i+1].matches(variableName) &&  (words[i+2].equals(";") || words[i+2].equals("="))){
+					name = words[i+1];
+					type = words[i];
+					if(words[i+2].equals("=")){
+						int place = i+3;
+						while(place<words.length&&place>-1&&!(words[place].equals(";")) && !(words[place] == null)) {
+							assignment += words[place] + " ";
+							place++;
+						}
+					}
+				}
+				else if((typeList.contains(words[i]) || words[i].matches(className)) && words[i+1].matches(variableName) && words[i+2].equals("[") && words[i+3].equals("]") && (words[i+4].equals("=") || words[i+4].equals(";"))){
+					name = words[i+1];
+					type = words[i] + "[]";
+					if(words[i+4].equals("=")){
+						int place = i+5;
+						while(!(words[place].equals(";")) && !(words[place] == null)){
+							assignment += words[place] + " ";
+							place++;
+						}
+					}
+				}
+				else if((typeList.contains(words[i]) || words[i].matches(className)) && words[i+1].equals("[") && words[i+2].equals("]") && words[i+3].equals(variableName) && (words[i+4].equals("=") || words[i+4].equals(";"))){
+					name = words[i+3];
+					type = words[i] + "[]";
+					if(words[i+4].equals("=")){
+						int place = i+5;
+						while(!(words[place].equals(";")) && !(words[place] == null)){
+							assignment += words[place] + " ";
+							place++;
+						}
+					}
+				}
+				else if((typeList.contains(words[i]) || words[i].matches(className)) && words[i+1].equals("<")){
+					int place = i+2;
+					String rest = "";
+					while(!(words[place].equals(">"))){
+						rest += words[place];
 						place++;
 					}
-				}
-			}
-			else if((typeList.contains(words[i]) || words[i].matches(className)) && words[i+1].matches(variableName) && words[i+2].equals("[") && words[i+3].equals("]") && (words[i+4].equals("=") || words[i+4].equals(";"))){
-				name = words[i+1];
-				type = words[i] + "[]";
-				if(words[i+4].equals("=")){
-					int place = i+5;
-					while(!(words[place].equals(";")) && !(words[place] == null)){
-						assignment += words[place] + " ";
+					name = words[++place];
+					type = words[i] + "<" + rest + ">";
+					if(words[++place].equals("=")){
 						place++;
+						while(!(words[place].equals(";"))){
+							assignment += words[place] + " ";
+						}
 					}
 				}
-			}
-			else if((typeList.contains(words[i]) || words[i].matches(className)) && words[i+1].equals("[") && words[i+2].equals("]") && words[i+3].equals(variableName) && (words[i+4].equals("=") || words[i+4].equals(";"))){
-				name = words[i+3];
-				type = words[i] + "[]";
-				if(words[i+4].equals("=")){
-					int place = i+5;
-					while(!(words[place].equals(";")) && !(words[place] == null)){
-						assignment += words[place] + " ";
-						place++;
-					}
+				if(!(name.equals(""))){
+					variablesList.add(new Variable(name, type, Integer.toString(scope), assignment + ";", 2));
 				}
 			}
-			else if((typeList.contains(words[i]) || words[i].matches(className)) && words[i+1].equals("<")){
-				int place = i+2;
-				String rest = "";
-				while(!(words[place].equals(">"))){
-					rest += words[place];
-					place++;
-				}
-				name = words[++place];
-				type = words[i] + "<" + rest + ">";
-				if(words[++place].equals("=")){
-					place++;
-					while(!(words[place].equals(";"))){
-						assignment += words[place] + " ";
-					}
-				}
-			}
-			if(!(name.equals(""))){
-				variablesList.add(new Variable(name, type, Integer.toString(scope), assignment + ";", 2));
-			}
+		}
 	}
-	}
-	}
-	@Override
-	/*
+	
+	
+	/**
 	 * Removes comments and extracts variables from source code.
 	 * @param filename the file to be parsed
 	 */
+	@Override
 	public void parse(String filename) {
 		StringBuilder fileBuilder = new StringBuilder();
 		String line = "";
@@ -358,8 +360,7 @@ public class JavaAnalyzer extends Analyzer {
 			}	
 		} catch (ClassNotFoundException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
-			
+			e.printStackTrace();	
 		} catch (NoSuchMethodException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -436,7 +437,11 @@ public class JavaAnalyzer extends Analyzer {
 		return lineNumber;
 	}
 
-
+	/**
+	 * This internal class represents a Variable in the parsed source code
+	 * @author Jamie Tyler Walder
+	 *
+	 */
 	public class Variable {
 		String name;
 		String type;
@@ -495,6 +500,9 @@ public class JavaAnalyzer extends Analyzer {
 			this.assignments = assignments;
 		}
 
+		/**
+		 * Returns a String containing the name, type, scope, symbolNumber, and assignments of the Variable
+		 */
 		@Override
 		public String toString() {
 			return "Variable [name=" + name + ", type=" + type + ", scope=" + scope + ", symbolNumber=" + lineNumber
@@ -540,14 +548,4 @@ public class JavaAnalyzer extends Analyzer {
 		}
 	}
 
-		//This is the java SQL injection vulnerability; hard-coded into the program until the database is implemented
-
-		/**
-		 * Method that analyzes a file for possible vulnerability to SQL injections
-		 *
-		 * @param fileName the name of the file to be analyzed
-		 */
-		public void sqlVuln(String fileName) {
-			
-		}
-	}
+}
