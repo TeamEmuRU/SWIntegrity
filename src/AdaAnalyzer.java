@@ -89,7 +89,7 @@ public class AdaAnalyzer extends Analyzer{
 	 */
 	@Override
 	public void parse(String filename) {
-		// TODO Auto-generated method stub
+		
 		clearAll();
 		String fileContents=openFile(filename);
 		rawCode = fileContents;
@@ -398,30 +398,30 @@ public class AdaAnalyzer extends Analyzer{
 				}
 			}	
 		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
+			
 			e.printStackTrace();
 		} catch (NoSuchMethodException e) {
-			// TODO Auto-generated catch block
+			
 			e.printStackTrace();
 		} catch (SecurityException e) {
-			// TODO Auto-generated catch block
+			
 			e.printStackTrace();
 		} catch (IllegalAccessException e) {
-			// TODO Auto-generated catch block
+			
 			e.printStackTrace();
 		} catch (IllegalArgumentException e) {
-			// TODO Auto-generated catch block
+			
 			e.printStackTrace();
 		} catch (InvocationTargetException e) {
-			// TODO Auto-generated catch block
+			
 			e.printStackTrace();
 		} catch (InstantiationException e) {
-			// TODO Auto-generated catch block
+			
 			e.printStackTrace();
 		}catch (FileNotFoundException e){
 			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
+			
 			e.printStackTrace();
 		}
 	}

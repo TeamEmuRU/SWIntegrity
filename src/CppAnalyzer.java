@@ -125,7 +125,7 @@ public class CppAnalyzer extends Analyzer
 		keywords.add("<");
 		keywords.add(">");
 		
-		//TODO add the rest
+		
 		//Can use http://en.cppreference.com/w/cpp/keyword as a reference
 	}
 	
@@ -596,25 +596,25 @@ public class CppAnalyzer extends Analyzer
 				}
 			}
 		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
+			// 
 			e.printStackTrace();
 		} catch (NoSuchMethodException e) {
-			// TODO Auto-generated catch block
+			
 			e.printStackTrace();
 		} catch (SecurityException e) {
-			// TODO Auto-generated catch block
+			
 			e.printStackTrace();
 		} catch (IllegalAccessException e) {
-			// TODO Auto-generated catch block
+			
 			e.printStackTrace();
 		} catch (IllegalArgumentException e) {
-			// TODO Auto-generated catch block
+		
 			e.printStackTrace();
 		} catch (InvocationTargetException e) {
-			// TODO Auto-generated catch block
+		
 			e.printStackTrace();
 		} catch (InstantiationException e) {
-			// TODO Auto-generated catch block
+			
 			e.printStackTrace();
 		}catch (FileNotFoundException e){
 			e.printStackTrace();
