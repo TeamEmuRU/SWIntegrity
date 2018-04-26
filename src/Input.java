@@ -56,7 +56,6 @@ public class Input {
 		if (args.length == 0) 
 		{
 			addFiles(getAllFilesInDirectory(System.getProperty("user.dir")));
-			this.analyze();
 		}
 		//If one argument is specified, and it is a language tag,
 		//process all files of that type in the current folder
@@ -248,7 +247,8 @@ public class Input {
 				
 			}
 		}//end if
-			this.analyze();
+	
+		this.analyze();
 	}
 	
 	/**

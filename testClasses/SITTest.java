@@ -10,7 +10,7 @@ class SITTest {
 	@Test
 	void test() {
 		Input input=new Input();
-		String args[]= {"-j","C:\\Users\\Tyler\\Desktop\\Test\\SWIntegrity\\hello.java"};
+		String args[]= {"-j"};
 		input.processInput(args);
 		
 	}
