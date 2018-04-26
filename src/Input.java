@@ -31,7 +31,7 @@ public class Input {
 		uJava = false;
 		uAda = false;
 		uCPP = false;
-	}
+	} 
 	
 	
 	
