@@ -40,6 +40,7 @@ public class JavaAnalyzer extends Analyzer {
 	 * The main constructor. Initializes list of variables.
 	 */
 	public JavaAnalyzer() {
+		
 		//instantiate map of variables
 		variablesList = new HashSet<>();
 		literalsList = new HashSet<>();

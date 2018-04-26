@@ -253,6 +253,7 @@ public class CppAnalyzer extends Analyzer
 				}
 			}	
 		}
+		
 		return finalString.trim();
 	}
 	
