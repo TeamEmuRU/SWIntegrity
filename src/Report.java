@@ -169,7 +169,7 @@ public class Report {
 			{
 				risks.put(temp.getRisk(), risks.get(temp.getRisk())+1);
 			}
-			else
+			else  
 			{
 				risks.put(temp.getRisk(), 1);
 			}

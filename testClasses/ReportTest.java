@@ -19,7 +19,7 @@ public class ReportTest {
 		Report.addVuln("f/hi", "C++", "cucumber", lines, "Medium", "don't touch it!");
 		Report.addVuln("f/hi", "C++", "onion", lines, "Low", "Its fine, just eat it");
 		Report.addVuln("f/ahd", "C++", "onion", lines, "Low", "Its fine, just eat it");
-		Report.writeReport();
+		Report.writeReport();  
 		
 	}
 
