@@ -36,7 +36,7 @@ public class Report {
 	public static void writeReport() 
 	{
 		SIT.notifyUser("Saving Results to File...");
-		new File("Reports").mkdirs();
+		new File("Reports").mkdirs(); 
 		long time=new Date().getTime();
 		
 		String fileName = "Reports/"+time+"report.txt";
