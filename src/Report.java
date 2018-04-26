@@ -45,7 +45,7 @@ public class Report {
 		try
 		{
 			PrintWriter outputStream = new PrintWriter(fileName);
-			outputStream.println("Software Intgrity Tester Vulnerability Report");
+			outputStream.println("Software Integrity Tester Vulnerability Report");
 			outputStream.println(" ");
 			outputStream.println("SIT Version 1.0.0");
 			outputStream.println("Date: " + dtf.format(now));
@@ -143,9 +143,9 @@ public class Report {
 		while(itty.hasNext())
 		{
 			Info temp = itty.next();
-			if(vulns.containsKey(temp.getVuln()))
+			if(vulns.containsKey(temp.getLang() + " " + temp.getVuln()))
 			{
-				vulns.put(temp.getLang() + " " + temp.getVuln(), vulns.get(temp.getVuln()+1));
+				vulns.put(temp.getLang() + " " + temp.getVuln(), vulns.get(temp.getLang() + " " + temp.getVuln())+1);
 			}
 			else
 			{
@@ -162,9 +162,9 @@ public class Report {
 		while(itty.hasNext())
 		{
 			Info temp = itty.next();
-			if(risks.containsKey(temp.getVuln()))
+			if(risks.containsKey(temp.getRisk()))
 			{
-				risks.put(temp.getRisk(), risks.get(temp.getRisk()+1));
+				risks.put(temp.getRisk(), risks.get(temp.getRisk())+1);
 			}
 			else
 			{
