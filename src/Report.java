@@ -37,9 +37,10 @@ public class Report {
 	{
 		SIT.notifyUser("Saving Results to File...");
 		new File("Reports").mkdirs(); 
+		
 		long time=new Date().getTime();
 		
-		String fileName = "Reports"+File.pathSeparator+time+"report.txt";
+		String fileName = System.getProperty("user.dir")+"/Reports/"+time+"report.txt";
 		
 		DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
 		LocalDateTime now = LocalDateTime.now();
@@ -98,7 +99,7 @@ public class Report {
 			HashMap<String,Integer> risk = riskNumbers();
 			outputStream.println("	High Risk Warnings: " + risk.get("High") + "	Medium Risk Warnings: " + risk.get("Medium") + "	Low Risk Warnings: " + risk.get("Low"));
 			outputStream.close(); 
-			SIT.notifyUser("Saved Results to Reports\\"+time+"report.txt");
+			SIT.notifyUser("Saved Results to Reports\\"+fileName);
 		}
 		catch (FileNotFoundException e)
 		{
