@@ -39,7 +39,7 @@ public class Report {
 		new File("Reports").mkdirs(); 
 		long time=new Date().getTime();
 		
-		String fileName = "Reports/"+time+"report.txt";
+		String fileName = "Reports"+File.pathSeparator+time+"report.txt";
 		
 		DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
 		LocalDateTime now = LocalDateTime.now();
