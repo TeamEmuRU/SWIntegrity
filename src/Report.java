@@ -35,10 +35,12 @@ public class Report {
 	
 	public static void writeReport() 
 	{
-		new File("Reports").mkdirs();
+		SIT.notifyUser("Saving Results to File...");
+		new File("Reports").mkdirs(); 
+		
 		long time=new Date().getTime();
-		SIT.notifyUser("Saving Results to Reports\\"+time+"report.txt");
-		String fileName = "Reports\\"+time+"report.txt";
+		
+		String fileName = System.getProperty("user.dir")+"/Reports/"+time+"report.txt";
 		
 		DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
 		LocalDateTime now = LocalDateTime.now();
@@ -47,7 +49,7 @@ public class Report {
 			PrintWriter outputStream = new PrintWriter(fileName);
 			outputStream.println("Software Integrity Tester Vulnerability Report");
 			outputStream.println(" ");
-			outputStream.println("SIT Version 1.0.0");
+			outputStream.println("SIT Version 1.0.0");//TODO should be pulled from config file
 			outputStream.println("Date: " + dtf.format(now));
 			outputStream.println(" ");
 			outputStream.println("Files Analyzed: " + numberOfFiles());
@@ -97,6 +99,7 @@ public class Report {
 			HashMap<String,Integer> risk = riskNumbers();
 			outputStream.println("	High Risk Warnings: " + risk.get("High") + "	Medium Risk Warnings: " + risk.get("Medium") + "	Low Risk Warnings: " + risk.get("Low"));
 			outputStream.close(); 
+			SIT.notifyUser("Saved Results to "+fileName);
 		}
 		catch (FileNotFoundException e)
 		{
