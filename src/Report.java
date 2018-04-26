@@ -99,7 +99,7 @@ public class Report {
 			HashMap<String,Integer> risk = riskNumbers();
 			outputStream.println("	High Risk Warnings: " + risk.get("High") + "	Medium Risk Warnings: " + risk.get("Medium") + "	Low Risk Warnings: " + risk.get("Low"));
 			outputStream.close(); 
-			SIT.notifyUser("Saved Results to Reports\\"+fileName);
+			SIT.notifyUser("Saved Results to "+fileName);
 		}
 		catch (FileNotFoundException e)
 		{
