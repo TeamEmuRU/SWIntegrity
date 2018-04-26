@@ -40,8 +40,6 @@ public class JavaAnalyzerTest {
     @Test
 	void test() {
     	ja = new JavaAnalyzer();
-		ja.sqlVuln("/Users/KristelleLucero/Documents/Software Engineering 2018/SWIntegrity/Test Files/sqlExample.java");
-		ja.sqlVuln("/Users/KristelleLucero/Documents/Software Engineering 2018/SWIntegrity/Test Files/sqlExample2.java");
 		System.out.println(ja.flattenCode(ja.openFile("src/JavaAnalyzer.java")));
 		
 	}

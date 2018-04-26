@@ -36,7 +36,10 @@ public class Report {
 	public static void writeReport() 
 	{
 		new File("Reports").mkdirs();
-		String fileName = "Reports\\"+new Date().getTime()+"report.txt";
+		long time=new Date().getTime();
+		SIT.notifyUser("Saving Results to Reports\\"+time+"report.txt");
+		String fileName = "Reports\\"+time+"report.txt";
+		
 		DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
 		LocalDateTime now = LocalDateTime.now();
 		try
