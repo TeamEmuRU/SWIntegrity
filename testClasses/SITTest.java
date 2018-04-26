@@ -10,7 +10,7 @@ class SITTest {
 	@Test
 	void test() {
 		Input input=new Input();
-		String args[]= {"-j"};
+		String args[]= {"-c","TestFiles"};
 		input.processInput(args);
 		
 	}
