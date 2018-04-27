@@ -38,6 +38,7 @@ public class AdaAnalyzer extends Analyzer{
 	Set<String> keyWords;
 	Set<String> accessTypes;
 	String rawCode;
+	String fileContents;
 	
 
 	/**
@@ -94,6 +95,7 @@ public class AdaAnalyzer extends Analyzer{
 		String fileContents=openFile(filename);
 		rawCode = fileContents;
 		fileContents=flattenCodeAndMap(fileContents);
+		this.fileContents = fileContents;
 		extractVariables(fileContents);
 	}
 	
@@ -208,14 +210,16 @@ public class AdaAnalyzer extends Analyzer{
 							//start loop to collect assignment
 							int index=i+2;
 							//set assigment to capture assignment
-							String assignment="";
+							StringBuilder assignment = new StringBuilder();
 							//loop and collect until end of statement 
 							while(!words[index].equals(";")) {
-								assignment+=words[index]+" ";
+								assignment.append(words[index]);
+								assignment.append(" ");
 								index++;
 							}
+							String assign = assignment.toString();
 							//add assignment to list and record it's line
-							var.getAssignments().put(symbolToLine.get(i), assignment);
+							var.getAssignments().put(symbolToLine.get(i), assign);
 							//signify that we found it
 							found=true;
 						}
@@ -234,14 +238,16 @@ public class AdaAnalyzer extends Analyzer{
 								//start loop to collect assignment
 								int index=i+2;
 								//set assigment to capture assignment
-								String assignment="";
+								StringBuilder assignment= new StringBuilder();
 								//loop and collect until end of statement 
 								while(!words[index].equals(";")) {
-									assignment+=words[index]+" ";
+									assignment.append(words[index]);
+									assignment.append(" ");
 									index++;
 								}
+								String assign = assignment.toString();
 								//add assignment to list and record it's line
-								var.getAssignments().put(symbolToLine.get(i), assignment);
+								var.getAssignments().put(symbolToLine.get(i), assign);
 								//signify that we found it
 								found=true;
 							}
@@ -261,15 +267,16 @@ public class AdaAnalyzer extends Analyzer{
 					if(var!=null) {
 					int index=i+1;
 					//set assigment to capture assignment
-					String assignment="";
+					StringBuilder assignment=new StringBuilder();
 					//loop and collect until end of statement 
 					while(!words[index].equals(";")) {
-						assignment+=words[index]+" ";
+						assignment.append(words[index]);
+						assignment.append(" ");
 						index++;
 					}
 					//add assignment to list and record it'sline
-					
-					var.getAssignments().put(symbolToLine.get(i), assignment);
+					String assign = assignment.toString();
+					var.getAssignments().put(symbolToLine.get(i), assign);
 					//signify that we found it
 					found=true;
 					}
@@ -300,7 +307,7 @@ public class AdaAnalyzer extends Analyzer{
 		//remove tabs
 		file=file.replaceAll("\t", "");
 		//set string for the result of this method
-		String result="";
+		StringBuilder result=new StringBuilder();
 		//set symbol id to keep track of symbols
 		int symbolID=0;
 		//set line id to keep track of lines
@@ -334,12 +341,13 @@ public class AdaAnalyzer extends Analyzer{
 			else if(words2.get(i).equals(""));
 			//add word to result and track its line
 			else {
-				result+=words2.get(i)+" ";
+				result.append(words2.get(i));
+				result.append(" ");
 				symbolToLine.put(symbolID, lineID);
 				symbolID++;
 			}
 		}
-		return result.trim();
+		return result.toString().trim();
 	}
 	
 	/**
@@ -449,12 +457,22 @@ public class AdaAnalyzer extends Analyzer{
 		return keyWords;
 	}
 
+	public String getFileContents() {
+		return fileContents;
+	}
+	public String getRawCode(){
+		return rawCode;
+	}
+	public Set<String> getAccessTypes(){
+		return accessTypes;
+	}
+
 	/**
 	 * This internal class represents a Variable in the parsed source code
 	 * @author Jamie Tyler Walder
 	 *
 	 */
-	class Variable{
+	 public class Variable{
 		String name;
 		String type;
 		String scope;
@@ -550,7 +568,7 @@ public class AdaAnalyzer extends Analyzer{
 	 * @author Jamie Tyler Walder
 	 *
 	 */
-	private class Pointer extends Variable{
+	public class Pointer extends Variable{
 		List<Integer> deletions;
 		public Pointer(String name, String type, String scope, int line) {
 			super(name, type, scope, line);

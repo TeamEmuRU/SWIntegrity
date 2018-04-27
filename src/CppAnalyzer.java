@@ -138,7 +138,7 @@ public class CppAnalyzer extends Analyzer
 		//removes escape characters and splits the file at spaces
 		String[] words = file.replace("\\\"", "").replace("\\","").split(" ");
 		
-		String literal = "";
+		StringBuilder literal = new StringBuilder();
 		//Flag to track whether the current word is a part of a string literal
 		boolean inLiteral = false;
 		//For each word in the file, if the word occurs between two quotation marks
@@ -153,14 +153,15 @@ public class CppAnalyzer extends Analyzer
 				//and clear the variable to capture the next literal in the file
 				if(!inLiteral) 
 				{
-					literals.add(literal);
-					literal = "";
+					literals.add(literal.toString());
+					literal = new StringBuilder();
 				}
 			}
 			//If the string is part of a literal, concatenate the word to the rest of the phrase
 			if(inLiteral) 
 			{
-				literal += (word + " ");
+				literal.append(word);
+				literal.append(" ");
 			}
 		}//end for
 	}
@@ -219,7 +220,7 @@ public class CppAnalyzer extends Analyzer
 		int symbolID=0;
 		int lineID=1;
 		//set variable for final result
-		String finalString="";
+		StringBuilder finalString=new StringBuilder();
 		//search through string
 		for(int index=0;index<words.size();index++) {
 			//if comment start switch to ignore
@@ -247,14 +248,15 @@ public class CppAnalyzer extends Analyzer
 			//if we arent in comment add that string to the final and incremtn symbol ID
 			else if(!inComment) {
 				if(!words.get(index).equals(""))	{
-					finalString+=words.get(index)+" ";
+					finalString.append(words.get(index));
+					finalString.append(" ");
 					symbolToLine.put(symbolID, lineID);
 					symbolID++;
 				}
 			}	
 		}
 		
-		return finalString.trim();
+		return finalString.toString().trim();
 	}
 	
 	/**

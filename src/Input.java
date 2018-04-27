@@ -711,7 +711,6 @@ public class Input {
 		
 		//set the analyzer to the appropriate type
 		analyzer = new AdaAnalyzer();
-		
 		//analyze each file
 		File f = null;
 		try {

@@ -1,0 +1,20 @@
+Software Integrity Tester Vulnerability Report
+ 
+SIT Version 1.0.0
+Date: 2018/04/26 23:50:49
+ 
+Files Analyzed: 0
+	C:\Users\Joe\Documents\SWIntegrity\TestFiles\hello.adb
+	C:\Users\Joe\Documents\SWIntegrity\TestFiles\helloAccessTypes.adb
+ 
+Warnings:
+Summary:
+	C:\Users\Joe\Documents\SWIntegrity\TestFiles\hello.adb
+		0 Warnings
+ 
+	C:\Users\Joe\Documents\SWIntegrity\TestFiles\helloAccessTypes.adb
+		0 Warnings
+ 
+Total Summary:
+	Files Analyzed: 0
+	High Risk Warnings: null	Medium Risk Warnings: null	Low Risk Warnings: null

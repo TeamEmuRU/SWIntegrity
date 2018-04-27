@@ -136,15 +136,16 @@ public class JavaAnalyzer extends Analyzer {
 		//Transform the array into an ArrayList
 		ArrayList<String> list = new ArrayList<>(Arrays.asList(words));
 		Iterator<String> itty = list.iterator();
-		String result = "";
+		StringBuilder result = new StringBuilder();
 		while (itty.hasNext()) {
 			String word = itty.next();
 			//Remove any blank words in the ArrayList
 			if (!word.equals("")) {
-				result += word + " ";
+				result.append(word);
+				result.append(" ");
 			}
 		}
-		return result;
+		return result.toString();
 	}
 
 
