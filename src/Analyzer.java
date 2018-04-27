@@ -14,7 +14,7 @@ import java.io.IOException;
 public abstract class Analyzer {
 	
 	private BufferedReader br;
-	protected static String jarPath = "file://./vulnerabilities.jar";
+	protected static String jarPath = "file://./vulnerabilities.jar"; 
 	
 	protected static String configPath=Analyzer.class.getResource("config.csv").getPath();
 	
