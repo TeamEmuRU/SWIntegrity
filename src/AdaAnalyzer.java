@@ -39,6 +39,7 @@ public class AdaAnalyzer extends Analyzer{
 	Set<String> accessTypes;
 	String rawCode;
 	
+	
 
 	/**
 	 * Constructor which creates lists necessary for collection of data.
@@ -68,6 +69,7 @@ public class AdaAnalyzer extends Analyzer{
 		this.keyWords.addAll(Arrays.asList(keyWords));
 		this.accessTypes=new HashSet<String>();
 	}
+	
 	
 	/**
 	 * Clears all existing data from each list used by AdaAnalyzer's parsing functions
@@ -565,6 +567,11 @@ public class AdaAnalyzer extends Analyzer{
 		}
 		
 		
+	}
+
+	public String getFileContents() {
+		// TODO Auto-generated method stub
+		return rawCode;
 	}
 
 }
