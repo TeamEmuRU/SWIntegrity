@@ -13,7 +13,7 @@ class AdaAnalyzerTest {
 		file=ana.flattenCodeAndMap(file);
 		ana.extractVariables(file);
 		testExtractVariables();
-		ana.analyze("TestFiles\\\\hello.adb");
+		ana.analyze("TestFiles\\helloAccessTypes.adb");
 	}
 
 	@Test

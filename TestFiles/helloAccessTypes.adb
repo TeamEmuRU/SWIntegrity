@@ -9,7 +9,7 @@ V : Vector;
 begin
    VA := new Vector(1..10);
    VB := VA;
-   Free(VA);
+   Free(VB);
    V:=VB;
    Put_Line ("Hello WORLD!");
    i:Integer;

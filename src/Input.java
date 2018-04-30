@@ -729,6 +729,7 @@ public class Input {
 		}
 		catch (NullPointerException npe) {
 		    SIT.notifyUser("File path was null.");
+		    npe.printStackTrace();
 		}
 		finally {SIT.notifyUser("all ada files read");}
 	}

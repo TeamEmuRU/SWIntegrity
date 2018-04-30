@@ -50,10 +50,11 @@ public class AdaAnalyzer extends Analyzer{
 		this.variables = new HashMap<>();
 		this.literals = new LinkedList<>();
 		this.symbolToLine = new HashMap<>();
+		this.pointers=new HashMap<>();
 		this.externalVariables=new HashMap<>();
 		this.externalFunctionCalls=new LinkedList<>();
 		//initialize lists of character and keywords
-		String[] specialSymbols= {":",";",")","(","+","-","/","\\","*","\\\"","\n","\t","\r","=",".","\""};
+		String[] specialSymbols= {":",";",")","(","+","-","/","\\","*","\\\"","\n","\t","\r","=",".","\"",","};
 		String[] keyWords= {"abort","else","new","return","abs","elsif","not","reverse",
 				"abstract","end","null","accept","entry","select","access","exception","of",
 				"separate","aliased","exit","or","subtype","all","others","synchronized","and",
@@ -81,6 +82,7 @@ public class AdaAnalyzer extends Analyzer{
 		this.externalVariables=new HashMap<>();
 		this.externalFunctionCalls=new LinkedList<>();
 		this.accessTypes=new HashSet<String>();
+		this.pointers=new HashMap<>();
 		
 	}
 
@@ -153,9 +155,23 @@ public class AdaAnalyzer extends Analyzer{
 			if(i+2<words.length&&isVarName(words[i])&&words[i+1].equals(":")&&isVarName(words[i+2])) {
 				if(!this.accessTypes.contains(words[i+2])) {
 					variables.put(words[i]+scopes.toString(),new Variable(words[i],words[i+2],scopes.toString(),symbolToLine.get(i)));
+					int temp=i-1;
+					while(temp>0&&!words[temp].equals(";")) {
+						if(words[temp].equals(",")&&isVarName(words[temp-1])) {
+							variables.put(words[temp-1]+scopes.toString(),new Variable(words[temp-1],words[i+2],scopes.toString(),symbolToLine.get(i)));
+						}
+						temp--;
+					}
 				}
 				else {
 					pointers.put(words[i]+scopes.toString(),new Pointer(words[i],words[i+2],scopes.toString(),symbolToLine.get(i)));
+					int temp=i-1;
+					while(temp>0&&!words[temp].equals(";")) {
+						if(words[temp].equals(",")&&isVarName(words[temp-1])) {
+							pointers.put(words[temp-1]+scopes.toString(),new Pointer(words[temp-1],words[i+2],scopes.toString(),symbolToLine.get(i)));
+						}
+						temp--;
+					}
 				}
 				int temp=i-1;
 				while(!words[temp].equals("is")&&!words[temp].equals(";")) {
@@ -165,6 +181,7 @@ public class AdaAnalyzer extends Analyzer{
 						}
 						else {
 							pointers.put(words[i]+scopes.toString(),new Pointer(words[i],words[i+2],scopes.toString(),symbolToLine.get(i)));
+							
 						}
 					}
 					temp--;

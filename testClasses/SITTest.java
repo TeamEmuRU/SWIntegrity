@@ -10,7 +10,7 @@ class SITTest {
 	@Test
 	void test() {
 		Input input=new Input();
-		String args[]= {"-all","TestFiles"};
+		String args[]= {"-a","TestFiles/helloAccessTypes.adb"};
 		input.processInput(args);
 		
 	}
