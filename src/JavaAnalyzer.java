@@ -34,6 +34,7 @@ public class JavaAnalyzer extends Analyzer {
 	private Pattern NON_ALPHA_NUMERIC;
 	private int lineNumber = 1;
 	private String fileContents;
+	private String rawContents;
 
 
 	/**
@@ -114,7 +115,7 @@ public class JavaAnalyzer extends Analyzer {
 		//Separate all special characters
 		Matcher match = NON_ALPHA_NUMERIC.matcher(finalString);
 
-		Pattern alpha = Pattern.compile("[\\w]+");
+		Pattern alpha = Pattern.compile("\\.?\\w+");
 		Matcher mm = alpha.matcher(finalString);
 		while(mm.find()){
 			if(symbolToLine.get(mm.group()) == null){
@@ -260,6 +261,7 @@ public class JavaAnalyzer extends Analyzer {
 	@Override
 	public void parse(String filename) {
 		StringBuilder fileBuilder = new StringBuilder();
+		StringBuilder rawBuilder = new StringBuilder();
 		String line = "";
 		try {
 			BufferedReader br = new BufferedReader(new FileReader(filename));
@@ -268,6 +270,7 @@ public class JavaAnalyzer extends Analyzer {
 
 			//Runs until end of file
 			while ((line = br.readLine()) != null) {
+				rawBuilder.append(line); //build up our raw representation of the file
 				/* First, remove any comments from the line */
 
 				//If the previous line began or continued a multi-line comment
@@ -282,6 +285,7 @@ public class JavaAnalyzer extends Analyzer {
 					//if the current line does not terminate the comment,
 					//then it continues to the next line
 					else {
+						lineNumber++;
 						continue;
 					}
 				}
@@ -301,6 +305,7 @@ public class JavaAnalyzer extends Analyzer {
 
 				//ignore lines that are blank
 				if (line.length() == 0) {
+					lineNumber++;
 					continue;
 				}
 
@@ -312,6 +317,7 @@ public class JavaAnalyzer extends Analyzer {
 				lineNumber++;
 			}
 			br.close();
+			this.rawContents = rawBuilder.toString();
 		} catch (FileNotFoundException fnf) {    //from FileReader
 			SIT.notifyUser("Error: File " + filename + " could not be parsed.");
 		} catch (IOException io) {    //from BufferedReader
@@ -431,6 +437,9 @@ public class JavaAnalyzer extends Analyzer {
 
 	public String getFileContents() {
 		return fileContents;
+	}
+	public String getRawContents(){
+		return rawContents;
 	}
 
 	public int getLineNumber() {

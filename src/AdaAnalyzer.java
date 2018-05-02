@@ -38,6 +38,7 @@ public class AdaAnalyzer extends Analyzer{
 	Set<String> keyWords;
 	Set<String> accessTypes;
 	String rawCode;
+	//String fileContents;
 	
 	
 
@@ -164,11 +165,11 @@ public class AdaAnalyzer extends Analyzer{
 					}
 				}
 				else {
-					pointers.put(words[i]+scopes.toString(),new Pointer(words[i],words[i+2],scopes.toString(),symbolToLine.get(i)));
+					variables.put(words[i]+scopes.toString(),new Pointer(words[i],words[i+2],scopes.toString(),symbolToLine.get(i)));
 					int temp=i-1;
 					while(temp>0&&!words[temp].equals(";")) {
 						if(words[temp].equals(",")&&isVarName(words[temp-1])) {
-							pointers.put(words[temp-1]+scopes.toString(),new Pointer(words[temp-1],words[i+2],scopes.toString(),symbolToLine.get(i)));
+							variables.put(words[temp-1]+scopes.toString(),new Pointer(words[temp-1],words[i+2],scopes.toString(),symbolToLine.get(i)));
 						}
 						temp--;
 					}
@@ -180,7 +181,7 @@ public class AdaAnalyzer extends Analyzer{
 							variables.put(words[i]+scopes.toString(),new Variable(words[i],words[i+2],scopes.toString(),symbolToLine.get(i)));
 						}
 						else {
-							pointers.put(words[i]+scopes.toString(),new Pointer(words[i],words[i+2],scopes.toString(),symbolToLine.get(i)));
+							variables.put(words[i]+scopes.toString(),new Pointer(words[i],words[i+2],scopes.toString(),symbolToLine.get(i)));
 							
 						}
 					}
@@ -244,7 +245,7 @@ public class AdaAnalyzer extends Analyzer{
 						tempScope.push(scopes.pop());
 					}
 				}
-				while(!found&&!scopes.isEmpty()) {
+				while(!found&&!scopes.isEmpty()) {//this loop is never entered
 					//check each variable
 						Variable var=pointers.get(words[i-1]+scopes.toString());
 						if(var!=null) {
