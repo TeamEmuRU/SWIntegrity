@@ -252,14 +252,25 @@ public class JavaAnalyzer extends Analyzer {
 			}
 		}
 	}
-	
-	
+
+	/**
+	 * Clears all lists of information to prepare the JavaAnalyzer for analyzing the next file.
+	 */
+	public void clearAll(){
+		variablesList.clear();
+		literalsList.clear();
+		symbolToLine.clear();
+		lineNumber = 1;
+		fileContents = "";
+		rawContents = "";
+	}
 	/**
 	 * Removes comments and extracts variables from source code.
 	 * @param filename the file to be parsed
 	 */
 	@Override
 	public void parse(String filename) {
+		clearAll();
 		StringBuilder fileBuilder = new StringBuilder();
 		StringBuilder rawBuilder = new StringBuilder();
 		String line = "";
