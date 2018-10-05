@@ -78,6 +78,7 @@ public class CppAnalyzer extends Analyzer
 		
 		file = flattenCode(file);
 		this.fileContents=file;
+		//System.out.println(file);
 		
 		extractVariables(file);
 		extractLiterals(file);
@@ -329,8 +330,9 @@ public class CppAnalyzer extends Analyzer
 				{
 					//if it is, we declare the variable name:type
 					variablesList.add(new Variable(words[i+1], words[i], scopes.toString(), symbolToLine.get(i)));
+					
 				}
-				//look for mulivaraible declaration on the same line
+				//look for multivaraible declaration on the same line
 				int place=i+1;
 				while(!words[place].equals(";")) {
 					if(words[place].equals(",")&&isValidName(words[place+1])){
@@ -409,9 +411,10 @@ public class CppAnalyzer extends Analyzer
 								place++;
 							}
 							//add word to assignments
-							v.getAssignments().put(i, assignment.trim());
+							v.getAssignments().put(symbolToLine.get(i), assignment.trim());
 							//we found the variable, so set flag to true
 							found = true;
+							
 						}
 						//if we didn't find it, back out a scope and try again
 					}
@@ -448,7 +451,7 @@ public class CppAnalyzer extends Analyzer
 								place++;
 							}
 							//add word to assignments
-							v.getAssignments().put(i, assignment.trim());
+							v.getAssignments().put(symbolToLine.get(i), assignment.trim());
 							//we found the variable, so set flag to true
 							found = true;
 						}
