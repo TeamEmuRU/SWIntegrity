@@ -1,10 +1,11 @@
 # SWIntegrity
 This Page is empty and is thus full of sadness and disappointment.<br/>
-Jamie 'Tyler' Walder- Development Team<br/>
-Kristelle Lucero - Product Owner<br/>
-Abby Beizer - Development Team<br/>
-Ed Klein - Scrum Master<br/>
-Sean || sdthe - Development Team<br/>
+Joe Whittier - Scrum Master/ Scrum Lord<br/>
+Sean Spencer - Product Owner<br/>
+Eric Stephens - Development Team<br/>
+Manoj George - Development Team<br/>
+Joe Mcilvaine - Development Team<br/>
+Ryan Beebe - Development Team<br/>
 INSTALATION<br/>
 install java<br/>
 C:\>set CLASSPATH=bin_directory<br/>
