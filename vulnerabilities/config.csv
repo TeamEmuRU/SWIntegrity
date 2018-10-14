@@ -7,3 +7,4 @@ CWE-22,Improper Limitation of a Pathname to a Restricted Directory,ADA,High,Use 
 CWE-78,Improper Neutralization of Special Elements used in an OS Command,JAVA,High,Use a whitelist to validate commands before they are processed. Sanitize input before processing it.,JavaOSInjectionVulnerability
 CWE-190,Integer Overflow or Wraparound,C++,Low,Validate the input before assigning it to a variable. Use libraries such as SafeInt or IntegerLib.,CppIntegerOverflowVulnerability
 CWE-190,Integer Overflow,JAVA,Low,Ensure that values being assigned are checked against the maximum or minimum value of the type to which they are being assigned,JavaIntegerOverflowVulnerability
+CWE-134,Externally Controlled Format String,C++,High,Avoid formatted prints,CppExternallyControlledFormatStringVulnerability
