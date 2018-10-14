@@ -19,11 +19,8 @@ public class JavaOverflowTest {
     @Test
     public void test() {
         List<Integer> locs = vuln.run(jana);
-        assertTrue(locs.size() == 4);
-        assertTrue(locs.contains(22));
-        assertTrue(locs.contains(13));
-        assertTrue(locs.contains(16));
+        assertTrue(locs.size() == 2);
         assertTrue(locs.contains(17));
-
+        assertTrue(locs.contains(19));
     }
 }
