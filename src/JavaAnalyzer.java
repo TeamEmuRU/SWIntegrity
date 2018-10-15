@@ -6,6 +6,8 @@
  * @author Jamie Tyler Walder
  */
 
+import com.sun.org.apache.xpath.internal.operations.VariableSafeAbsRef;
+
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -31,6 +33,8 @@ public class JavaAnalyzer extends Analyzer {
 	private Set<String> literalsList;
 	private Set<String> typeList;
 	private HashMap<String, ArrayList<Integer>> symbolToLine;
+	private HashMap<String, HashMap<Integer, String>> someMap;
+	private HashMap<Integer, String> lineToLine;
 	private Pattern NON_ALPHA_NUMERIC;
 	private int lineNumber = 1;
 	private String fileContents;
@@ -41,12 +45,14 @@ public class JavaAnalyzer extends Analyzer {
 	 * The main constructor. Initializes list of variables.
 	 */
 	public JavaAnalyzer() {
-		
+
 		//instantiate map of variables
 		variablesList = new HashSet<>();
 		literalsList = new HashSet<>();
 		typeList = new HashSet<>();
 		symbolToLine = new HashMap<>();
+		someMap = new HashMap<>();
+		lineToLine = new HashMap<>();
 		createTypeList();
 		//Create a regex pattern to catch special characters
 		String regex = "[\\W&&\\S]";
@@ -114,7 +120,6 @@ public class JavaAnalyzer extends Analyzer {
 		String finalString = s.trim().replaceAll("[\\n|\\t|\\r|\\f]", "");
 		//Separate all special characters
 		Matcher match = NON_ALPHA_NUMERIC.matcher(finalString);
-
 		Pattern alpha = Pattern.compile("\\.?\\w+");
 		Matcher mm = alpha.matcher(finalString);
 		while(mm.find()){
@@ -154,8 +159,8 @@ public class JavaAnalyzer extends Analyzer {
 	 *
 	 * @param s The line of code to extract variables from
 	 */
-	public void extractVariables(String s) {
-		SIT.notifyUser("Extracting Variables");
+	public void extractVariables(String s, int linenum) {
+
 		s = s.replace(" \\ t", "");
 		//Create an array of all words separated by a space
 		String words[] = s.split(" ");
@@ -165,6 +170,7 @@ public class JavaAnalyzer extends Analyzer {
 		Iterator<String> itty = list.iterator();
 		//set a switch to keep track of when we are in a string.
 		boolean stringSwitch = false;
+		HashMap<Integer, String> assignments = new HashMap<Integer, String>();
 		//the following loop removes Strings. In order to detect variables strings must not be present
 		while (itty.hasNext()) {
 			String word = itty.next();
@@ -187,6 +193,7 @@ public class JavaAnalyzer extends Analyzer {
 		String variableName = "[\\w$]+";
 		int scope = 0;
 		for(int i = 0; (i <= words.length - 4); i++) {
+			Variable v = null;
 			String name = "";
 			String type = "";
 			String assignment = "";
@@ -198,6 +205,7 @@ public class JavaAnalyzer extends Analyzer {
 			}
 			else{
 				if((typeList.contains(words[i]) || words[i].matches(className)) && words[i+1].matches(variableName) &&  (words[i+2].equals(";") || words[i+2].equals("="))){
+
 					name = words[i+1];
 					type = words[i];
 					if(words[i+2].equals("=")){
@@ -206,9 +214,18 @@ public class JavaAnalyzer extends Analyzer {
 							assignment += words[place] + " ";
 							place++;
 						}
+
+					}
+
+					if ((v = containsVarName(name)) == null) {
+						v = new Variable(name, type, Integer.toString(scope), linenum);
+					}
+					else {
+						v.getAssignments().put(linenum ,assignment);
 					}
 				}
 				else if((typeList.contains(words[i]) || words[i].matches(className)) && words[i+1].matches(variableName) && words[i+2].equals("[") && words[i+3].equals("]") && (words[i+4].equals("=") || words[i+4].equals(";"))){
+
 					name = words[i+1];
 					type = words[i] + "[]";
 					if(words[i+4].equals("=")){
@@ -217,9 +234,17 @@ public class JavaAnalyzer extends Analyzer {
 							assignment += words[place] + " ";
 							place++;
 						}
+
+						if ((v = containsVarName(name)) == null) {
+							v = new Variable(name, type, Integer.toString(scope), linenum);
+						}
+						else {
+							v.getAssignments().put(linenum ,assignment);
+						}
 					}
 				}
 				else if((typeList.contains(words[i]) || words[i].matches(className)) && words[i+1].equals("[") && words[i+2].equals("]") && words[i+3].equals(variableName) && (words[i+4].equals("=") || words[i+4].equals(";"))){
+
 					name = words[i+3];
 					type = words[i] + "[]";
 					if(words[i+4].equals("=")){
@@ -228,6 +253,32 @@ public class JavaAnalyzer extends Analyzer {
 							assignment += words[place] + " ";
 							place++;
 						}
+
+						if ((v = containsVarName(name)) == null) {
+							v = new Variable(name, type, Integer.toString(scope), linenum);
+						}
+						else {
+							v.getAssignments().put(linenum ,assignment);
+						}
+
+					}
+
+				}
+				else if (varEq(words[i])) {
+					if(words[i+1].contains("=") || words[i+1].equals("=")){
+						int place = i+2;
+						while(place<words.length&&place>-1&&!(words[place].equals(";")) && !(words[place] == null)) {
+							assignment += words[place] + " ";
+							place++;
+						}
+						for (Variable vr: variablesList) {
+							if (vr.getName().equals(words[i])) {
+								v = vr;
+								break;
+							}
+						}
+						v.getAssignments().put(linenum,assignment.trim().replaceAll(";","") );
+						return;
 					}
 				}
 				else if((typeList.contains(words[i]) || words[i].matches(className)) && words[i+1].equals("<")){
@@ -244,15 +295,39 @@ public class JavaAnalyzer extends Analyzer {
 						while(!(words[place].equals(";"))){
 							assignment += words[place] + " ";
 						}
+
+						if (someMap.size() == 0) {
+							someMap.put(name, new HashMap<>());
+						}
+						for (String vv: someMap.keySet()) {
+							if (vv.trim().equals(name.trim())) {
+								someMap.get(vv).put(linenum, assignment);
+							}
+							else {
+								someMap.put(vv, new HashMap<>());
+							}
+						}
 					}
 				}
+
 				if(!(name.equals(""))){
-					variablesList.add(new Variable(name, type, Integer.toString(scope), assignment + ";", 2));
+
+					if (v == null)
+						v = new Variable(name, type, Integer.toString(scope), i);
+					variablesList.add(v);
 				}
 			}
+
 		}
 	}
 
+	private boolean varEq(String s) {
+		for (Variable v : variablesList) {
+			if (v.getName().equals(s))
+				return true;
+		}
+		return false;
+	}
 	/**
 	 * Clears all lists of information to prepare the JavaAnalyzer for analyzing the next file.
 	 */
@@ -321,8 +396,9 @@ public class JavaAnalyzer extends Analyzer {
 				}
 
 				/* Second, extract the literals and variables: */
-
+				extractVariables(line.trim(), lineNumber);
 				extractLiterals(line.toCharArray());
+				lineToLine.put(lineNumber, line.trim().replace("null", ""));
 				line = flattenCode(line);
 				fileBuilder.append(line);
 				lineNumber++;
@@ -335,7 +411,6 @@ public class JavaAnalyzer extends Analyzer {
 			SIT.notifyUser("Error reading the contents of " + filename + ".");
 		}
 		fileContents=fileBuilder.toString();
-		extractVariables(fileBuilder.toString());
 		//temporary fix
 		Iterator<Variable> it = variablesList.iterator();
 		Matcher m;
@@ -348,6 +423,14 @@ public class JavaAnalyzer extends Analyzer {
 		}
 	}
 
+	private Variable containsVarName(String s) {
+		for (Variable v: variablesList) {
+			if (v.getName().equals(s)) {
+				return v;
+			}
+		}
+		return null;
+	}
 	/**
 	 * Parses a file, then runs known vulnerability algorithms against the file and
 	 * reports any detected vulnerabilities to a Reporter class.
@@ -362,7 +445,7 @@ public class JavaAnalyzer extends Analyzer {
 		try {
 			BufferedReader br = new BufferedReader(new FileReader(configPath));
 			String config = br.readLine();	//ignore the CSV header
-			
+
 			while((config = br.readLine())!=null&&!config.equals(",,,,,"))	//If the current line of the CVS is not null
 			{
 				String[] fields = config.split(",");	//Split at the comma because CSV
@@ -374,10 +457,10 @@ public class JavaAnalyzer extends Analyzer {
 						Report.addVuln(filename, "Java", fields[1], lines, fields[3], fields[4]);
 					}
 				}
-			}	
+			}
 		} catch (ClassNotFoundException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();	
+			e.printStackTrace();
 		} catch (NoSuchMethodException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -403,7 +486,7 @@ public class JavaAnalyzer extends Analyzer {
 			e.printStackTrace();
 		}
 	}
-	
+
 
 	/**
 	 * This method loads a jar file containing all known SIT vulnerabilities
@@ -424,7 +507,7 @@ public class JavaAnalyzer extends Analyzer {
 		//Create a new URL class using the jarPath variable stored in Analyzer
 		URL temp = new URL(jarPath);
 		URL[] jar = {temp};
-		
+
 		//Load the jar file and find the correct vulnerability within this jar
 		URLClassLoader jarLoader = new URLClassLoader(jar);
 		Class c = jarLoader.loadClass(className);
@@ -432,7 +515,7 @@ public class JavaAnalyzer extends Analyzer {
 		Method m = c.getDeclaredMethod("run", Analyzer.class);
 		return (List<Integer>) (m.invoke(c.newInstance(), this));
 	}
-	
+
 
 	public Set<String> getTypeList() {
 		return typeList;
@@ -469,15 +552,15 @@ public class JavaAnalyzer extends Analyzer {
 		//Line on which this variable is created
 		int lineNumber;
 		//line on which the assignment is followed by the reference
-		String assignments;
+		HashMap<Integer, String> assignments;
 
-		public Variable(String name, String type, String scope, String assignments, int line) {
+		public Variable(String name, String type, String scope, int line) {
 			super();
 			this.name = name;
 			this.type = type;
 			this.scope = scope;
 			this.lineNumber = line;
-			this.assignments = assignments;
+			this.assignments = new HashMap<>();
 		}
 
 		public String getName() {
@@ -512,11 +595,11 @@ public class JavaAnalyzer extends Analyzer {
 			this.lineNumber = line;
 		}
 
-		public String getAssignments() {
+		public HashMap<Integer, String> getAssignments() {
 			return assignments;
 		}
 
-		public void setAssignments(String assignments) {
+		public void setAssignments(HashMap<Integer, String> assignments) {
 			this.assignments = assignments;
 		}
 
@@ -568,4 +651,29 @@ public class JavaAnalyzer extends Analyzer {
 		}
 	}
 
+	public HashMap<Integer, String> getLineToLine() {
+		return lineToLine;
+	}
+
+	public String getUntilLine(int line) {
+		String code = "";
+		for (int i = 0; i <= line; i++) {
+			if (lineToLine.get(i) != null)
+				code += lineToLine.get(i);
+		}
+		return code;
+	}
+
+	public String getBetweenLines(int l1, int l2) {
+		String temp = "";
+
+		for (int i = l1; i <= l2; i++) {
+			if (lineToLine.get(i) != null)
+				temp += lineToLine.get(i);
+		}
+		return temp;
+	}
+	public HashMap<String, HashMap<Integer, String>> getSomeMap() {
+		return someMap;
+	}
 }
