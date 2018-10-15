@@ -1,5 +1,9 @@
 public class OverFlow {
 
+
+    public static int add(int a, int b) {
+        return a + b;
+    }
     public static void main(String args[]) {
 
     int a = 5000000;
@@ -13,7 +17,7 @@ public class OverFlow {
         c = a + b;
     }
 
-
+    int someInt = add(a, b);
     char j = 'a' + 'b';
 
     c = c + b;
